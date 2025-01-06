@@ -1,5 +1,5 @@
-from app.utils.constants import SEAS_DEPARTMENT_PEOPLE
 from app.utils.http_client import HttpClient
+from app.utils.institution_utils import InstitutionUtils
 
 import typing
 import logging
@@ -11,16 +11,16 @@ logger = logging.getLogger(__name__)
 CONTACT_BLOCK_NAME_A_TAG = '//a[contains(@class, "contact_block_name_link")]/@href'
 NO_RESULTS_DIV = '//div[contains(@class, "results_message_inner typography") and contains(text(), "There are no results matching these criteria.")]'
 
-class DepartmentScraper:
+class ProfileScraper:
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
 
-    def extract_faculty_profile_urls(self, base_url: str) -> typing.List[str]:
+    def extract_profile_endpoints_from_people_page(self, people_url: str) -> typing.List[str]:
         """
         Extracts faculty profile URLs from paginated department people pages.
 
         Args:
-            base_url (str): The base URL of the department's people page.
+            people_url (str): The base URL of the department's people page.
 
         Returns:
             list: A list of profile URLs.
@@ -30,7 +30,7 @@ class DepartmentScraper:
         MAX_PAGES = 100
 
         while page_number < MAX_PAGES:
-            page_url = f"{base_url}&page={page_number}"
+            page_url = f"{people_url}&page={page_number}"
             logger.info(f"Processing page {page_number}: {page_url}")
             try:
                 response = self.http_client.request('GET', page_url)
@@ -49,7 +49,7 @@ class DepartmentScraper:
 
 
 # http_client = HttpClient()
-# scraper = DepartmentScraper(http_client)
+# scraper = ProfileScraper(http_client)
 # URL = SEAS_DEPARTMENT_PEOPLE['Biomedical Engineering']
 # info = scraper.extract_faculty_profile_urls(URL)
 # print(info)
