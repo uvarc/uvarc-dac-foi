@@ -5,16 +5,14 @@ from requests.exceptions import RequestException, Timeout, HTTPError
 logger = logging.getLogger(__name__)
 
 class HttpClient:
-    """
-    Initializes the HTTP client facade.
+    def __init__(self, timeout=10, retries=3):
+        """
+       Initializes the HTTP client facade.
 
-    Args:
-        base_url (str): Base URL for the API.
-        timeout (int): Timeout in seconds for requests.
-        retries (int): Number of retries for transient errors.
-    """
-    def __init__(self, base_url, timeout=10, retries=3):
-        self.base_url = base_url
+       Args:
+           timeout (int): Timeout in seconds for requests.
+           retries (int): Number of retries for transient errors.
+       """
         self.timeout = timeout
         self.retries = retries
 
@@ -34,7 +32,7 @@ class HttpClient:
             Timeout: If the request times out.
             RequestException: For other types of request errors.
         """
-        url = self.base_url + endpoint if not endpoint.startswith("http") else endpoint
+        url = endpoint if not endpoint.startswith("http") else endpoint
 
         for attempt in range(self.retries):
             try:
