@@ -14,4 +14,9 @@ class InstitutionUtils:
 
     @staticmethod
     def get_people_page_urls_from_department(department: str) -> str:
-        return
+        school = InstitutionUtils.get_school_from_department(department)
+        return SCHOOL_DEPARTMENT_DATA[school]["departments"][department]["people_url"]
+
+    @staticmethod
+    def get_profile_url(base_url: str, profile_endpoint: str) -> str:
+        return f"{base_url}/{profile_endpoint}"

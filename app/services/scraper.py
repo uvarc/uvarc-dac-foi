@@ -9,13 +9,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 CONTACT_BLOCK_NAME_A_TAG = '//a[contains(@class, "contact_block_name_link")]/@href'
+EMAIL_A_TAG = "//a[contains(@class, 'people_meta_detail_info_link') and starts-with(@href, 'mailto:')]/@href"
 NO_RESULTS_DIV = '//div[contains(@class, "results_message_inner typography") and contains(text(), "There are no results matching these criteria.")]'
 
 class ProfileScraper:
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
 
-    def extract_profile_endpoints_from_people_page(self, people_url: str) -> typing.List[str]:
+    def get_profile_endpoints_from_people_page(self, people_url: str) -> typing.List[str]:
         """
         Extracts faculty profile URLs from paginated department people pages.
 
@@ -46,10 +47,3 @@ class ProfileScraper:
                 logger.error(f"Error processing page {page_number}: {e}")
                 break
         return profile_urls
-
-
-# http_client = HttpClient()
-# scraper = ProfileScraper(http_client)
-# URL = SEAS_DEPARTMENT_PEOPLE['Biomedical Engineering']
-# info = scraper.extract_faculty_profile_urls(URL)
-# print(info)
