@@ -119,13 +119,3 @@ class ProfileScraper:
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
         return []
-
-
-http_client = HttpClient()
-scraper = ProfileScraper(http_client)
-biomed_eng_people_url = InstitutionUtils.get_people_url_from_department("Biomedical Engineering")
-biomed_profile_endpoints = scraper.get_profile_endpoints_from_people(biomed_eng_people_url)
-endpoint = biomed_profile_endpoints[0]
-seas_base_url = InstitutionUtils.get_school_base_url("SEAS")
-profile_url = InstitutionUtils.get_profile_url(seas_base_url, endpoint)
-text = scraper.get_about_from_profile(profile_url)
