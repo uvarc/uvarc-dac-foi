@@ -1,10 +1,9 @@
-from requests import RequestException
+import requests
+import typing
+import logging
 
 from app.utils.http_client import HttpClient
 from app.utils.institution_utils import InstitutionUtils
-
-import typing
-import logging
 from lxml import html
 
 logging.basicConfig(level=logging.INFO)
@@ -20,6 +19,7 @@ class ProfileScraper:
         :param people_url: The base URL of the department's people page.
         :return list: A list of profile URLs.
         """
+
         if not InstitutionUtils.is_valid_url(people_url):
             logger.error(f'Invalid URL: {people_url}')
             return []
@@ -33,18 +33,29 @@ class ProfileScraper:
         while page_number < MAX_PAGES:
             page_url = f"{people_url}&page={page_number}"
             logger.info(f"Processing page {page_number}: {page_url}")
+
+            if not InstitutionUtils.is_valid_url(page_url):
+                logger.error(f'Invalid URL: {page_url}')
+                return profile_urls
+
             try:
                 response = self.http_client.request('GET', page_url)
+            except Exception:
+                return []
+
+            try:
                 tree = html.fromstring(response.content)
                 no_results = tree.xpath(NO_RESULTS_DIV)
                 if no_results:
                     logger.info(f"No results found for page {page_number}: {page_url}")
                     break
-                links = tree.xpath(CONTACT_BLOCK_NAME_A_TAG)
-                profile_urls.extend(links)
+                urls = tree.xpath(CONTACT_BLOCK_NAME_A_TAG)
+                profile_urls.extend(urls)
                 page_number += 1
+            except html.etree.XMLSyntaxError as e:
+                logger.error(f"Failed to parse HTML for {page_url}: {e}")
             except Exception as e:
-                logger.error(f"Error processing page {page_number}: {e}")
+                logger.error(f"Unexpected error processing page {page_number}: {e}")
                 break
         return profile_urls
 
@@ -56,17 +67,25 @@ class ProfileScraper:
         """
         if not InstitutionUtils.is_valid_url(profile_url):
             logger.error(f'Invalid URL: {profile_url}')
+            return []
 
-        emails = []
         EMAIL_A_TAG = "//a[contains(@class, 'people_meta_detail_info_link') and starts-with(@href, 'mailto:')]/@href"
 
         try:
             response = self.http_client.request('GET', profile_url)
+        except Exception:
+            return []
+
+        try:
             tree = html.fromstring(response.content)
-            emails = {email.replace("mailto:", "") for email in tree.xpath(EMAIL_A_TAG)}
+            raw_emails = tree.xpath(EMAIL_A_TAG)
+            emails = {email.replace("mailto:", "").strip() for email in raw_emails}
+            return list(emails)
+        except html.etree.XMLSyntaxError as e:
+            logger.error(f"Failed to parse HTML for {profile_url}: {e}")
         except Exception as e:
-            logger.error(f"Error processing page {profile_url}: {e}")
-        return list(emails)
+            logger.error(f"Unexpected error processing page {profile_url}: {e}")
+
 
 # http_client = HttpClient()
 # scraper = ProfileScraper(http_client)
