@@ -1,3 +1,5 @@
+
+
 SCHOOL_DEPARTMENT_DATA = {
     "SEAS": {
         "base_url": "https://engineering.virginia.edu",

@@ -1,4 +1,4 @@
-from constants import *
+from app.utils.constants import *
 
 class InstitutionUtils:
     @staticmethod
@@ -19,4 +19,4 @@ class InstitutionUtils:
 
     @staticmethod
     def get_profile_url(base_url: str, profile_endpoint: str) -> str:
-        return f"{base_url}/{profile_endpoint}"
+        return f"{base_url}{profile_endpoint}"
