@@ -1,4 +1,3 @@
-import requests
 import typing
 import logging
 
@@ -87,10 +86,12 @@ class ProfileScraper:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
 
 
-# http_client = HttpClient()
-# scraper = ProfileScraper(http_client)
-# biomed_eng_people_url = InstitutionUtils.get_people_url_from_department("Biomedical Engineering")
-# biomed_profile_endpoints = scraper.get_profile_endpoints_from_people_page(biomed_eng_people_url)
-# endpoint = biomed_profile_endpoints[0]
-# seas_base_url = InstitutionUtils.get_school_base_url("SEAS")
-# profile_url = InstitutionUtils.get_profile_url(seas_base_url, endpoint)
+http_client = HttpClient()
+scraper = ProfileScraper(http_client)
+biomed_eng_people_url = InstitutionUtils.get_people_url_from_department("Biomedical Engineering")
+biomed_profile_endpoints = scraper.get_profile_endpoints_from_people_page(biomed_eng_people_url)
+endpoint = biomed_profile_endpoints[0]
+seas_base_url = InstitutionUtils.get_school_base_url("SEAS")
+profile_url = InstitutionUtils.get_profile_url(seas_base_url, endpoint)
+emails = scraper.get_emails_from_profile(profile_url)
+print(emails)
