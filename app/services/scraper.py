@@ -33,10 +33,6 @@ class ProfileScraper:
             page_url = f"{people_url}&page={page_number}"
             logger.info(f"Processing page {page_number}: {page_url}")
 
-            if not InstitutionUtils.is_valid_url(page_url):
-                logger.error(f'Invalid URL: {page_url}')
-                return profile_urls
-
             try:
                 response = self.http_client.request('GET', page_url)
             except Exception:
@@ -83,7 +79,6 @@ class ProfileScraper:
             logger.error(f"Failed to parse HTML for {profile_url}: {e}")
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
-
 
     def get_about_from_profile(self, profile_url: str) -> typing.List[str]:
         """
