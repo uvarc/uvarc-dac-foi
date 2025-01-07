@@ -78,7 +78,7 @@ class SEASScraper:
 
         try:
             tree = html.fromstring(response.content)
-            raw_emails = tree.xpath(ProfileScraper.EMAIL_XPATH)
+            raw_emails = tree.xpath(self.EMAIL_XPATH)
             emails = {email.replace("mailto:", "").strip() for email in raw_emails}
             return list(emails)
         except html.etree.XMLSyntaxError as e:
