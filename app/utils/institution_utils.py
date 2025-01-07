@@ -13,7 +13,7 @@ class InstitutionUtils:
         return SCHOOL_DEPARTMENT_DATA[school].get("base_url", "UNKNOWN")
 
     @staticmethod
-    def get_people_page_urls_from_department(department: str) -> str:
+    def get_people_url_from_department(department: str) -> str:
         school = InstitutionUtils.get_school_from_department(department)
         return SCHOOL_DEPARTMENT_DATA[school]["departments"][department]["people_url"]
 
