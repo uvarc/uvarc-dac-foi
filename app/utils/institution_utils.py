@@ -1,5 +1,7 @@
 from app.utils.constants import *
 
+import re
+
 class InstitutionUtils:
     @staticmethod
     def get_school_from_department(department: str) -> str:
@@ -20,3 +22,7 @@ class InstitutionUtils:
     @staticmethod
     def get_profile_url(base_url: str, profile_endpoint: str) -> str:
         return f"{base_url}{profile_endpoint}"
+
+    @staticmethod
+    def is_valid_url(url: str) -> bool:
+        return bool(re.match(r"^https?://[^\s/$.?#].[^\s]*$", url))

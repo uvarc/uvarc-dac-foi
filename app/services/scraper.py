@@ -20,6 +20,10 @@ class ProfileScraper:
         :param people_url: The base URL of the department's people page.
         :return list: A list of profile URLs.
         """
+        if not InstitutionUtils.is_valid_url(people_url):
+            logger.error(f'Invalid URL: {people_url}')
+            return []
+
         page_number = 0
         profile_urls = []
         MAX_PAGES = 100
@@ -50,8 +54,12 @@ class ProfileScraper:
         :param profile_url: the URL to the profile page
         :return emails: list of emails contained in the profile page
         """
+        if not InstitutionUtils.is_valid_url(profile_url):
+            logger.error(f'Invalid URL: {profile_url}')
+
         emails = []
         EMAIL_A_TAG = "//a[contains(@class, 'people_meta_detail_info_link') and starts-with(@href, 'mailto:')]/@href"
+
         try:
             response = self.http_client.request('GET', profile_url)
             tree = html.fromstring(response.content)
