@@ -8,7 +8,7 @@ from lxml import html
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class ProfileScraper:
+class SEASScraper:
     NO_RESULTS_XPATH = '//div[contains(@class, "results_message_inner typography") and contains(text(), "There are no results matching these criteria.")]'
     CONTACT_BLOCK_NAME_XPATH = '//a[contains(@class, "contact_block_name_link")]/@href'
     EMAIL_XPATH = "//a[contains(@class, 'people_meta_detail_info_link') and starts-with(@href, 'mailto:')]/@href"
