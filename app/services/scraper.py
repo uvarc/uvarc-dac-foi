@@ -19,12 +19,8 @@ class ProfileScraper:
     def get_profile_endpoints_from_people_page(self, people_url: str) -> typing.List[str]:
         """
         Extracts faculty profile URLs from paginated department people pages.
-
-        Args:
-            people_url (str): The base URL of the department's people page.
-
-        Returns:
-            list: A list of profile URLs.
+        :param people_url: The base URL of the department's people page.
+        :return list: A list of profile URLs.
         """
         page_number = 0
         profile_urls = []
@@ -47,3 +43,10 @@ class ProfileScraper:
                 logger.error(f"Error processing page {page_number}: {e}")
                 break
         return profile_urls
+
+    def get_emails_from_profile(self, profile_url: str) -> typing.List[str]:
+        """
+        Extracts emails from profile URLs.
+        :param profile_url:
+        :return:
+        """
