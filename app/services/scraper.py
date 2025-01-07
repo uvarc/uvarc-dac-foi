@@ -20,7 +20,7 @@ class ProfileScraper:
         self.http_client = http_client
 
 
-    def get_profile_endpoints_from_people_page(self, people_url: str, max_pages: int =100) -> typing.List[str]:
+    def get_profile_endpoints_from_people(self, people_url: str, max_pages: int =100) -> typing.List[str]:
         """
         Extracts faculty profile URLs from paginated department people pages.
         :param people_url: The base URL of the department's people page.
@@ -124,7 +124,7 @@ class ProfileScraper:
 http_client = HttpClient()
 scraper = ProfileScraper(http_client)
 biomed_eng_people_url = InstitutionUtils.get_people_url_from_department("Biomedical Engineering")
-biomed_profile_endpoints = scraper.get_profile_endpoints_from_people_page(biomed_eng_people_url)
+biomed_profile_endpoints = scraper.get_profile_endpoints_from_people(biomed_eng_people_url)
 endpoint = biomed_profile_endpoints[0]
 seas_base_url = InstitutionUtils.get_school_base_url("SEAS")
 profile_url = InstitutionUtils.get_profile_url(seas_base_url, endpoint)
