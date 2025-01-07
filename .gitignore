@@ -2,3 +2,5 @@
 venv/
 .DS_Store/
 */.DS_Store/
+app/services/__pycache__/
+app/utils/__pycache__/
