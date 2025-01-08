@@ -9,7 +9,6 @@ from lxml import html
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 class SEASScraper(BaseScraper):
     NO_RESULTS_XPATH = '//div[contains(@class, "results_message_inner typography") and contains(text(), "There are no results matching these criteria.")]'
     CONTACT_BLOCK_NAME_XPATH = '//a[contains(@class, "contact_block_name_link")]/@href'
@@ -19,7 +18,7 @@ class SEASScraper(BaseScraper):
     ABOUT_XPATH = "//h2[text()='About']/following-sibling::*"
 
     def __init__(self, http_client: HttpClient):
-        self.department = "SEAS"
+        self.school_id = "SEAS"
         self.http_client = http_client
 
     def get_profile_endpoints_from_people(self, people_url: str, max_pages: int =100) -> typing.List[str]:
