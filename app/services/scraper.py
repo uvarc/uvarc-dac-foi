@@ -5,7 +5,6 @@ from app.utils.http_client import HttpClient
 from app.utils.institution_utils import InstitutionUtils
 from app.utils.base_scraper import BaseScraper
 from lxml import html
-from abc import abstractmethod, ABC
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
