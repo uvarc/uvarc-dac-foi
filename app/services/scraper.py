@@ -4,11 +4,51 @@ import logging
 from app.utils.http_client import HttpClient
 from app.utils.institution_utils import InstitutionUtils
 from lxml import html
+from abc import abstractmethod, ABC
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class SEASScraper:
+
+class BaseScraper(ABC):
+    @abstractmethod
+    def get_profile_endpoints_from_people(self, people_url: str, max_pages: int=100) -> typing.List[str]:
+        """
+        Extracts faculty profile URLs from paginated department people pages.
+        :param people_url: The base URL of the department's people page.
+        :param max_pages: The maximum number of pages requested before timeout
+        :return list: A list of profile URLs.
+        """
+        pass
+
+    @abstractmethod
+    def get_emails_from_profile(self, profile_url: str) -> typing.List[str]:
+        """
+        Extracts emails from profile URLs.
+        :param profile_url: the URL to the profile page
+        :return emails: list of emails contained in the profile page
+        """
+        pass
+
+    @abstractmethod
+    def get_about_from_profile(self, profile_url: str) -> typing.List[str]:
+        """
+        Extracts about from profile URLs.
+        :param profile_url: the URL to the profile page
+        :return: About Section text for profile
+        """
+        pass
+
+    @abstractmethod
+    def get_name_from_profile(self, profile_url: str) -> str:
+        """
+        Extracts name from profile URLs.
+        :param profile_url: profile URL
+        :return: faculty name string
+        """
+        pass
+
+class SEASScraper(BaseScraper):
     NO_RESULTS_XPATH = '//div[contains(@class, "results_message_inner typography") and contains(text(), "There are no results matching these criteria.")]'
     CONTACT_BLOCK_NAME_XPATH = '//a[contains(@class, "contact_block_name_link")]/@href'
     EMAIL_XPATH = "//a[contains(@class, 'people_meta_detail_info_link') and starts-with(@href, 'mailto:')]/@href"
@@ -17,17 +57,11 @@ class SEASScraper:
     ABOUT_XPATH = "//h2[text()='About']/following-sibling::*"
 
     def __init__(self, http_client: HttpClient):
+        self.department = "SEAS"
         self.http_client = http_client
 
 
     def get_profile_endpoints_from_people(self, people_url: str, max_pages: int =100) -> typing.List[str]:
-        """
-        Extracts faculty profile URLs from paginated department people pages.
-        :param people_url: The base URL of the department's people page.
-        :param max_pages: The maximum number of pages requested before timeout
-        :return list: A list of profile URLs.
-        """
-
         if not InstitutionUtils.is_valid_url(people_url):
             logger.error(f'Invalid URL: {people_url}')
             return []
@@ -62,11 +96,6 @@ class SEASScraper:
 
 
     def get_emails_from_profile(self, profile_url: str) -> typing.List[str]:
-        """
-        Extracts emails from profile URLs.
-        :param profile_url: the URL to the profile page
-        :return emails: list of emails contained in the profile page
-        """
         if not InstitutionUtils.is_valid_url(profile_url):
             logger.error(f'Invalid URL: {profile_url}')
             return []
@@ -88,11 +117,6 @@ class SEASScraper:
 
 
     def get_about_from_profile(self, profile_url: str) -> typing.List[str]:
-        """
-        Extracts about from profile URLs.
-        :param profile_url: the URL to the profile page
-        :return: About Section text for profile
-        """
         if not InstitutionUtils.is_valid_url(profile_url):
             logger.error(f'Invalid URL: {profile_url}')
             return []
@@ -119,3 +143,13 @@ class SEASScraper:
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
         return []
+
+
+    def get_name_from_profile(self, profile_url: str) -> str:
+        if not InstitutionUtils.is_valid_url(profile_url):
+            logger.error(f'Invalid URL: {profile_url}')
+            return ""
+        endpoint = profile_url.split("/")[-1]
+        return " ".join(name.capitalize() for name in endpoint.split("-"))
+
+
