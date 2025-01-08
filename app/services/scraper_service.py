@@ -19,5 +19,10 @@ class ScraperService:
         school_base_url = InstitutionUtils.get_school_base_url(school)
 
     def _select_scraper(self, department: str) -> BaseScraper:
+        """
+        Select scraper based on department
+        :param department: UVA school department e.g. Biomedical Engineering
+        :return: scraper instance corresponding to given department
+        """
         school_id = InstitutionUtils.get_school_from_department(department)
         return next(scraper for scraper in self.scrapers if scraper.SCHOOL_ID == school_id)
