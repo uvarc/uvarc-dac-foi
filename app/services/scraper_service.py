@@ -17,10 +17,9 @@ class ScraperService:
         school = InstitutionUtils.get_school_from_department(department)
         school_base_url = InstitutionUtils.get_school_base_url(school)
 
-
-    def _select_scraper(self, department: str):
-
-
+    def _select_scraper(self, department: str) -> BaseScraper:
+        school_id = InstitutionUtils.get_school_from_department(department)
+        return next(scraper for scraper in self.scrapers if scraper.SCHOOL_ID == school_id)
 
 if __name__ == '__main__':
     from app.utils.http_client import HttpClient
