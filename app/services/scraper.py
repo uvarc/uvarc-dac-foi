@@ -3,50 +3,13 @@ import logging
 
 from app.utils.http_client import HttpClient
 from app.utils.institution_utils import InstitutionUtils
+from app.utils.base_scraper import BaseScraper
 from lxml import html
 from abc import abstractmethod, ABC
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-class BaseScraper(ABC):
-    @abstractmethod
-    def get_profile_endpoints_from_people(self, people_url: str, max_pages: int=100) -> typing.List[str]:
-        """
-        Extracts faculty profile URLs from paginated department people pages.
-        :param people_url: The base URL of the department's people page.
-        :param max_pages: The maximum number of pages requested before timeout
-        :return list: A list of profile URLs.
-        """
-        pass
-
-    @abstractmethod
-    def get_emails_from_profile(self, profile_url: str) -> typing.List[str]:
-        """
-        Extracts emails from profile URLs.
-        :param profile_url: the URL to the profile page
-        :return emails: list of emails contained in the profile page
-        """
-        pass
-
-    @abstractmethod
-    def get_about_from_profile(self, profile_url: str) -> typing.List[str]:
-        """
-        Extracts about from profile URLs.
-        :param profile_url: the URL to the profile page
-        :return: About Section text for profile
-        """
-        pass
-
-    @abstractmethod
-    def get_name_from_profile(self, profile_url: str) -> str:
-        """
-        Extracts name from profile URLs.
-        :param profile_url: profile URL
-        :return: faculty name string
-        """
-        pass
 
 class SEASScraper(BaseScraper):
     NO_RESULTS_XPATH = '//div[contains(@class, "results_message_inner typography") and contains(text(), "There are no results matching these criteria.")]'
