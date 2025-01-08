@@ -10,13 +10,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class SEASScraper(BaseScraper):
+    SCHOOL_ID = "SEAS"
     NO_RESULTS_XPATH = '//div[contains(@class, "results_message_inner typography") and contains(text(), "There are no results matching these criteria.")]'
     CONTACT_BLOCK_NAME_XPATH = '//a[contains(@class, "contact_block_name_link")]/@href'
     EMAIL_XPATH = "//a[contains(@class, 'people_meta_detail_info_link') and starts-with(@href, 'mailto:')]/@href"
     EDUCATION_XPATH = "//h2[text()='Education']"
     ABOUT_AND_EDUCATION_XPATH = "//h2[text()='About']/following-sibling::*[following-sibling::h2[text()='Education']]"
     ABOUT_XPATH = "//h2[text()='About']/following-sibling::*"
-    SCHOOL_ID = "SEAS"
 
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
