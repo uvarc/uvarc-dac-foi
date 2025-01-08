@@ -12,20 +12,12 @@ class ScraperService:
         :param department: school department e.g. Biomedical Engineering (Dept of SEAS)
         :return: dataframe containing the faculty name, email address, about section, and SEAS website
         """
+        scraper = self._select_scraper(department)
         people_url = InstitutionUtils.get_people_url_from_department(department)
-        profile_endpoints = seas_scraper.get_profile_endpoints_from_people(people_url)
+        profile_endpoints = scraper.get_profile_endpoints_from_people(people_url)
         school = InstitutionUtils.get_school_from_department(department)
         school_base_url = InstitutionUtils.get_school_base_url(school)
 
     def _select_scraper(self, department: str) -> BaseScraper:
         school_id = InstitutionUtils.get_school_from_department(department)
         return next(scraper for scraper in self.scrapers if scraper.SCHOOL_ID == school_id)
-
-if __name__ == '__main__':
-    from app.utils.http_client import HttpClient
-    from app.services.scraper import SEASScraper
-    seas_scraper = SEASScraper(http_client=HttpClient())
-    scrapers = [seas_scraper]
-    service = ScraperService(scrapers)
-    print(service.get_department_info("Biomedical Engineering"))
-
