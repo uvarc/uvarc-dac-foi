@@ -16,9 +16,9 @@ class SEASScraper(BaseScraper):
     EDUCATION_XPATH = "//h2[text()='Education']"
     ABOUT_AND_EDUCATION_XPATH = "//h2[text()='About']/following-sibling::*[following-sibling::h2[text()='Education']]"
     ABOUT_XPATH = "//h2[text()='About']/following-sibling::*"
+    SCHOOL_ID = "SEAS"
 
     def __init__(self, http_client: HttpClient):
-        self.school_id = "SEAS"
         self.http_client = http_client
 
     def get_profile_endpoints_from_people(self, people_url: str, max_pages: int =100) -> typing.List[str]:
