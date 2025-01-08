@@ -60,7 +60,6 @@ class SEASScraper(BaseScraper):
         self.department = "SEAS"
         self.http_client = http_client
 
-
     def get_profile_endpoints_from_people(self, people_url: str, max_pages: int =100) -> typing.List[str]:
         if not InstitutionUtils.is_valid_url(people_url):
             logger.error(f'Invalid URL: {people_url}')
@@ -94,7 +93,6 @@ class SEASScraper(BaseScraper):
                 break
         return profile_urls
 
-
     def get_emails_from_profile(self, profile_url: str) -> typing.List[str]:
         if not InstitutionUtils.is_valid_url(profile_url):
             logger.error(f'Invalid URL: {profile_url}')
@@ -114,7 +112,6 @@ class SEASScraper(BaseScraper):
             logger.error(f"Failed to parse HTML for {profile_url}: {e}")
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
-
 
     def get_about_from_profile(self, profile_url: str) -> typing.List[str]:
         if not InstitutionUtils.is_valid_url(profile_url):
@@ -143,7 +140,6 @@ class SEASScraper(BaseScraper):
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
         return []
-
 
     def get_name_from_profile(self, profile_url: str) -> str:
         if not InstitutionUtils.is_valid_url(profile_url):
