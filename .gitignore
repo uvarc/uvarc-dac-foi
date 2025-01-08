@@ -4,3 +4,4 @@ venv/
 */.DS_Store/
 app/services/__pycache__/
 app/utils/__pycache__/
+**/__pycache__/
