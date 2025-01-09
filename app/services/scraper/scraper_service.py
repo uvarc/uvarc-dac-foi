@@ -35,6 +35,8 @@ class ScraperService:
 
             faculty_data.append({
                 "Faculty Name": name,
+                "School": school,
+                "Department": department,
                 "Email Address": emails,
                 "About Section": about,
                 "Profile URL": profile_url,
