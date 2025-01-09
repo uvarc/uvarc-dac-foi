@@ -1,4 +1,4 @@
-from app.utils.constants import *
+from app.core.constants import *
 
 import re
 

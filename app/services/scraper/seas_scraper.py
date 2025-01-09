@@ -3,7 +3,7 @@ import logging
 
 from app.utils.http_client import HttpClient
 from app.utils.institution_utils import InstitutionUtils
-from app.utils.base_scraper import BaseScraper
+from app.services.scraper.base_scraper import BaseScraper
 from lxml import html
 
 logging.basicConfig(level=logging.INFO)
