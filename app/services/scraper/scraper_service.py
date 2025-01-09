@@ -2,7 +2,7 @@ import typing
 import logging
 import pandas as pd
 
-from app.services.scraper import BaseScraper
+from app.services.scraper.base_scraper import BaseScraper
 from app.utils.institution_utils import InstitutionUtils
 
 logging.basicConfig(level=logging.INFO)
@@ -59,13 +59,3 @@ class ScraperService:
             return obj == ""
         if isinstance(obj, list):
             return obj == []
-
-
-if __name__ == '__main__':
-    from app.utils.http_client import HttpClient
-    from app.services.scraper import SEASScraper
-
-    seas_scraper = SEASScraper(HttpClient())
-    scrapers = [seas_scraper]
-    service = ScraperService(scrapers)
-    print(service.get_department_faculty_data('Biomedical Engineering'))
