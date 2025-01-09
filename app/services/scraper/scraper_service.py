@@ -4,6 +4,7 @@ import pandas as pd
 
 from app.services.scraper.base_scraper import BaseScraper
 from app.utils.institution_utils import InstitutionUtils
+from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -11,6 +12,13 @@ logger = logging.getLogger(__name__)
 class ScraperService:
     def __init__(self, scrapers: typing.List[BaseScraper]):
         self.scrapers = scrapers
+
+    def get_school_faculty_data(self, school: str) -> typing.List[pd.DataFrame]:
+        departments = InstitutionUtils.get_departments_from_school(school)
+        logger.info(f"Fetching school faculty data for school: {school}")
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            departments_data = list(executor.map(self.get_department_faculty_data, departments))
+        return departments_data
 
     def get_department_faculty_data(self, department: str) -> pd.DataFrame:
         """
@@ -23,7 +31,7 @@ class ScraperService:
         school = InstitutionUtils.get_school_from_department(department)
         school_base_url = InstitutionUtils.get_school_base_url(school)
 
-        logger.info(f"Extracting faculty profile endpoints from {department} webpage")
+        logger.info(f"Scraping faculty profile endpoints from {department} webpage")
         profile_endpoints = scraper.get_profile_endpoints_from_people(people_url)
 
         faculty_data = []
