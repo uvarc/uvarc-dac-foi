@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 class BaseScraper(ABC):
     SCHOOL_ID: str
 
+    # TODO: scrape research interests from profile
+
     @abstractmethod
     def get_profile_endpoints_from_people(self, people_url: str, max_pages: int=100) -> typing.List[str]:
         """
