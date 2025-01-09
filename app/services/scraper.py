@@ -74,15 +74,15 @@ class SEASScraper(BaseScraper):
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
 
-    def get_about_from_profile(self, profile_url: str) -> typing.List[str]:
+    def get_about_from_profile(self, profile_url: str) -> str:
         if not InstitutionUtils.is_valid_url(profile_url):
             logger.error(f'Invalid URL: {profile_url}')
-            return []
+            return "UNKNOWN"
 
         try:
             response = self.http_client.request('GET', profile_url)
         except Exception:
-            return []
+            return "UNKNOWN"
 
         try:
             tree = html.fromstring(response.content)
@@ -94,13 +94,13 @@ class SEASScraper(BaseScraper):
             about_content = [element.text_content().strip() for element in raw_about if element.text_content().strip()]
             if about_content:
                 logger.info(f"Extract About section text for profile: {profile_url}")
-                return about_content
+                return "\n".join(about_content)
             else:
                 logger.warning(f"No About section text found for profile: {profile_url}")
-                return []
+                return "UNKNOWN"
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
-        return []
+        return "UNKNOWN"
 
     def get_name_from_profile(self, profile_url: str) -> str:
         if not InstitutionUtils.is_valid_url(profile_url):
