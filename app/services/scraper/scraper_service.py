@@ -3,8 +3,10 @@ import logging
 import pandas as pd
 
 from app.services.scraper.base_scraper import BaseScraper
+from app.services.scraper.seas_scraper import SEASScraper
+from app.utils.http_client import HttpClient
 from app.utils.institution_utils import InstitutionUtils
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -13,12 +15,35 @@ class ScraperService:
     def __init__(self, scrapers: typing.List[BaseScraper]):
         self.scrapers = scrapers
 
-    def get_school_faculty_data(self, school: str) -> typing.List[pd.DataFrame]:
+    def get_school_faculty_data(self, school: str) -> typing.Dict[str, pd.DataFrame]:
+        """
+        Fetch school faculty data
+        :param school:
+        :return:
+        """
         departments = InstitutionUtils.get_departments_from_school(school)
         logger.info(f"Fetching school faculty data for school: {school}")
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            departments_data = list(executor.map(self.get_department_faculty_data, departments))
-        return departments_data
+
+        try:
+            with ThreadPoolExecutor(max_workers=10) as executor:
+                future_to_department = {
+                    executor.submit(self.get_department_faculty_data, dept): dept for dept in departments
+                }
+                school_data = {}
+                for future in as_completed(future_to_department):
+                    department = future_to_department[future]
+                    try:
+                        data = future.result()
+                        school_data[department] = data
+                    except Exception as e:
+                        logger.critical(f"Error fetching data for department: {department}: {e}")
+                        raise RuntimeError(f"Data generation failed for department: {department}") from e
+            return school_data
+        except Exception as e:
+            logger.critical(f"Failed to fetch school faculty data for school: {school}")
+            raise
+
+
 
     def get_department_faculty_data(self, department: str) -> pd.DataFrame:
         """
