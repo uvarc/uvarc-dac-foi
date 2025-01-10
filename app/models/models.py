@@ -26,6 +26,7 @@ class Faculty(db.Model):
     profile_url = db.Column(db.String(500), nullable=False)
     department_id = db.Column(db.Integer, db.ForeignKey("department.id"), nullable=False)
     department = db.relationship('Department', backref=db.backref("faculty", lazy=True))
+    embedding_id = db.Column(db.Integer, nullable=False, unique=True)
 
 class FacultyEmail(db.Model):
     __tablename__ = "faculty_email"
