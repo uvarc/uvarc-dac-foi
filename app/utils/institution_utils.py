@@ -17,7 +17,7 @@ class InstitutionUtils:
 
     @staticmethod
     def get_school_base_url(school: str) -> str:
-        return SCHOOL_DEPARTMENT_DATA[school].get("base_url", "UNKNOWN")
+        return SCHOOL_DEPARTMENT_DATA[school]["base_url"]
 
     @staticmethod
     def get_people_url_from_department(department: str) -> str:
