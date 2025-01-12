@@ -36,10 +36,6 @@ class SEASScraper(BaseScraper):
 
             try:
                 response = self.http_client.get(page_url)
-            except Exception:
-                raise
-
-            try:
                 tree = html.fromstring(response.content)
                 no_results = tree.xpath(self.NO_RESULTS_XPATH)
                 if no_results:
@@ -70,10 +66,6 @@ class SEASScraper(BaseScraper):
 
         try:
             response = self.http_client.get(profile_url)
-        except Exception:
-            raise
-
-        try:
             tree = html.fromstring(response.content)
             raw_emails = tree.xpath(self.EMAIL_XPATH)
             emails = {email.replace("mailto:", "").strip() for email in raw_emails}
@@ -92,10 +84,6 @@ class SEASScraper(BaseScraper):
 
         try:
             response = self.http_client.get(profile_url)
-        except Exception:
-            raise
-
-        try:
             tree = html.fromstring(response.content)
             raw_education = tree.xpath(self.EDUCATION_XPATH)
             if raw_education:
@@ -108,7 +96,7 @@ class SEASScraper(BaseScraper):
                 return "\n".join(about_content)
             else:
                 logger.warning(f"No About section text found for profile: {profile_url}")
-                raise
+                return ""
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
             raise
@@ -120,10 +108,6 @@ class SEASScraper(BaseScraper):
 
         try:
             response = self.http_client.get(profile_url)
-        except Exception:
-            raise
-
-        try:
             tree = html.fromstring(response.content)
             raw_research_interests = tree.xpath(self.RESEARCH_INTERESTS_XPATH)
             research_interests = [element.text_content().strip() for element in raw_research_interests if element.text_content().strip()]
