@@ -4,8 +4,6 @@ from abc import ABC, abstractmethod
 class BaseScraper(ABC):
     SCHOOL_ID: str
 
-    # TODO: scrape research interests from profile
-
     @abstractmethod
     def get_profile_endpoints_from_people(self, people_url: str, max_pages: int=100) -> typing.List[str]:
         """
@@ -40,5 +38,14 @@ class BaseScraper(ABC):
         Extracts name from profile URLs.
         :param profile_url: profile URL
         :return: faculty name string
+        """
+        pass
+
+    @abstractmethod
+    def get_research_interests_from_profile(self, profile_url: str) -> typing.List[str]:
+        """
+        Extracts research interests from profile URLs.
+        :param profile_url:
+        :return: list of research interests
         """
         pass

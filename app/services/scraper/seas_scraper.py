@@ -17,6 +17,7 @@ class SEASScraper(BaseScraper):
     EDUCATION_XPATH = "//h2[text()='Education']"
     ABOUT_AND_EDUCATION_XPATH = "//h2[text()='About']/following-sibling::*[following-sibling::h2[text()='Education']]"
     ABOUT_XPATH = "//h2[text()='About']/following-sibling::*"
+    RESEARCH_INTERESTS_XPATH = "//h2[normalize-space(text())='Research Interests']/following-sibling::div[@class='directory_grid_items']//div[@class='directory_grid_item']"
 
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
@@ -34,7 +35,7 @@ class SEASScraper(BaseScraper):
             logger.info(f"Processing page {page_number}: {page_url}")
 
             try:
-                response = self.http_client.request('GET', page_url)
+                response = self.http_client.get(page_url)
             except Exception:
                 raise
 
@@ -68,7 +69,7 @@ class SEASScraper(BaseScraper):
             raise
 
         try:
-            response = self.http_client.request('GET', profile_url)
+            response = self.http_client.get(profile_url)
         except Exception:
             raise
 
@@ -90,7 +91,7 @@ class SEASScraper(BaseScraper):
             raise
 
         try:
-            response = self.http_client.request('GET', profile_url)
+            response = self.http_client.get(profile_url)
         except Exception:
             raise
 
@@ -112,4 +113,24 @@ class SEASScraper(BaseScraper):
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
             raise
 
+    def get_research_interests_from_profile(self, profile_url: str) -> typing.List[str]:
+        if not InstitutionUtils.is_valid_url(profile_url):
+            logger.error(f'Invalid URL: {profile_url}')
+            raise
 
+        try:
+            response = self.http_client.get(profile_url)
+        except Exception:
+            raise
+
+        try:
+            tree = html.fromstring(response.content)
+            raw_research_interests = tree.xpath(self.RESEARCH_INTERESTS_XPATH)
+            research_interests = [element.text_content().strip() for element in raw_research_interests if element.text_content().strip()]
+            return research_interests
+        except html.etree.XMLSyntaxError as e:
+            logger.error(f"Failed to parse HTML for {profile_url}: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error processing page {profile_url}: {e}")
+            raise
