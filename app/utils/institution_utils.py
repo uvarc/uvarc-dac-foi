@@ -25,8 +25,8 @@ class InstitutionUtils:
         return SCHOOL_DEPARTMENT_DATA[school]["departments"][department]["people_url"]
 
     @staticmethod
-    def make_profile_url(base_url: str, profile_endpoint: str) -> str:
-        return f"{base_url}{profile_endpoint}"
+    def make_profile_url(people_url: str, profile_endpoint: str) -> str:
+        return f"{people_url}{profile_endpoint}"
 
     @staticmethod
     def is_valid_url(url: str) -> bool:
