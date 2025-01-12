@@ -3,8 +3,6 @@ import logging
 import pandas as pd
 
 from app.services.scraper.base_scraper import BaseScraper
-from app.services.scraper.seas_scraper import SEASScraper
-from app.utils.http_client import HttpClient
 from app.utils.institution_utils import InstitutionUtils
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -62,9 +60,9 @@ class ScraperService:
         faculty_data = []
         for endpoint in profile_endpoints:
             profile_url = InstitutionUtils.make_profile_url(school_base_url, endpoint)
-            name = scraper.get_name_from_profile(profile_url) or "UNKNOWN"
-            emails = ", ".join(scraper.get_emails_from_profile(profile_url)) or ["UNKNOWN"]
-            about = scraper.get_about_from_profile(profile_url) or "UNKNOWN"
+            name = scraper.get_name_from_profile(profile_url)
+            emails = ", ".join(scraper.get_emails_from_profile(profile_url))
+            about = scraper.get_about_from_profile(profile_url)
 
             faculty_data.append({
                 "Faculty Name": name,
