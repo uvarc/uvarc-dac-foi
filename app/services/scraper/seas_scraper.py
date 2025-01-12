@@ -24,8 +24,7 @@ class SEASScraper(BaseScraper):
 
     def get_profile_endpoints_from_people(self, people_url: str, max_pages: int =100) -> typing.List[str]:
         if not InstitutionUtils.is_valid_url(people_url):
-            logger.error(f'Invalid URL: {people_url}')
-            raise ValueError("Invalid URL")
+            raise ValueError(f"Invalid URL: {people_url}")
 
         page_number = 0
         profile_urls = []
@@ -54,15 +53,14 @@ class SEASScraper(BaseScraper):
 
     def get_name_from_profile(self, profile_url: str) -> str:
         if not InstitutionUtils.is_valid_url(profile_url):
-            logger.error(f'Invalid URL: {profile_url}')
-            raise
+            raise ValueError(f"Invalid URL: {profile_url}")
+
         endpoint = profile_url.split("/")[-1]
         return " ".join(name.capitalize() for name in endpoint.split("-"))
 
     def get_emails_from_profile(self, profile_url: str) -> typing.List[str]:
         if not InstitutionUtils.is_valid_url(profile_url):
-            logger.error(f'Invalid URL: {profile_url}')
-            raise ValueError("Invalid URL")
+            raise ValueError(f"Invalid URL: {profile_url}")
 
         try:
             response = self.http_client.get(profile_url)
@@ -79,8 +77,7 @@ class SEASScraper(BaseScraper):
 
     def get_about_from_profile(self, profile_url: str) -> str:
         if not InstitutionUtils.is_valid_url(profile_url):
-            logger.error(f'Invalid URL: {profile_url}')
-            raise ValueError("Invalid URL")
+            raise ValueError(f"Invalid URL: {profile_url}")
 
         try:
             response = self.http_client.get(profile_url)
@@ -103,8 +100,7 @@ class SEASScraper(BaseScraper):
 
     def get_research_interests_from_profile(self, profile_url: str) -> typing.List[str]:
         if not InstitutionUtils.is_valid_url(profile_url):
-            logger.error(f'Invalid URL: {profile_url}')
-            raise ValueError("Invalid URL")
+            raise ValueError(f"Invalid URL: {profile_url}")
 
         try:
             response = self.http_client.get(profile_url)
