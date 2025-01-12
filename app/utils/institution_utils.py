@@ -1,8 +1,13 @@
-from app.utils.constants import *
-
 import re
+import typing
+
+from app.core.constants import *
 
 class InstitutionUtils:
+    @staticmethod
+    def get_departments_from_school(school: str) -> typing.List[str]:
+        return [dept for dept in SCHOOL_DEPARTMENT_DATA[school]["departments"]]
+
     @staticmethod
     def get_school_from_department(department: str) -> str:
         for school, data in SCHOOL_DEPARTMENT_DATA.items():

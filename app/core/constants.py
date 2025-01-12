@@ -1,5 +1,3 @@
-
-
 SCHOOL_DEPARTMENT_DATA = {
     "SEAS": {
         "base_url": "https://engineering.virginia.edu",
@@ -17,7 +15,7 @@ SCHOOL_DEPARTMENT_DATA = {
                 "people_url": "https://engineering.virginia.edu/department/civil-and-environmental-engineering/people?keyword=&position=2&impact_area=All&research_area=All",
             },
             "Computer Science": {
-                "people_url": "https://engineering.virginia.edu/department/computer-science/people"
+                "people_url": "https://engineering.virginia.edu/department/computer-science/people?keyword=&position=2&impact_area=All&research_area=All"
             },
             "Electrical and Computer Engineering": {
                 "people_url": "https://engineering.virginia.edu/department/electrical-and-computer-engineering/faculty?keyword=&position=2&impact_area=All&research_area=All"
