@@ -14,10 +14,9 @@ class HttpClient:
         self.timeout = timeout
         self.retries = retries
 
-    def request(self, method, endpoint):
+    def get(self, endpoint):
         """
-        Makes an HTTP request with retries.
-        :param method (str): HTTP method (GET, POST, etc.).
+        Makes an HTTP GET request with retries.
         :param endpoint (str): API endpoint (relative or absolute URL).
         :return requests.Response: The HTTP response object.
         :raise HTTPError: For non-2xx HTTP responses.
@@ -28,7 +27,7 @@ class HttpClient:
 
         for attempt in range(self.retries):
             try:
-                response = requests.request(method, url)
+                response = requests.request("GET", url)
                 response.raise_for_status()
                 return response
             except (Timeout, HTTPError) as e:
