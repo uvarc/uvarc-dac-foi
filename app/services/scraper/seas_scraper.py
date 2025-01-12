@@ -24,7 +24,7 @@ class SEASScraper(BaseScraper):
     def get_profile_endpoints_from_people(self, people_url: str, max_pages: int =100) -> typing.List[str]:
         if not InstitutionUtils.is_valid_url(people_url):
             logger.error(f'Invalid URL: {people_url}')
-            return []
+            raise
 
         page_number = 0
         profile_urls = []
@@ -36,7 +36,7 @@ class SEASScraper(BaseScraper):
             try:
                 response = self.http_client.request('GET', page_url)
             except Exception:
-                return []
+                raise
 
             try:
                 tree = html.fromstring(response.content)
@@ -49,20 +49,28 @@ class SEASScraper(BaseScraper):
                 page_number += 1
             except html.etree.XMLSyntaxError as e:
                 logger.error(f"Failed to parse HTML for {page_url}: {e}")
+                raise
             except Exception as e:
                 logger.error(f"Unexpected error processing page {page_number}: {e}")
-                break
+                raise
         return profile_urls
+
+    def get_name_from_profile(self, profile_url: str) -> str:
+        if not InstitutionUtils.is_valid_url(profile_url):
+            logger.error(f'Invalid URL: {profile_url}')
+            raise
+        endpoint = profile_url.split("/")[-1]
+        return " ".join(name.capitalize() for name in endpoint.split("-"))
 
     def get_emails_from_profile(self, profile_url: str) -> typing.List[str]:
         if not InstitutionUtils.is_valid_url(profile_url):
             logger.error(f'Invalid URL: {profile_url}')
-            return []
+            raise
 
         try:
             response = self.http_client.request('GET', profile_url)
         except Exception:
-            return []
+            raise
 
         try:
             tree = html.fromstring(response.content)
@@ -71,18 +79,20 @@ class SEASScraper(BaseScraper):
             return list(emails)
         except html.etree.XMLSyntaxError as e:
             logger.error(f"Failed to parse HTML for {profile_url}: {e}")
+            raise
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
+            raise
 
     def get_about_from_profile(self, profile_url: str) -> str:
         if not InstitutionUtils.is_valid_url(profile_url):
             logger.error(f'Invalid URL: {profile_url}')
-            return "UNKNOWN"
+            raise
 
         try:
             response = self.http_client.request('GET', profile_url)
         except Exception:
-            return "UNKNOWN"
+            raise
 
         try:
             tree = html.fromstring(response.content)
@@ -97,16 +107,9 @@ class SEASScraper(BaseScraper):
                 return "\n".join(about_content)
             else:
                 logger.warning(f"No About section text found for profile: {profile_url}")
-                return "UNKNOWN"
+                raise
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
-        return "UNKNOWN"
-
-    def get_name_from_profile(self, profile_url: str) -> str:
-        if not InstitutionUtils.is_valid_url(profile_url):
-            logger.error(f'Invalid URL: {profile_url}')
-            return ""
-        endpoint = profile_url.split("/")[-1]
-        return " ".join(name.capitalize() for name in endpoint.split("-"))
+            raise
 
 
