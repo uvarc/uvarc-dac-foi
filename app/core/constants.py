@@ -35,3 +35,20 @@ SCHOOL_DEPARTMENT_DATA = {
         },
     },
 }
+
+NIH_REPORTER_PAYLOAD = {
+    "criteria": {
+        "use_relevance": True,
+        "fiscal_years": [],
+        "include_active_projects": True,
+        "pi_names": [
+            {
+                "first_name": "",
+                "last_name": "",
+            }
+        ],
+
+    },
+    "offset": 0,
+    "limit": 10
+}
