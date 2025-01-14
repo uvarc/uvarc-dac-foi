@@ -24,8 +24,8 @@ class NIHReporterProxy:
         :return: payload as dictionary
         """
         payload = copy.deepcopy(NIH_REPORTER_PAYLOAD)
-        payload["criteria"]["pi_names"]["first_name"] = first_name
-        payload["criteria"]["pi_names"]["last_name"] = last_name
+        payload["criteria"]["pi_names"][0]["first_name"] = first_name
+        payload["criteria"]["pi_names"][0]["last_name"] = last_name
         payload["criteria"]["fiscal_years"] = fiscal_years
         return payload
 
