@@ -43,7 +43,7 @@ class NIHReporterProxy():
         try:
             response = self.http_client.post(self.NIH_REPORTER_ENDPOINT, json=payload)
             return response.json()
-        except (Timeout, HTTPError, RequestException, ValueError) as e
+        except (Timeout, HTTPError, RequestException, ValueError) as e:
             logger.error(f"NIH Reporter API request failed with error:{e}"
                          f"Please verify endpoint correctness: {self.NIH_REPORTER_ENDPOINT}")
         except Exception as e:
