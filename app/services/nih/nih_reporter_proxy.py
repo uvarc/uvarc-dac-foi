@@ -1,7 +1,6 @@
 import typing
 import logging
 import copy
-from datetime import datetime
 from requests import RequestException, Timeout, HTTPError
 from app.utils.http_client import HttpClient
 from app.core.constants import NIH_REPORTER_PAYLOAD
@@ -9,13 +8,14 @@ from app.core.constants import NIH_REPORTER_PAYLOAD
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class NIHReporterProxy():
+class NIHReporterProxy:
     NIH_REPORTER_ENDPOINT = "https://api.reporter.nih.gov/v2/projects/search"
 
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
 
-    def build_payload(self, first_name: str, last_name: str, fiscal_years: typing.List[int] = None) -> typing.Dict:
+    @staticmethod
+    def build_payload(first_name: str, last_name: str, fiscal_years: typing.List) -> typing.Dict:
         """
         Build the payload for the NIH RePORTER API request
         :param first_name: PI's first name
@@ -23,9 +23,6 @@ class NIHReporterProxy():
         :param fiscal_years: list of fiscal years to filter results
         :return: payload as dictionary
         """
-        if fiscal_years is None:
-            fiscal_years = [datetime.now().year]
-
         payload = copy.deepcopy(NIH_REPORTER_PAYLOAD)
         payload["criteria"]["pi_names"]["first_name"] = first_name
         payload["criteria"]["pi_names"]["last_name"] = last_name
