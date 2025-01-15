@@ -16,25 +16,40 @@ class NIHReporterService:
     def __init__(self, proxy: NIHReporterProxy):
         self.proxy = proxy
 
-    def get_project_data(self, first_name: str, last_name: str, fiscal_years: typing.List = None) -> pd.DataFrame:
+    def get_project_data(self, first_name: str = None, last_name: str = None, fiscal_years: typing.List = None) -> pd.DataFrame:
+        if first_name is None or last_name is None:
+            raise ValueError("")
         if fiscal_years is None:
             fiscal_years = [datetime.now().year]
 
         payload = self._build_payload(first_name, last_name, fiscal_years)
         response = self.proxy.call_reporter_api(payload)
-        projects = self._all_projects(response)
+        projects = self._get_all_projects(response)
 
+        all_project_data = []
+        for project in projects:
+            metadata = dict()
+            metadata["Project Number"] = self._get_project_number(project)
+            print(metadata.get("Project Number"))
 
-
-    def _all_projects(self, response: typing.Dict) -> typing.List[typing.Dict]:
+    def _get_all_projects(self, response: typing.Dict) -> typing.List[typing.Dict]:
         try:
             projects = response["results"]
             if len(projects) == 0:
                 logger.warning("No projects found for given PI or fiscal year(s)")
                 return []
         except KeyError:
-            logger.error("Results field absent in response JSON")
+            logger.error("Results field missing in response")
             return []
+
+    def _get_project_number(self, project: typing.Dict) -> int:
+        try:
+            return project["project_num"]
+        except KeyError:
+            logger.error("Project number missing in response")
+            return -1
+
+
 
     @staticmethod
     def _build_payload(first_name: str, last_name: str, fiscal_years: typing.List) -> typing.Dict:
@@ -54,6 +69,5 @@ class NIHReporterService:
 
 
 proxy = NIHReporterProxy(HttpClient())
-payload = proxy.build_payload("Daniel", "Abebayehu", [2024, 2025])
-response = proxy.call_reporter_api(payload)
-print(response)
+service = NIHReporterService(proxy)
+service.get_project_data("David", "Abebayehu", fiscal_years=[2024, 2025])
