@@ -47,7 +47,7 @@ class ScraperService:
         """
         Returns scraped information about a department's faculty members as a Pandas DataFrame
         :param department: school department e.g. Biomedical Engineering (Dept of SEAS)
-        :return: dataframe containing the faculty name, email address, about section, and SEAS website
+        :return: dataframe containing the faculty name, email address, about section, and profile URL
         """
         scraper = self._select_scraper(department)
         people_url = InstitutionUtils.get_people_url_from_department(department)
