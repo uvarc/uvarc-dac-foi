@@ -16,7 +16,7 @@ class NIHReporterService:
     def __init__(self, proxy: NIHReporterProxy):
         self.proxy = proxy
 
-    def compile_project_metadata(self, pi_first_name: str = None, pi_last_name: str = None, fiscal_years: typing.List = None) -> pd.DataFrame:
+    def compile_project_metadata(self, pi_first_name: str = None, pi_last_name: str = None, fiscal_years: typing.List[int] = None) -> pd.DataFrame:
         """
         Extract relevant metadata from PI projects for provided fiscal years
         :param pi_first_name: PI's first name
@@ -25,13 +25,14 @@ class NIHReporterService:
         :return: dataframe of given PI's project metadata
         """
         if pi_first_name is None or pi_last_name is None:
-            raise ValueError("")
+            raise ValueError("pi_first_name and pi_last_name cannot be None")
         if fiscal_years is None:
             fiscal_years = [datetime.now().year]
 
         payload = self.build_payload(pi_first_name, pi_last_name, fiscal_years)
         response = self.proxy.call_reporter_api(payload)
-        projects = self.get_all_projects(response)
+        pi = f"{pi_first_name} {pi_last_name}"
+        projects = self.get_all_projects(response, pi, fiscal_years)
 
         compiled_metadata = []
         for project in projects:
@@ -40,16 +41,18 @@ class NIHReporterService:
             metadata["abstract_text"] = self.get_abstract_text(project)
 
     @staticmethod
-    def get_all_projects(response: typing.Dict) -> typing.List[typing.Dict]:
+    def get_all_projects(response: typing.Dict, pi: str, fiscal_years: typing.List[int]) -> typing.List[typing.Dict]:
         """
         Extract all projects from API response
         :param response: API response
+        :param pi: PI's name
+        :param fiscal_years: fiscal years
         :return: list of project metadata
         """
         try:
             projects = response["results"]
             if len(projects) == 0:
-                logger.warning("No projects found for given PI or fiscal year(s)")
+                logger.warning(f"No projects found for {pi} and/or fiscal years {fiscal_years}")
                 return []
             return projects
         except KeyError:
@@ -83,7 +86,7 @@ class NIHReporterService:
             return "N/A"
 
     @staticmethod
-    def build_payload(pi_first_name: str, pi_last_name: str, fiscal_years: typing.List) -> typing.Dict:
+    def build_payload(pi_first_name: str, pi_last_name: str, fiscal_years: typing.List[int]) -> typing.Dict:
         """
         Build the payload for the NIH RePORTER API request
         :param pi_first_name: PI's first name
