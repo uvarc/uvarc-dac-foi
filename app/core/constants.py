@@ -49,6 +49,4 @@ NIH_REPORTER_PAYLOAD = {
         ],
 
     },
-    "offset": 0,
-    "limit": 10
 }
