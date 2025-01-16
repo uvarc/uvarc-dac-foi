@@ -24,6 +24,7 @@ class NIHReporterService:
 
         payload = self.build_payload(first_name, last_name, fiscal_years)
         response = self.proxy.call_reporter_api(payload)
+        print(response)
         projects = self.get_all_projects(response)
 
         all_project_data = []
@@ -33,18 +34,19 @@ class NIHReporterService:
             metadata["abstract_text"] = self.get_abstract_text(project)
 
     @staticmethod
-    def get_all_projects(self, response: typing.Dict) -> typing.List[typing.Dict]:
+    def get_all_projects(response: typing.Dict) -> typing.List[typing.Dict]:
         try:
             projects = response["results"]
             if len(projects) == 0:
                 logger.warning("No projects found for given PI or fiscal year(s)")
                 return []
+            return projects
         except KeyError:
             logger.error("Results field missing in response")
             return []
 
     @staticmethod
-    def get_project_number(self, project: typing.Dict) -> int:
+    def get_project_number(project: typing.Dict) -> int:
         try:
             return project["project_num"]
         except KeyError:
@@ -52,7 +54,7 @@ class NIHReporterService:
             return -1
 
     @staticmethod
-    def get_abstract_text(self, project: typing.Dict) -> str:
+    def get_abstract_text(project: typing.Dict) -> str:
         try:
             return project["abstract_text"]
         except KeyError:
@@ -78,4 +80,4 @@ class NIHReporterService:
 
 proxy = NIHReporterProxy(HttpClient())
 service = NIHReporterService(proxy)
-service.get_project_data("David", "Abebayehu", fiscal_years=[2024, 2025])
+service.get_project_data("Daniel", "Abebayehu", fiscal_years=[2024, 2025])
