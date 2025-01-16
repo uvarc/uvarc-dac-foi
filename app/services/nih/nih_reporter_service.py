@@ -22,17 +22,18 @@ class NIHReporterService:
         if fiscal_years is None:
             fiscal_years = [datetime.now().year]
 
-        payload = self._build_payload(first_name, last_name, fiscal_years)
+        payload = self.build_payload(first_name, last_name, fiscal_years)
         response = self.proxy.call_reporter_api(payload)
-        projects = self._get_all_projects(response)
+        projects = self.get_all_projects(response)
 
         all_project_data = []
         for project in projects:
             metadata = dict()
-            metadata["Project Number"] = self._get_project_number(project)
-            print(metadata.get("Project Number"))
+            metadata["project_number"] = self.get_project_number(project)
+            metadata["abstract_text"] = self.get_abstract_text(project)
 
-    def _get_all_projects(self, response: typing.Dict) -> typing.List[typing.Dict]:
+    @staticmethod
+    def get_all_projects(self, response: typing.Dict) -> typing.List[typing.Dict]:
         try:
             projects = response["results"]
             if len(projects) == 0:
@@ -42,17 +43,24 @@ class NIHReporterService:
             logger.error("Results field missing in response")
             return []
 
-    def _get_project_number(self, project: typing.Dict) -> int:
+    @staticmethod
+    def get_project_number(self, project: typing.Dict) -> int:
         try:
             return project["project_num"]
         except KeyError:
-            logger.error("Project number missing in response")
+            logger.error(f"Project number missing for project: {project}")
             return -1
 
-
+    @staticmethod
+    def get_abstract_text(self, project: typing.Dict) -> str:
+        try:
+            return project["abstract_text"]
+        except KeyError:
+            logger.error(f"Abstract text missing for project: {project}")
+            return "N/A"
 
     @staticmethod
-    def _build_payload(first_name: str, last_name: str, fiscal_years: typing.List) -> typing.Dict:
+    def build_payload(first_name: str, last_name: str, fiscal_years: typing.List) -> typing.Dict:
         """
         Build the payload for the NIH RePORTER API request
         :param first_name: PI's first name
