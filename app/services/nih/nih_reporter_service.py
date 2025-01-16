@@ -39,6 +39,7 @@ class NIHReporterService:
             metadata = dict()
             metadata["project_number"] = self.get_project_number(project)
             metadata["abstract_text"] = self.get_abstract_text(project)
+            metadata["terms"] = self.get_terms(project)
 
     @staticmethod
     def get_all_projects(response: typing.Dict, pi: str, fiscal_years: typing.List[int]) -> typing.List[typing.Dict]:
@@ -75,7 +76,7 @@ class NIHReporterService:
     @staticmethod
     def get_abstract_text(project: typing.Dict) -> str:
         """
-        Extract abstract text from response JSON
+        Extract abstract text from API response segment
         :param project: JSON containing project metadata
         :return: abstract text
         """
@@ -84,6 +85,19 @@ class NIHReporterService:
         except KeyError:
             logger.error(f"Abstract text missing for project: {project}")
             return "N/A"
+
+    @staticmethod
+    def get_terms(project: typing.Dict) -> typing.List[str]:
+        """
+        Extract terms from API response segment
+        :param project: JSON containing project metadata
+        :return list of key terms relevant to project
+        """
+        try:
+            return project["terms"]
+        except KeyError:
+            logger.error(f"Terms missing for project: {project}")
+            return []
 
     @staticmethod
     def build_payload(pi_first_name: str, pi_last_name: str, fiscal_years: typing.List[int]) -> typing.Dict:
