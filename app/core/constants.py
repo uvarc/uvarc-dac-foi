@@ -47,6 +47,9 @@ NIH_REPORTER_PAYLOAD = {
                 "last_name": "",
             }
         ],
-
+        "org_names": [
+            "UNIVERSITY OF VIRGINIA",
+            "University of Virginia"
+        ],
     },
 }
