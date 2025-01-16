@@ -16,7 +16,14 @@ class NIHReporterService:
     def __init__(self, proxy: NIHReporterProxy):
         self.proxy = proxy
 
-    def get_project_data(self, pi_first_name: str = None, pi_last_name: str = None, fiscal_years: typing.List = None) -> pd.DataFrame:
+    def compile_project_metadata(self, pi_first_name: str = None, pi_last_name: str = None, fiscal_years: typing.List = None) -> pd.DataFrame:
+        """
+        Extract relevant metadata from PI projects for provided fiscal years
+        :param pi_first_name: PI's first name
+        :param pi_last_name: PI's last name
+        :param fiscal_years: fiscal years during which projects were/are active
+        :return: dataframe of given PI's project metadata
+        """
         if pi_first_name is None or pi_last_name is None:
             raise ValueError("")
         if fiscal_years is None:
@@ -34,6 +41,11 @@ class NIHReporterService:
 
     @staticmethod
     def get_all_projects(response: typing.Dict) -> typing.List[typing.Dict]:
+        """
+        Extract all projects from API response
+        :param response: API response
+        :return: list of project metadata
+        """
         try:
             projects = response["results"]
             if len(projects) == 0:
@@ -46,6 +58,11 @@ class NIHReporterService:
 
     @staticmethod
     def get_project_number(project: typing.Dict) -> int:
+        """
+        Extract unique project number from API response segment
+        :param project: API response segment
+        :return: project number
+        """
         try:
             return project["project_num"]
         except KeyError:
@@ -54,6 +71,11 @@ class NIHReporterService:
 
     @staticmethod
     def get_abstract_text(project: typing.Dict) -> str:
+        """
+        Extract abstract text from response JSON
+        :param project: JSON containing project metadata
+        :return: abstract text
+        """
         try:
             return project["abstract_text"]
         except KeyError:
@@ -79,4 +101,4 @@ class NIHReporterService:
 
 proxy = NIHReporterProxy(HttpClient())
 service = NIHReporterService(proxy)
-service.get_project_data("Daniel", "Abebayehu", fiscal_years=[2024, 2025])
+service.compile_project_metadata("Daniel", "Abebayehu", fiscal_years=[2024, 2025])
