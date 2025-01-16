@@ -31,8 +31,11 @@ class NIHReporterService:
 
         payload = self.build_payload(pi_first_name, pi_last_name, fiscal_years)
         response = self.proxy.call_reporter_api(payload)
-        pi = f"{pi_first_name} {pi_last_name}"
-        projects = self.get_all_projects(response, pi, fiscal_years)
+        projects = response["results"]
+
+        if len(projects) == 0:
+            logger.warning(f"No projects founds for PI '{pi_first_name} {pi_last_name}' and fiscal years '{fiscal_years}'")
+            return pd.DataFrame()
 
         compiled_metadata = []
         for project in projects:
@@ -47,64 +50,29 @@ class NIHReporterService:
 
         return pd.DataFrame(compiled_metadata)
 
-
-    @staticmethod
-    def get_all_projects(response: typing.Dict, pi: str, fiscal_years: typing.List[int]) -> typing.List[typing.Dict]:
-        """
-        Extract all projects from API response
-        :param response: API response
-        :param pi: PI's name
-        :param fiscal_years: fiscal years
-        :return: list of project metadata
-        """
-        try:
-            projects = response["results"]
-            if len(projects) == 0:
-                logger.warning(f"No projects found for {pi} and/or fiscal years {fiscal_years}")
-                return []
-            return projects
-        except KeyError:
-            logger.error("Results field missing in response")
-            return []
-
-    @staticmethod
-    def get_project_number(project: typing.Dict) -> int:
+    def get_project_number(self, project: typing.Dict) -> str:
         """
         Extract unique project number from API response segment
         :param project: API response segment
         :return: project number
         """
-        try:
-            return project["project_num"]
-        except KeyError:
-            logger.error(f"Project number missing for project: {project}")
-            return -1
+        return self.safe_get_field(project, "project_num")
 
-    @staticmethod
-    def get_abstract_text(project: typing.Dict) -> str:
+    def get_abstract_text(self, project: typing.Dict) -> str:
         """
         Extract abstract text from API response segment
         :param project: JSON containing project metadata
         :return: abstract text
         """
-        try:
-            return project["abstract_text"]
-        except KeyError:
-            logger.error(f"Abstract text missing for project: {project}")
-            return "N/A"
+        return self.safe_get_field(project, "abstract_text")
 
-    @staticmethod
-    def get_terms(project: typing.Dict) -> typing.List[str]:
+    def get_terms(self, project: typing.Dict) -> typing.List[str]:
         """
         Extract terms from API response segment
         :param project: JSON containing project metadata
         :return list of key terms relevant to project
         """
-        try:
-            return project["terms"]
-        except KeyError:
-            logger.error(f"Terms missing for project: {project}")
-            return []
+        return self.safe_get_field(project, "terms")
 
     def get_project_start_date(self, project: typing.Dict) -> str:
         """
@@ -112,11 +80,8 @@ class NIHReporterService:
         :param project: JSON containing project metadata
         :return: project start date
         """
-        try:
-            return self.process_date_string(project["start_date"])
-        except KeyError:
-            logger.error(f"Project start date missing for project: {project}")
-            return "N/A"
+        raw_start_date = self.safe_get_field(project, "start_date")
+        return self.process_date_string(raw_start_date)
 
     def get_project_end_date(self, project: typing.Dict) -> str:
         """
@@ -124,11 +89,8 @@ class NIHReporterService:
         :param project: JSON containing project metadata
         :return: project end date
         """
-        try:
-            return self.process_date_string(project["end_date"])
-        except KeyError:
-            logger.error(f"Project end date missing for project: {project}")
-            return "N/A"
+        raw_end_date = self.safe_get_field(project, "end_date")
+        return self.process_date_string(raw_end_date)
 
     @staticmethod
     def process_date_string(raw_date: str) -> str:
@@ -155,7 +117,15 @@ class NIHReporterService:
         payload["criteria"]["fiscal_years"] = fiscal_years
         return payload
 
-
+    @staticmethod
+    def safe_get_field(data: dict, key: str) -> typing.Any:
+        try:
+            return data[key]
+        except KeyError:
+            logger.error(f"{key} missing in data: {data}")
+            if key == "terms":
+                return []
+            return "N/A"
 
 proxy = NIHReporterProxy(HttpClient())
 service = NIHReporterService(proxy)
