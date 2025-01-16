@@ -21,12 +21,5 @@ class NIHReporterProxy:
         :raises: Any exceptions raised by the HTTP client
         """
         logger.info(f"Invoking NIH RePORTER API with payload: {payload}")
-        try:
-            response = self.http_client.post(self.NIH_REPORTER_ENDPOINT, json=payload)
-            return response.json()
-        except (Timeout, HTTPError, RequestException, ValueError) as e:
-            logger.error(f"NIH Reporter API request failed with error:{e}"
-                         f"Please verify endpoint correctness: {self.NIH_REPORTER_ENDPOINT}")
-        except Exception as e:
-            logger.error(f"Unexpected error: {e}")
-            raise
+        response = self.http_client.post(self.NIH_REPORTER_ENDPOINT, json=payload)
+        return response.json()
