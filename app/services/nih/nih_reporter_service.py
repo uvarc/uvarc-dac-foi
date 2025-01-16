@@ -40,6 +40,7 @@ class NIHReporterService:
             metadata["project_number"] = self.get_project_number(project)
             metadata["abstract_text"] = self.get_abstract_text(project)
             metadata["terms"] = self.get_terms(project)
+            metadata["start_date"] = self.get_project_start_date(project)
 
     @staticmethod
     def get_all_projects(response: typing.Dict, pi: str, fiscal_years: typing.List[int]) -> typing.List[typing.Dict]:
@@ -98,6 +99,21 @@ class NIHReporterService:
         except KeyError:
             logger.error(f"Terms missing for project: {project}")
             return []
+
+    @staticmethod
+    def get_project_start_date(project: typing.Dict) -> str:
+        """
+        Extract project start date from API response segment
+        :param project: JSON containing project metadata
+        :return: project start date
+        """
+        try:
+            raw_start_date = project["project_start_date"]
+            start_datetime = datetime.strptime(raw_start_date, "%Y-%m-%dT%H:%M:%SZ")
+            return start_datetime.strftime("%Y-%m-%d")
+        except KeyError:
+            logger.error(f"Project start date missing for project: {project}")
+            return "N/A"
 
     @staticmethod
     def build_payload(pi_first_name: str, pi_last_name: str, fiscal_years: typing.List[int]) -> typing.Dict:
