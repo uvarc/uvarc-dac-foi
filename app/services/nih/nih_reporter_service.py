@@ -31,8 +31,8 @@ class NIHReporterService:
 
         payload = self.build_payload(pi_first_name, pi_last_name, fiscal_years)
         response = self.proxy.call_reporter_api(payload)
-        projects = response["results"]
 
+        projects = response["results"]
         if len(projects) == 0:
             logger.warning(f"No projects founds for PI '{pi_first_name} {pi_last_name}' and fiscal years '{fiscal_years}'")
             return pd.DataFrame()
