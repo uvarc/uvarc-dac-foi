@@ -45,6 +45,7 @@ class NIHReporterService:
                 "terms": self.get_terms(project),
                 "start_date": self.get_project_start_date(project),
                 "end_date": self.get_project_end_date(project),
+                "agency_ic_admin": self.get_agency_ic_admin(project),
             }
             compiled_metadata.append(metadata)
 
@@ -92,6 +93,14 @@ class NIHReporterService:
         raw_end_date = self.safe_get_field(project, "end_date")
         return self.process_date_string(raw_end_date)
 
+    def get_agency_ic_admin(self, project: typing.Dict) -> str:
+        """
+        Extract NIH agency administering project from API response segment
+        :param project: JSON containing project metadata
+        :return: NIH agency
+        """
+        return self.safe_get_field(project, "agency_ic_admin")
+
     @staticmethod
     def process_date_string(raw_date: str) -> str:
         try:
@@ -120,6 +129,8 @@ class NIHReporterService:
     @staticmethod
     def safe_get_field(data: dict, key: str) -> typing.Any:
         try:
+            if key == "agency_ic_admin":
+                return data[key]["name"]
             return data[key]
         except KeyError:
             logger.error(f"{key} missing in data: {data}")
