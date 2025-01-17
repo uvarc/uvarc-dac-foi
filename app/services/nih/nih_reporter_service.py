@@ -47,6 +47,7 @@ class NIHReporterService:
                 "end_date": self.get_project_end_date(project),
                 "agency_ic_admin": self.get_agency_ic_admin(project),
                 "activity_code": self.get_activity_code(project),
+                "total_cost": self.get_total_cost(project),
             }
             compiled_metadata.append(metadata)
 
@@ -82,7 +83,7 @@ class NIHReporterService:
         :param project: JSON w/ project metadata
         :return: project start date
         """
-        raw_start_date = self.safe_get_field(project, "start_date")
+        raw_start_date = self.safe_get_field(project, "project_start_date")
         return self.process_date_string(raw_start_date)
 
     def get_project_end_date(self, project: typing.Dict) -> str:
@@ -91,7 +92,7 @@ class NIHReporterService:
         :param project: JSON w/ project metadata
         :return: project end date
         """
-        raw_end_date = self.safe_get_field(project, "end_date")
+        raw_end_date = self.safe_get_field(project, "project_end_date")
         return self.process_date_string(raw_end_date)
 
     def get_agency_ic_admin(self, project: typing.Dict) -> str:
@@ -143,9 +144,10 @@ class NIHReporterService:
         :return: field to retrieve
         """
         try:
+            field = data[key]
             if key == "agency_ic_admin":
-                return data[key]["name"]
-            return data[key]
+                return field["name"]
+            return field
         except KeyError:
             logger.error(f"{key} missing in data: {data}")
             if key == "terms":
