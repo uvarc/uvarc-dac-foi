@@ -46,6 +46,7 @@ class NIHReporterService:
                 "start_date": self.get_project_start_date(project),
                 "end_date": self.get_project_end_date(project),
                 "agency_ic_admin": self.get_agency_ic_admin(project),
+                "activity_code": self.get_activity_code(project),
             }
             compiled_metadata.append(metadata)
 
@@ -54,7 +55,7 @@ class NIHReporterService:
     def get_project_number(self, project: typing.Dict) -> str:
         """
         Extract unique project number from API response segment
-        :param project: API response segment
+        :param project: JSON w/ project metadata
         :return: project number
         """
         return self.safe_get_field(project, "project_num")
@@ -62,7 +63,7 @@ class NIHReporterService:
     def get_abstract_text(self, project: typing.Dict) -> str:
         """
         Extract abstract text from API response segment
-        :param project: JSON containing project metadata
+        :param project: JSON w/ project metadata
         :return: abstract text
         """
         return self.safe_get_field(project, "abstract_text")
@@ -70,7 +71,7 @@ class NIHReporterService:
     def get_terms(self, project: typing.Dict) -> typing.List[str]:
         """
         Extract terms from API response segment
-        :param project: JSON containing project metadata
+        :param project: JSON w/ project metadata
         :return list of key terms relevant to project
         """
         return self.safe_get_field(project, "terms")
@@ -78,7 +79,7 @@ class NIHReporterService:
     def get_project_start_date(self, project: typing.Dict) -> str:
         """
         Extract project start date from API response segment
-        :param project: JSON containing project metadata
+        :param project: JSON w/ project metadata
         :return: project start date
         """
         raw_start_date = self.safe_get_field(project, "start_date")
@@ -87,7 +88,7 @@ class NIHReporterService:
     def get_project_end_date(self, project: typing.Dict) -> str:
         """
         Extract project end date from API response segment
-        :param project: JSON containing project metadata
+        :param project: JSON w/ project metadata
         :return: project end date
         """
         raw_end_date = self.safe_get_field(project, "end_date")
@@ -96,10 +97,18 @@ class NIHReporterService:
     def get_agency_ic_admin(self, project: typing.Dict) -> str:
         """
         Extract NIH agency administering project from API response segment
-        :param project: JSON containing project metadata
+        :param project: JSON w/ project metadata
         :return: NIH agency
         """
         return self.safe_get_field(project, "agency_ic_admin")
+
+    def get_activity_code(self, project: typing.Dict) -> str:
+        """
+        Extract activity code from API response segment
+        :param project: JSON w/ project metadata
+        :return: activity code
+        """
+        return self.safe_get_field(project, "activity_code")
 
     @staticmethod
     def process_date_string(raw_date: str) -> str:
@@ -109,7 +118,6 @@ class NIHReporterService:
         except Exception as e:
             logger.error(f"Unexpected error parsing date {raw_date}, returning unprocessed date: {e}")
             return raw_date
-
 
     @staticmethod
     def build_payload(pi_first_name: str, pi_last_name: str, fiscal_years: typing.List[int]) -> typing.Dict:
@@ -128,6 +136,12 @@ class NIHReporterService:
 
     @staticmethod
     def safe_get_field(data: dict, key: str) -> typing.Any:
+        """
+        Return field from API response and abstract error handling logic from JSON indexing,
+        :param data: API response
+        :param key: key corresponding to field to retrieve
+        :return: field to retrieve
+        """
         try:
             if key == "agency_ic_admin":
                 return data[key]["name"]
