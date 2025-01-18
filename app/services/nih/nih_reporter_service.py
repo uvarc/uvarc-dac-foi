@@ -5,7 +5,6 @@ import copy
 
 from datetime import datetime
 from app.services.nih.nih_reporter_proxy import NIHReporterProxy
-from app.utils.http_client import HttpClient
 from app.core.constants import NIH_REPORTER_PAYLOAD
 
 logging.basicConfig(level=logging.INFO)
