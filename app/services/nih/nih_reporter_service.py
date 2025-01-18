@@ -47,7 +47,6 @@ class NIHReporterService:
                 "end_date": self.get_project_end_date(project),
                 "agency_ic_admin": self.get_agency_ic_admin(project),
                 "activity_code": self.get_activity_code(project),
-                "total_cost": self.get_total_cost(project),
             }
             compiled_metadata.append(metadata)
 
@@ -153,7 +152,3 @@ class NIHReporterService:
             if key == "terms":
                 return []
             return "N/A"
-
-proxy = NIHReporterProxy(HttpClient())
-service = NIHReporterService(proxy)
-service.compile_project_metadata("Daniel", "Abebayehu", fiscal_years=[2024, 2025])
