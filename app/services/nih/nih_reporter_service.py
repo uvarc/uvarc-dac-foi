@@ -23,13 +23,7 @@ class NIHReporterService:
         :param fiscal_years: fiscal years during which projects were/are active
         :return: dataframe of given PI's project metadata
         """
-        if pi_first_name is None or pi_last_name is None:
-            raise ValueError("pi_first_name and pi_last_name cannot be None")
-        if fiscal_years is None:
-            fiscal_years = [datetime.now().year]
-
-        payload = self.build_payload(pi_first_name, pi_last_name, fiscal_years)
-        response = self.proxy.call_reporter_api(payload)
+        response = self.invoke_proxy(pi_first_name=pi_first_name, pi_last_name=pi_last_name, fiscal_years=fiscal_years)
 
         projects = response["results"]
         if len(projects) == 0:
@@ -50,6 +44,14 @@ class NIHReporterService:
             compiled_metadata.append(metadata)
 
         return pd.DataFrame(compiled_metadata)
+
+    def invoke_proxy(self, pi_first_name: str = None, pi_last_name: str = None, fiscal_years: typing.List[int] = None) -> typing.Dict:
+        if pi_first_name is None or pi_last_name is None:
+            raise ValueError("pi_first_name and pi_last_name cannot be None")
+        if fiscal_years is None:
+            fiscal_years = [datetime.now().year]
+        payload = self.build_payload(pi_first_name, pi_last_name, fiscal_years)
+        return self.proxy.call_reporter_api(payload)
 
     def get_project_number(self, project: typing.Dict) -> str:
         """
