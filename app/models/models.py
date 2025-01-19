@@ -2,35 +2,42 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class School(db.Model):
-    __tablename__ = "school"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-
-class Department(db.Model):
-    __tablename__ = "department"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    school_id = db.Column(db.Integer, db.ForeignKey("school.id"), nullable=False)
-    school = db.relationship('school', backref=db.backref("departments", lazy=True))
-
 class Faculty(db.Model):
-    __tablename__ = "faculty"
+    __tablename__ = 'faculty'
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    email = db.relationship('FacultyEmail', backref=db.backref("faculty", lazy=True, cascade="all, delete-orphan"))
-    about = db.Column(db.Text)
-    profile_url = db.Column(db.String(500), nullable=False)
-    department_id = db.Column(db.Integer, db.ForeignKey("department.id"), nullable=False)
-    department = db.relationship('Department', backref=db.backref("faculty", lazy=True))
-    embedding_id = db.Column(db.Integer, nullable=False, unique=True)
+    faculty_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String, nullable=False)
+    school = db.Column(db.String, nullable=False)
+    department = db.Column(db.String, nullable=False)
+    about = db.Column(db.Text, nullable=True)
+    profile_url = db.Column(db.String, nullable=True)
+    embedding_id = db.Column(db.Integer, nullable=True)
 
-class FacultyEmail(db.Model):
-    __tablename__ = "faculty_email"
+    emails = db.relationship('Email', back_populates='faculty', cascade='all, delete')
+    projects = db.relationship('Project', back_populates='faculty', cascade='all, delete')
 
-    email = db.Column(db.String(300), primary_key=True)
-    faculty_id = db.Column(db.Integer, db.ForeignKey("faculty.id"), nullable=False)
-    faculty = db.relationship('Faculty', backref=db.backref("emails", lazy=True))
+
+class Email(db.Model):
+    __tablename__ = 'emails'
+
+    email_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    faculty_id = db.Column(db.Integer, db.ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)
+    email = db.Column(db.String, nullable=False)
+
+    faculty = db.relationship('Faculty', back_populates='emails')
+
+
+class Project(db.Model):
+    __tablename__ = 'projects'
+
+    project_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    faculty_id = db.Column(db.Integer, db.ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)
+    project_number = db.Column(db.String, nullable=False)
+    abstract = db.Column(db.Text, nullable=True)
+    relevant_terms = db.Column(db.Text, nullable=True)
+    start_date = db.Column(db.Date, nullable=True)
+    end_date = db.Column(db.Date, nullable=True)
+    agency_ic_admin = db.Column(db.String, nullable=True)
+    activity_code = db.Column(db.String, nullable=True)
+
+    faculty = db.relationship('Faculty', back_populates='projects')
