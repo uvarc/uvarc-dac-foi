@@ -36,10 +36,12 @@ SCHOOL_DEPARTMENT_DATA = {
     },
 }
 
+DEFAULT_FISCAL_YEARS = [2020 + i for i in range(6)]
+
 NIH_REPORTER_PAYLOAD = {
     "criteria": {
         "use_relevance": True,
-        "fiscal_years": [2020 + i for i in range(6)],
+        "fiscal_years": [],
         "include_active_projects": True,
         "pi_names": [
             {
