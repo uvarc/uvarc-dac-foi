@@ -39,7 +39,7 @@ SCHOOL_DEPARTMENT_DATA = {
 NIH_REPORTER_PAYLOAD = {
     "criteria": {
         "use_relevance": True,
-        "fiscal_years": [2020 + i for i in range(5)],
+        "fiscal_years": [2020 + i for i in range(6)],
         "include_active_projects": True,
         "pi_names": [
             {
