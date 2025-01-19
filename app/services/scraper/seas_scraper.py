@@ -4,6 +4,7 @@ import logging
 from app.utils.http_client import HttpClient
 from app.utils.institution_utils import InstitutionUtils
 from app.services.scraper.base_scraper import BaseScraper
+from app.core.constants import SCHOOL_DEPARTMENT_DATA
 from lxml import html
 
 logging.basicConfig(level=logging.INFO)
@@ -37,12 +38,17 @@ class SEASScraper(BaseScraper):
                 response = self.http_client.get(page_url)
                 tree = html.fromstring(response.content)
                 no_results = tree.xpath(self.NO_RESULTS_XPATH)
+
                 if no_results:
                     logger.info(f"No results found for page {page_number}: {page_url}")
                     break
                 urls = tree.xpath(self.CONTACT_BLOCK_NAME_XPATH)
                 profile_urls.extend(urls)
                 page_number += 1
+
+                if self.is_cs_department(people_url):
+                    break
+
             except html.etree.XMLSyntaxError as e:
                 logger.error(f"Failed to parse HTML for {page_url}: {e}")
                 raise
@@ -114,3 +120,8 @@ class SEASScraper(BaseScraper):
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
             raise
+
+    @staticmethod
+    def is_cs_department(people_url) -> bool:
+        cs_people_url = SCHOOL_DEPARTMENT_DATA["SEAS"]["departments"]["Computer Science"]["people_url"]
+        return people_url == cs_people_url
