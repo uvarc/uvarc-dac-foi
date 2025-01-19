@@ -51,7 +51,7 @@ class ScraperService:
         for endpoint in profile_endpoints:
             profile_url = InstitutionUtils.make_profile_url(school_base_url, endpoint)
             name = scraper.get_name_from_profile(profile_url)
-            emails = ", ".join(scraper.get_emails_from_profile(profile_url))
+            emails = ",".join(scraper.get_emails_from_profile(profile_url))
             about = scraper.get_about_from_profile(profile_url)
 
             faculty_data.append({
