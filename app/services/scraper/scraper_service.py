@@ -4,7 +4,6 @@ import pandas as pd
 
 from app.services.scraper.base_scraper import BaseScraper
 from app.utils.institution_utils import InstitutionUtils
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,23 +22,14 @@ class ScraperService:
         logger.info(f"Fetching school faculty data for school: {school}")
 
         try:
-            with ThreadPoolExecutor(max_workers=10) as executor:
-                future_to_department = {
-                    executor.submit(self.get_department_faculty_data, dept): dept for dept in departments
-                }
-                school_data = {}
-                for future in as_completed(future_to_department):
-                    department = future_to_department[future]
-                    try:
-                        data = future.result()
-                        school_data[department] = data
-                    except Exception as e:
-                        logger.critical(f"Error fetching data for department: {department}: {e}")
-                        raise RuntimeError(f"Data generation failed for department: {department}") from e
+            school_data = {}
+            for dept in departments:
+                data = self.get_department_faculty_data(dept)
+                school_data[dept] = data
             return school_data
         except Exception as e:
-            logger.critical(f"Failed to fetch school faculty data for school: {school}")
-            raise
+            logger.critical(f"Failed to fetch school faculty data for school: {school}: {e}")
+            raise RuntimeError(f"Data generation failed for school: {school}") from e
 
 
 
