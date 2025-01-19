@@ -11,6 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class NIHReporterService:
+    DEFAULT_FISCAL_YEAR = NIH_REPORTER_PAYLOAD["criteria"]["fiscal_years"]
 
     def __init__(self, proxy: NIHReporterProxy):
         self.proxy = proxy
@@ -45,11 +46,9 @@ class NIHReporterService:
 
         return pd.DataFrame(compiled_metadata)
 
-    def invoke_proxy(self, pi_first_name: str = None, pi_last_name: str = None, fiscal_years: typing.List[int] = None) -> typing.Dict:
+    def invoke_proxy(self, pi_first_name: str = None, pi_last_name: str = None, fiscal_years: typing.List[int] = DEFAULT_FISCAL_YEAR) -> typing.Dict:
         if pi_first_name is None or pi_last_name is None:
             raise ValueError("pi_first_name and pi_last_name cannot be None")
-        if fiscal_years is None:
-            fiscal_years = [datetime.now().year]
         payload = self.build_payload(pi_first_name, pi_last_name, fiscal_years)
         return self.proxy.call_reporter_api(payload)
 
