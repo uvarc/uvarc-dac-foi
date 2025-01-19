@@ -30,7 +30,7 @@ SCHOOL_DEPARTMENT_DATA = {
                 "people_url": "https://engineering.virginia.edu/department/mechanical-and-aerospace-engineering/people?keyword=&position=2&impact_area=All&research_area=All"
             },
             "Systems and Information Engineering": {
-                "people_url": "https://engineering.virginia.edu/department/systems-and-information-engineering/people?keyword=&position=2&impact_area=All&research_area=All=",
+                "people_url": "https://engineering.virginia.edu/department/systems-and-information-engineering/people?keyword=&position=2&impact_area=All&research_area=All",
             },
         },
     },
