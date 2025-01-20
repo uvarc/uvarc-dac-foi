@@ -42,8 +42,8 @@ class DataAggregator:
             for faculty_profile in dept_faculty_df.itertuples():
                 first_name, last_name = self.extract_faculty_names_from_profile(faculty_profile)
                 projects = self.get_faculty_member_projects(first_name, last_name)
-                faculty = self.convert_to_faculty_model(faculty_profile, projects)
-                # TODO: generate faculty embedding
+                # TODO: generate faculty embedding and return ID
+                # faculty = self.convert_to_faculty_model(faculty_profile, projects, embedding_id)
 
     @staticmethod
     def extract_faculty_names_from_profile(faculty_profile: typing.Tuple) -> typing.Tuple[str, str]:
@@ -83,11 +83,12 @@ class DataAggregator:
         )
 
     @staticmethod
-    def convert_to_faculty_model(faculty_profile: typing.Tuple, projects: typing.List[Project]) -> Faculty:
+    def convert_to_faculty_model(faculty_profile: typing.Tuple, projects: typing.List[Project], embedding_id: int) -> Faculty:
         """
-        Use profile and RePORTER project data to construct Faculty model object
+        Use profile, RePORTER project data, and embedding ID to construct Faculty model object
         :param faculty_profile: namedtuple w/ faculty information
         :param projects: list of Project model objects
+        :param embedding_id: embedding id
         :return: Faculty model object
         """
         return Faculty(
@@ -97,7 +98,8 @@ class DataAggregator:
             about=faculty_profile.About_Section,
             email=faculty_profile.Email_Address,
             profile_url=faculty_profile.Profile_URL,
-            projects=projects
+            projects=projects,
+            embedding_id=embedding_id
         )
 
 
