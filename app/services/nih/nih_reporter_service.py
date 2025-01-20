@@ -67,13 +67,14 @@ class NIHReporterService:
         """
         return self.safe_get_field(project, "abstract_text")
 
-    def get_terms(self, project: typing.Dict) -> typing.List[str]:
+    def get_terms(self, project: typing.Dict) -> str:
         """
         Extract terms from API response segment
         :param project: JSON w/ project metadata
         :return list of key terms relevant to project
         """
-        return self.safe_get_field(project, "terms")
+        raw_terms = self.safe_get_field(project, "terms")
+        return ",".join(raw_terms)
 
     def get_project_start_date(self, project: typing.Dict) -> str:
         """
