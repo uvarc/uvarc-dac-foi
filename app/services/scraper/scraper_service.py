@@ -55,12 +55,12 @@ class ScraperService:
             about = scraper.get_about_from_profile(profile_url)
 
             faculty_data.append({
-                "Faculty Name": name,
+                "Faculty_Name": name,
                 "School": school,
                 "Department": department,
-                "Email Address": emails,
-                "About Section": about,
-                "Profile URL": profile_url,
+                "Email_Address": emails,
+                "About_Section": about,
+                "Profile_URL": profile_url,
             })
 
         return pd.DataFrame(faculty_data)
