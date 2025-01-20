@@ -73,8 +73,7 @@ class NIHReporterService:
         :param project: JSON w/ project metadata
         :return list of key terms relevant to project
         """
-        raw_terms = self.safe_get_field(project, "terms")
-        return ",".join(raw_terms)
+        return self.safe_get_field(project, "terms")
 
     def get_project_start_date(self, project: typing.Dict) -> str:
         """
@@ -149,6 +148,4 @@ class NIHReporterService:
             return field
         except KeyError:
             logger.error(f"{key} missing in data: {data}")
-            if key == "terms":
-                return []
             return "N/A"
