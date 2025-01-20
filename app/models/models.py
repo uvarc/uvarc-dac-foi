@@ -10,22 +10,11 @@ class Faculty(db.Model):
     school = db.Column(db.String, nullable=False)
     department = db.Column(db.String, nullable=False)
     about = db.Column(db.Text, nullable=True)
+    email = db.Column(db.String, nullable=True)
     profile_url = db.Column(db.String, nullable=True)
     embedding_id = db.Column(db.Integer, nullable=True)
 
-    emails = db.relationship('Email', back_populates='faculty', cascade='all, delete')
     projects = db.relationship('Project', back_populates='faculty', cascade='all, delete')
-
-
-class Email(db.Model):
-    __tablename__ = 'emails'
-
-    email_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    faculty_id = db.Column(db.Integer, db.ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)
-    email = db.Column(db.String, nullable=False)
-
-    faculty = db.relationship('Faculty', back_populates='emails')
-
 
 class Project(db.Model):
     __tablename__ = 'projects'
