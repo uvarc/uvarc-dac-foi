@@ -57,7 +57,8 @@ class EmbeddingService:
         :return: List of faculty IDs
         """
         logging.info(f"Searching similar faculty for query: {query}.")
-        query_embedding = self.embedding_generator.generate_embedding(query)
+        standardized_query = self.preprocessor.preprocess_query(query)
+        query_embedding = self.embedding_generator.generate_embedding(standardized_query)
         results = self.embedding_storage.search(query_embedding, top_k)
         logging.info(f"Search successful. Found {len(results)} results.")
         return results

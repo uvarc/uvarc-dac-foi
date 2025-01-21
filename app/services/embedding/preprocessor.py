@@ -1,5 +1,7 @@
 import typing
 import logging
+import re
+
 from app.models.models import *
 
 logging.basicConfig(level=logging.INFO)
@@ -30,3 +32,17 @@ class Preprocessor:
         )
         logging.debug(f"Processed text for faculty {faculty.name}: {processed_text}")
         return processed_text
+
+    @staticmethod
+    def preprocess_query(query: str) -> str:
+        """
+        Preprocess query into standardized string for embedding
+        :param query: user input
+        :return: standardized string
+        """
+        query = query.lower()
+        # Remove special characters
+        query = re.sub(r"[^\w\s,.:;?!-]", "", query)
+        # Normalize whitespace
+        query = re.sub(r"\s+", " ", query).strip()
+        return query
