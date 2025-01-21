@@ -35,14 +35,13 @@ class EmbeddingStorage:
             logging.error(f"Error saving FAISS index: {e}")
             raise
 
-    def add_embedding(self, faculty_name: str, embedding: typing.List[float]) -> int:
+    def add_embedding(self, embedding: typing.List[float]) -> int:
         """
         Add an embedding to the FAISS index
-        :param faculty_name: name of the faculty
         :param embedding: faculty embedding
         :return: index of the added embedding
         """
-        logging.info(f"Adding embedding for faculty: {faculty_name}.")
+        logging.info(f"Adding embedding...")
         try:
             vector = np.array([embedding], dtype=np.float32)
             self.index.add(vector)
