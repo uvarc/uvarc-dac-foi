@@ -52,3 +52,20 @@ class EmbeddingStorage:
         except Exception as e:
             logging.error(f"Error adding embedding: {e}")
             raise
+
+    def search(self, query_embedding: typing.List[float], top_k: int = 10) -> typing.List[int]:
+        """
+        Search the FAISS index for most similar embeddings
+        :param query_embedding: embedding generated from user input
+        :param top_k: number of similar embeddings to return
+        :return: list of indexes
+        """
+        logging.info(f"Searching FAISS index for {top_k} most similar embeddings.")
+        try:
+            query_vector = np.array([query_embedding], dtype=np.float32)
+            distances, indices = self.index.search(query_vector, top_k)
+            logging.info(f"Search completed. Found {len(indices.flatten())} results.")
+            return indices.flatten().tolist()
+        except Exception as e:
+            logging.error(f"Error during search: {e}")
+        raise
