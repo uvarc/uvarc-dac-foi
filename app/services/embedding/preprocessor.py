@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 class Preprocessor:
     @staticmethod
-    def preprocess(faculty: Faculty, projects: typing.List[Project]) -> str:
+    def preprocess_faculty_profile(faculty: Faculty, projects: typing.List[Project]) -> str:
         """
         Preprocess faculty and project(s) data into a single string for embedding
         :param faculty: faculty data
