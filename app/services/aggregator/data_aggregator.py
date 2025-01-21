@@ -103,17 +103,17 @@ class DataAggregator:
         )
 
 
-from app.utils.http_client import HttpClient
-from app.services.nih.nih_reporter_proxy import NIHReporterProxy
-from app.services.scraper.seas_scraper import SEASScraper
-nih_service = NIHReporterService(NIHReporterProxy(HttpClient()))
-scrapers = [
-    SEASScraper(HttpClient())
-]
-scraper_service = ScraperService(scrapers)
-aggregator = DataAggregator(scraper_service, nih_service)
-dept_faculty_df = scraper_service.get_department_faculty_data("Biomedical Engineering")
-for faculty_profile in dept_faculty_df.itertuples():
-    first_name, last_name = aggregator.extract_faculty_names_from_profile(faculty_profile)
-    projects = aggregator.get_faculty_member_projects(first_name, last_name)
-    faculty = aggregator.convert_to_faculty_model(faculty_profile, projects)
+# from app.utils.http_client import HttpClient
+# from app.services.nih.nih_reporter_proxy import NIHReporterProxy
+# from app.services.scraper.seas_scraper import SEASScraper
+# nih_service = NIHReporterService(NIHReporterProxy(HttpClient()))
+# scrapers = [
+#     SEASScraper(HttpClient())
+# ]
+# scraper_service = ScraperService(scrapers)
+# aggregator = DataAggregator(scraper_service, nih_service)
+# dept_faculty_df = scraper_service.get_department_faculty_data("Biomedical Engineering")
+# for faculty_profile in dept_faculty_df.itertuples():
+#     first_name, last_name = aggregator.extract_faculty_names_from_profile(faculty_profile)
+#     projects = aggregator.get_faculty_member_projects(first_name, last_name)
+#     faculty = aggregator.convert_to_faculty_model(faculty_profile, projects)
