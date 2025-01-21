@@ -10,7 +10,8 @@ class EmbeddingGenerator:
         openai.api_key = api_key
         logging.info("Initialized EmbeddingGenerator with OpenAI API key")
 
-    def generate_embedding(self, text: str) -> typing.List[float]:
+    @staticmethod
+    def generate_embedding(text: str) -> typing.List[float]:
         """
         Generates an embedding for provided text using OpenAI's text-embedding-ada-002 model
         :param text: input text
