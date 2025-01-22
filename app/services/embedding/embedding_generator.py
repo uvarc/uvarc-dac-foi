@@ -18,8 +18,10 @@ class EmbeddingGenerator:
         """
         logging.info(f"Generating embedding for text: {text}")
         try:
-            response = self.client.embeddings.create(input=text,
-            model="text-embedding-ada-002")
+            response = self.client.embeddings.create(
+                input=text,
+                model="text-embedding-ada-002"
+            )
             logging.info("Successfully generated embedding.")
             return response.data[0].embedding
         except Exception as e:
