@@ -43,7 +43,6 @@ class EmbeddingStorage:
             self.index.add(vector)
             self.save_index()
             current_index = self.index.ntotal - 1
-            logging.info(f"Embedding added at index:{current_index}.")
             return current_index
         except Exception as e:
             logging.error(f"Error adding embedding: {e}")
