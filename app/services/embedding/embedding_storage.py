@@ -9,19 +9,14 @@ logger = logging.getLogger(__name__)
 class EmbeddingStorage:
     def __init__(self, index_path: str):
         self.index_path = index_path
-        self.index = faiss.IndexFlatL2(1536)
-        logging.info(f"Initialized EmbeddingStorage with index path: {self.index_path}")
-
-    def load_index(self):
-        """
-        Load the FAISS index from a file
-        """
         logging.info(f"Loading FAISS index from {self.index_path}.")
         try:
             self.index = faiss.read_index(self.index_path)
             logging.info("FAISS index loaded successfully.")
         except Exception:
             logging.warning("No existing index found. Starting with an empty index.")
+            self.index = faiss.IndexFlatL2(1536)
+        logging.info(f"Initialized EmbeddingStorage with index path: {self.index_path}")
 
     def save_index(self):
         """
@@ -48,7 +43,7 @@ class EmbeddingStorage:
             self.index.add(vector)
             self.save_index()
             current_index = self.index.ntotal - 1
-            logging.info(f"Embedding added at index: {current_index}.")
+            logging.info(f"Embedding added at index:{current_index}.")
             return current_index
         except Exception as e:
             logging.error(f"Error adding embedding: {e}")
@@ -63,6 +58,11 @@ class EmbeddingStorage:
         """
         logging.info(f"Searching FAISS index for {top_k} most similar embeddings.")
         try:
+            logging.info(f"Total embeddings in the index: {self.index.ntotal}")
+
+            logging.info(f"Query embedding dimension: {len(query_embedding)}")
+            logging.info(f"FAISS index dimension: {self.index.d}")
+
             query_vector = np.array([query_embedding], dtype=np.float32)
             distances, indices = self.index.search(query_vector, top_k)
             logging.info(f"Search completed. Found {len(indices.flatten())} results.")
