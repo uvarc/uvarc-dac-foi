@@ -46,6 +46,7 @@ class EmbeddingStorage:
         try:
             vector = np.array([embedding], dtype=np.float32)
             self.index.add(vector)
+            self.save_index()
             current_index = self.index.ntotal - 1
             logging.info(f"Embedding added at index: {current_index}.")
             return current_index
