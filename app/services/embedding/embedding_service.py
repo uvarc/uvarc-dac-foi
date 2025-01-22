@@ -73,7 +73,7 @@ class EmbeddingService:
 
 
 # if __name__ == "__main__":
-#     API_KEY = "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"
+#     API_KEY =
 #     INDEX_PATH = "../../../data/faculty_index.faiss"
 #
 #     client = OpenAI(api_key=API_KEY)
