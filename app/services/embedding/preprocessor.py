@@ -41,8 +41,6 @@ class Preprocessor:
         :return: standardized string
         """
         query = query.lower()
-        # Remove special characters
         query = re.sub(r"[^\w\s,.:;?!-]", "", query)
-        # Normalize whitespace
         query = re.sub(r"\s+", " ", query).strip()
         return query
