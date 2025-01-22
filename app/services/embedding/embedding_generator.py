@@ -22,8 +22,9 @@ class EmbeddingGenerator:
                 input=text,
                 model="text-embedding-ada-002"
             )
-            logging.info("Successfully generated embedding.")
-            return response.data[0].embedding
+            embedding = response.data[0].embedding
+            logging.info(f"Successfully generated embedding. Dimension is {len(embedding)}.")
+            return embedding
         except Exception as e:
             logging.error(f"Error generating embedding: {e}")
             raise
