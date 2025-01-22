@@ -4,7 +4,7 @@ import logging
 import copy
 
 from datetime import datetime
-from app.services.nih_reporter.proxy import NIHReporterProxy
+from app.services.nih.nih_reporter_proxy import NIHReporterProxy
 from app.core.constants import NIH_REPORTER_PAYLOAD, DEFAULT_FISCAL_YEARS
 
 logging.basicConfig(level=logging.INFO)
