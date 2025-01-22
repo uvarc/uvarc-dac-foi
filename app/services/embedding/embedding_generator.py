@@ -1,4 +1,6 @@
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=api_key)
 import logging
 import typing
 
@@ -7,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 class EmbeddingGenerator:
     def __init__(self, api_key: str):
-        openai.api_key = api_key
         logging.info("Initialized EmbeddingGenerator with OpenAI API key")
 
     @staticmethod
@@ -19,12 +20,10 @@ class EmbeddingGenerator:
         """
         logging.info(f"Generating embedding for text: {text}")
         try:
-            response = openai.Embedding.create(
-                input=text,
-                model="text-embedding-ada-002"
-            )
+            response = client.embeddings.create(input=text,
+            model="text-embedding-ada-002")
             logging.info("Successfully generated embedding.")
-            return response["data"][0]["embedding"]
+            return response.data[0].embedding
         except Exception as e:
             logging.error(f"Error generating embedding: {e}")
             raise
