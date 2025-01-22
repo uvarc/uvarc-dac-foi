@@ -1,31 +1,27 @@
 import typing
+
+from app.services.embedding.embedding_service import EmbeddingService
 from app.services.nih.nih_reporter_service import NIHReporterService
 from app.services.scraper.scraper_service import ScraperService
 from app.models.models import *
 
 
 class DataAggregator:
-    def __init__(self, scraper_service: ScraperService, nih_service: NIHReporterService):
+    def __init__(self, scraper_service: ScraperService, nih_service: NIHReporterService, embedding_service: EmbeddingService):
         self.scraper_service = scraper_service
         self.nih_service = nih_service
+        self.embedding_service = embedding_service
         """
         {
             dept1: [
-                {
-                    "faculty": FacultyObject
-                    "embedding_id": int
-                },
-                {
-                ...
-                }
+                Faculty1,
+                Faculty2,
             ]
             dept2: [
                 ...
             ]
             ...
         }
-        :param school: 
-        :return: 
         """
 
     def aggregate_school_faculty_data(self, school: str) -> typing.Dict:
@@ -42,8 +38,12 @@ class DataAggregator:
             for faculty_profile in dept_faculty_df.itertuples():
                 first_name, last_name = self.extract_faculty_names_from_profile(faculty_profile)
                 projects = self.get_faculty_member_projects(first_name, last_name)
-                # TODO: generate faculty embedding and return ID
-                # faculty = self.convert_to_faculty_model(faculty_profile, projects, embedding_id)
+                faculty = self.convert_to_faculty_model(faculty_profile, projects)
+                embedding_id = self.embedding_service.generate_and_store_embedding(faculty, projects)
+                faculty.embedding_id = embedding_id
+                aggregated_faculty_data[dept].append(faculty)
+        return aggregated_faculty_data
+
 
     @staticmethod
     def extract_faculty_names_from_profile(faculty_profile: typing.Tuple) -> typing.Tuple[str, str]:
@@ -83,7 +83,7 @@ class DataAggregator:
         )
 
     @staticmethod
-    def convert_to_faculty_model(faculty_profile: typing.Tuple, projects: typing.List[Project], embedding_id: int) -> Faculty:
+    def convert_to_faculty_model(faculty_profile: typing.Tuple, projects: typing.List[Project]) -> Faculty:
         """
         Use profile, RePORTER project data, and embedding ID to construct Faculty model object
         :param faculty_profile: namedtuple w/ faculty information
@@ -99,7 +99,7 @@ class DataAggregator:
             email=faculty_profile.Email_Address,
             profile_url=faculty_profile.Profile_URL,
             projects=projects,
-            embedding_id=embedding_id
+            embedding_id=-1,
         )
 
 
