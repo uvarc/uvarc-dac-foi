@@ -2,6 +2,7 @@ import faiss
 import logging
 import typing
 import numpy as np
+from app.core.script_config import OPENAI_CONFIG
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,7 +16,7 @@ class EmbeddingStorage:
             logging.info("FAISS index loaded successfully.")
         except Exception:
             logging.warning("No existing index found. Starting with an empty index.")
-            self.index = faiss.IndexFlatL2(1536)
+            self.index = faiss.IndexFlatL2(OPENAI_CONFIG["EMBEDDING_DIMENSIONS"])
         logging.info(f"Initialized EmbeddingStorage with index path: {self.index_path}")
 
     def save_index(self):
