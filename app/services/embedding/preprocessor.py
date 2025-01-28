@@ -1,16 +1,15 @@
 import typing
 import logging
 import re
-from openai import OpenAI
+import tiktoken
+
+from app.core.script_config import OPENAI_CONFIG
 from app.models.models import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Preprocessor:
-    def __init__(self, openai_client: OpenAI):
-        self.client = openai_client
-
     @staticmethod
     def preprocess_faculty_profile(faculty: Faculty, projects: typing.List[Project]) -> str:
         """
@@ -27,11 +26,11 @@ class Preprocessor:
         )
 
         processed_text = (
-            f"Faculty Name: {faculty.name}\n"
-            f"Department: {faculty.department}\n"
-            f"School: {faculty.school}\n"
-            f"About: {faculty.about or ''}\n"
-            f"Projects: [{project_details}]"
+            f"Faculty Name: {faculty.name}."
+            f"Department: {faculty.department}."
+            f"School: {faculty.school}."
+            f"About: {faculty.about or ''}."
+            f"Projects: {project_details}"
         )
         logging.debug(f"Processed text for faculty {faculty.name}: {processed_text}")
         return processed_text
@@ -47,3 +46,8 @@ class Preprocessor:
         query = re.sub(r"[^\w\s,.:;?!-]", "", query)
         query = re.sub(r"\s+", " ", query).strip()
         return query
+
+    @staticmethod
+    def count_tokens(text: str) -> int:
+        tokenizer = tiktoken.encoding_for_model(OPENAI_CONFIG["EMBEDDING_MODEL"])
+        return len(tokenizer.encode(text))
