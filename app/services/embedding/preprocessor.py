@@ -1,12 +1,16 @@
 import typing
 import logging
 import re
+from openai import OpenAI
 from app.models.models import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Preprocessor:
+    def __init__(self, openai_client: OpenAI):
+        self.client = openai_client
+
     @staticmethod
     def preprocess_faculty_profile(faculty: Faculty, projects: typing.List[Project]) -> str:
         """
@@ -18,16 +22,16 @@ class Preprocessor:
         logger.info(f"Preprocessing data for faculty: {faculty.name}")
 
         project_details = " ".join(
-            f"Abstract: {project.abstract or ''}, Terms: {project.relevant_terms or ''}."
+            f"Abstract: {project.abstract or ''}, Terms: {project.relevant_terms or ''}\n"
             for project in projects
         )
 
         processed_text = (
-            f"Faculty Name: {faculty.name}. "
-            f"Department: {faculty.department}. "
-            f"School: {faculty.school}. "
-            f"About: {faculty.about or ''}. "
-            f"Projects: {project_details}"
+            f"Faculty Name: {faculty.name}\n"
+            f"Department: {faculty.department}\n"
+            f"School: {faculty.school}\n"
+            f"About: {faculty.about or ''}\n"
+            f"Projects: [{project_details}]"
         )
         logging.debug(f"Processed text for faculty {faculty.name}: {processed_text}")
         return processed_text

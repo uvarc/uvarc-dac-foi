@@ -7,8 +7,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class EmbeddingGenerator:
-    def __init__(self, client: OpenAI):
-        self.client = client
+    def __init__(self, openai_client: OpenAI):
+        self.client = openai_client
         logging.info("Initialized EmbeddingGenerator with OpenAI client")
 
     def generate_embedding(self, text: str) -> typing.List[float]:
