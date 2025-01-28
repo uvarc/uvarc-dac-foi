@@ -118,7 +118,7 @@ class DataAggregator:
 #
 # nih_service = NIHReporterService(NIHReporterProxy(HttpClient()))
 #
-# client = openai.OpenAI(api_key=Config.SECRET_KEY)
+# client = OpenAI(api_key=Config.SECRET_KEY)
 # embedding_service = EmbeddingService(
 #     preprocessor=Preprocessor(),
 #     embedding_generator=EmbeddingGenerator(client),
