@@ -3,6 +3,7 @@ import typing
 from openai import OpenAI
 from app.core.script_config import OPENAI_CONFIG
 from app.services.embedding.preprocessor import Preprocessor
+from app.utils.token_utils import count_tokens
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,7 +21,7 @@ class EmbeddingGenerator:
         :return: embedding
         """
         logger.info(f"Generating embedding for text: {text}")
-        token_count = Preprocessor.count_tokens(text)
+        token_count = count_tokens(text)
         if token_count <= OPENAI_CONFIG["MAX_TOKENS"]:
             return self._call_embedding_api(text)
 
