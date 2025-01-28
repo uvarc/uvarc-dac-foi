@@ -1,7 +1,6 @@
 import typing
 import logging
 import re
-
 from app.models.models import *
 
 logging.basicConfig(level=logging.INFO)

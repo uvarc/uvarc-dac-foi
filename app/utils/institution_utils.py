@@ -2,7 +2,7 @@ import re
 import typing
 import logging
 
-from app.core.constants import *
+from app.core.script_config import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

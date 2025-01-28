@@ -1,6 +1,7 @@
 import logging
 import typing
 from openai import OpenAI
+from app.core.script_config import OPENAI_CONFIG
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,7 +21,7 @@ class EmbeddingGenerator:
         try:
             response = self.client.embeddings.create(
                 input=text,
-                model="text-embedding-ada-002"
+                model=OPENAI_CONFIG["EMBEDDING_MODEL"],
             )
             embedding = response.data[0].embedding
             logging.info(f"Successfully generated embedding. Dimension is {len(embedding)}.")
