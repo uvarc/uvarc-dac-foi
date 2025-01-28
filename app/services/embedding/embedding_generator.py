@@ -44,7 +44,8 @@ class EmbeddingGenerator:
         logging.info("All chunk embeddings generated successfully. Aggregating embeddings.")
         return self._aggregate_embeddings(embeddings)
 
-    def _aggregate_embeddings(self, embeddings: typing.List[typing.List[float]]) -> typing.List[float]:
+    @staticmethod
+    def _aggregate_embeddings(embeddings: typing.List[typing.List[float]]) -> typing.List[float]:
         """
         Aggregates multiple embeddings into a single vector by averaging
         :param embeddings: list of embeddings
