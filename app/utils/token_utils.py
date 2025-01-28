@@ -1,4 +1,5 @@
 import tiktoken
+from app.core.script_config import OPENAI_CONFIG
 
 def count_tokens(text: str) -> int:
     """
