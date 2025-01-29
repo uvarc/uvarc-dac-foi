@@ -11,20 +11,8 @@ class DataAggregator:
         self.scraper_service = scraper_service
         self.nih_service = nih_service
         self.embedding_service = embedding_service
-        """
-        {
-            dept1: [
-                Faculty1,
-                Faculty2,
-            ]
-            dept2: [
-                ...
-            ]
-            ...
-        }
-        """
 
-    def aggregate_school_faculty_data(self, school: str) -> typing.Dict:
+    def aggregate_school_faculty_data(self, school: str) -> typing.List[Faculty]:
         """
         Aggregate faculty data for school from scrapers, NIH RePORTER API, generate embeddings
         Outputs are DB commit-ready
@@ -32,18 +20,25 @@ class DataAggregator:
         :return: dictionary of department faculty data stored as Faculty model objects
         """
         school_faculty_df = self.scraper_service.get_school_faculty_data(school)
-        aggregated_faculty_data = {}
+        all_faculty = []
         for dept, dept_faculty_df in school_faculty_df.items():
-            aggregated_faculty_data[dept] = []
             for faculty_profile in dept_faculty_df.itertuples():
-                first_name, last_name = self.extract_faculty_names_from_profile(faculty_profile)
-                projects = self.get_faculty_member_projects(first_name, last_name)
-                faculty = self.convert_to_faculty_model(faculty_profile, projects)
-                embedding_id = self.embedding_service.generate_and_store_embedding(faculty, projects)
-                faculty.embedding_id = embedding_id
-                aggregated_faculty_data[dept].append(faculty)
-        return aggregated_faculty_data
+                faculty = self.build_faculty_model(faculty_profile)
+                all_faculty.append(faculty)
+        return all_faculty
 
+    def build_faculty_model(self, faculty_profile: typing.Tuple) -> Faculty:
+        """
+        Build faculty model from faculty profile
+        :param faculty_profile: faculty data
+        :return: faculty model
+        """
+        first_name, last_name = self.extract_faculty_names_from_profile(faculty_profile)
+        projects = self.get_faculty_member_projects(first_name, last_name)
+        faculty = self.convert_to_faculty_model(faculty_profile, projects)
+        embedding_id = self.embedding_service.generate_and_store_embedding(faculty, projects)
+        faculty.embedding_id = embedding_id
+        return faculty
 
     @staticmethod
     def extract_faculty_names_from_profile(faculty_profile: typing.Tuple) -> typing.Tuple[str, str]:
@@ -101,37 +96,3 @@ class DataAggregator:
             projects=projects,
             embedding_id=-1,
         )
-
-from openai import OpenAI
-from app.utils.http_client import HttpClient
-from app.services.nih.nih_reporter_proxy import NIHReporterProxy
-from app.services.scraper.seas_scraper import SEASScraper
-from app.services.embedding.preprocessor import Preprocessor
-from app.services.embedding.embedding_generator import EmbeddingGenerator
-from app.services.embedding.embedding_storage import EmbeddingStorage
-from app.core.config import Config
-
-scrapers = [
-    SEASScraper(HttpClient())
-]
-scraper_service = ScraperService(scrapers)
-
-nih_service = NIHReporterService(NIHReporterProxy(HttpClient()))
-
-client = OpenAI(api_key=Config.SECRET_KEY)
-embedding_service = EmbeddingService(
-    preprocessor=Preprocessor(),
-    embedding_generator=EmbeddingGenerator(client),
-    embedding_storage=EmbeddingStorage(),
-)
-
-aggregator = DataAggregator(scraper_service, nih_service, embedding_service)
-
-dept_faculty_df = scraper_service.get_department_faculty_data("Biomedical Engineering")
-for faculty_profile in dept_faculty_df.itertuples():
-    first_name, last_name = aggregator.extract_faculty_names_from_profile(faculty_profile)
-    projects = aggregator.get_faculty_member_projects(first_name, last_name)
-    faculty = aggregator.convert_to_faculty_model(faculty_profile, projects)
-    embedding_id = aggregator.embedding_service.generate_and_store_embedding(faculty, projects)
-    faculty.embedding_id = embedding_id
-    print(faculty)
