@@ -2,32 +2,32 @@ import faiss
 import logging
 import typing
 import numpy as np
+from app.core.script_config import OPENAI_CONFIG, INDEX_PATH
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class EmbeddingStorage:
-    def __init__(self, index_path: str):
-        self.index_path = index_path
-        logging.info(f"Loading FAISS index from {self.index_path}.")
+    def __init__(self):
+        logging.info(f"Loading FAISS index from {INDEX_PATH}.")
         try:
-            self.index = faiss.read_index(self.index_path)
+            self.index = faiss.read_index(INDEX_PATH)
             logging.info("FAISS index loaded successfully.")
         except Exception:
             logging.warning("No existing index found. Starting with an empty index.")
-            self.index = faiss.IndexFlatL2(1536)
-        logging.info(f"Initialized EmbeddingStorage with index path: {self.index_path}")
+            self.index = faiss.IndexFlatL2(OPENAI_CONFIG["EMBEDDING_DIMENSIONS"])
+        logging.info(f"Initialized EmbeddingStorage with index path: {INDEX_PATH}")
 
     def save_index(self):
         """
         Save the FAISS index to a file
         """
-        logging.info(f"Saving FAISS index to {self.index_path}.")
+        logging.info(f"Saving FAISS index to {INDEX_PATH}.")
         try:
-            faiss.write_index(self.index, self.index_path)
+            faiss.write_index(self.index, INDEX_PATH)
             logging.info("FAISS index saved successfully.")
         except Exception as e:
-            logging.error(f"Error saving FAISS index: {e}")
+            logging.error(f"Error saving FAISS index: {INDEX_PATH}")
             raise
 
     def add_embedding(self, faculty_name: str, embedding: typing.List[float]) -> int:

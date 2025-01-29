@@ -4,7 +4,7 @@ import logging
 from app.utils.http_client import HttpClient
 from app.utils.institution_utils import InstitutionUtils
 from app.services.scraper.base_scraper import BaseScraper
-from app.core.constants import SCHOOL_DEPARTMENT_DATA
+from app.core.script_config import SCHOOL_DEPARTMENT_DATA
 from lxml import html
 
 logging.basicConfig(level=logging.INFO)

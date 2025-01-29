@@ -5,3 +5,5 @@ venv/
 **/__pycache__
 rc-DACFOI.env
 data
+database.db
+index.faiss

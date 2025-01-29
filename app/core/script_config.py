@@ -55,3 +55,11 @@ NIH_REPORTER_PAYLOAD = {
         ],
     },
 }
+
+OPENAI_CONFIG = {
+    "EMBEDDING_MODEL": "text-embedding-ada-002",
+    "MAX_TOKENS": 8192,
+    "EMBEDDING_DIMENSIONS": 1536,
+}
+
+INDEX_PATH = "../../../index.faiss"
