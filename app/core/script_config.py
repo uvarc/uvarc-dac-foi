@@ -62,4 +62,4 @@ OPENAI_CONFIG = {
     "EMBEDDING_DIMENSIONS": 1536,
 }
 
-INDEX_PATH = "../../../instance/index.faiss"
+INDEX_PATH = "../../../index.faiss"

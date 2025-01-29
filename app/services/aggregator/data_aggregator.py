@@ -102,36 +102,36 @@ class DataAggregator:
             embedding_id=-1,
         )
 
-# from openai import OpenAI
-# from app.utils.http_client import HttpClient
-# from app.services.nih.nih_reporter_proxy import NIHReporterProxy
-# from app.services.scraper.seas_scraper import SEASScraper
-# from app.services.embedding.preprocessor import Preprocessor
-# from app.services.embedding.embedding_generator import EmbeddingGenerator
-# from app.services.embedding.embedding_storage import EmbeddingStorage
-# from app.core.config import Config
-#
-# scrapers = [
-#     SEASScraper(HttpClient())
-# ]
-# scraper_service = ScraperService(scrapers)
-#
-# nih_service = NIHReporterService(NIHReporterProxy(HttpClient()))
-#
-# client = OpenAI(api_key=Config.SECRET_KEY)
-# embedding_service = EmbeddingService(
-#     preprocessor=Preprocessor(),
-#     embedding_generator=EmbeddingGenerator(client),
-#     embedding_storage=EmbeddingStorage("index.faiss"),
-# )
-#
-# aggregator = DataAggregator(scraper_service, nih_service, embedding_service)
-#
-# dept_faculty_df = scraper_service.get_department_faculty_data("Biomedical Engineering")
-# for faculty_profile in dept_faculty_df.itertuples():
-#     first_name, last_name = aggregator.extract_faculty_names_from_profile(faculty_profile)
-#     projects = aggregator.get_faculty_member_projects(first_name, last_name)
-#     faculty = aggregator.convert_to_faculty_model(faculty_profile, projects)
-#     embedding_id = aggregator.embedding_service.generate_and_store_embedding(faculty, projects)
-#     faculty.embedding_id = embedding_id
-#     print(faculty)
+from openai import OpenAI
+from app.utils.http_client import HttpClient
+from app.services.nih.nih_reporter_proxy import NIHReporterProxy
+from app.services.scraper.seas_scraper import SEASScraper
+from app.services.embedding.preprocessor import Preprocessor
+from app.services.embedding.embedding_generator import EmbeddingGenerator
+from app.services.embedding.embedding_storage import EmbeddingStorage
+from app.core.config import Config
+
+scrapers = [
+    SEASScraper(HttpClient())
+]
+scraper_service = ScraperService(scrapers)
+
+nih_service = NIHReporterService(NIHReporterProxy(HttpClient()))
+
+client = OpenAI(api_key=Config.SECRET_KEY)
+embedding_service = EmbeddingService(
+    preprocessor=Preprocessor(),
+    embedding_generator=EmbeddingGenerator(client),
+    embedding_storage=EmbeddingStorage(),
+)
+
+aggregator = DataAggregator(scraper_service, nih_service, embedding_service)
+
+dept_faculty_df = scraper_service.get_department_faculty_data("Biomedical Engineering")
+for faculty_profile in dept_faculty_df.itertuples():
+    first_name, last_name = aggregator.extract_faculty_names_from_profile(faculty_profile)
+    projects = aggregator.get_faculty_member_projects(first_name, last_name)
+    faculty = aggregator.convert_to_faculty_model(faculty_profile, projects)
+    embedding_id = aggregator.embedding_service.generate_and_store_embedding(faculty, projects)
+    faculty.embedding_id = embedding_id
+    print(faculty)
