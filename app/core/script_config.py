@@ -61,3 +61,5 @@ OPENAI_CONFIG = {
     "MAX_TOKENS": 8192,
     "EMBEDDING_DIMENSIONS": 1536,
 }
+
+INDEX_PATH = "../../../instance/index.faiss"
