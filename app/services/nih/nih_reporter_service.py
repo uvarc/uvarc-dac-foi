@@ -110,10 +110,10 @@ class NIHReporterService:
         return self.safe_get_field(project, "activity_code")
 
     @staticmethod
-    def process_date_string(raw_date: str) -> str:
+    def process_date_string(raw_date: str) -> datetime.date:
         try:
             start_datetime = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%SZ")
-            return start_datetime.strftime("%Y-%m-%d")
+            return start_datetime.date()
         except Exception as e:
             logger.error(f"Unexpected error parsing date {raw_date}, returning unprocessed date: {e}")
             return raw_date
