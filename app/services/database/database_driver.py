@@ -21,6 +21,8 @@ class DatabaseDriver:
             db.session.rollback()
             logger.error(f"Failed to create faculty record for {faculty.name}: {e}")
             raise
+        finally:
+            db.session.remove()
 
     @staticmethod
     def get_faculty_by_embedding_id(embedding_id: int) -> Faculty | None:
@@ -53,4 +55,6 @@ class DatabaseDriver:
             db.session.rollback()
             logger.error(f"Failed to clear faculty records: {e}")
             raise
+        finally:
+            db.session.remove()
 
