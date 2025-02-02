@@ -1,3 +1,5 @@
+SCHOOLS_TO_SCRAPE = ["SEAS"]
+
 SCHOOL_DEPARTMENT_DATA = {
     "SEAS": {
         "base_url": "https://engineering.virginia.edu",
@@ -62,4 +64,4 @@ OPENAI_CONFIG = {
     "EMBEDDING_DIMENSIONS": 1536,
 }
 
-INDEX_PATH = "../../../index.faiss"
+INDEX_PATH = "../../instance/index.faiss"

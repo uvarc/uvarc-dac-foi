@@ -12,6 +12,7 @@ def create_app(config_class="app.core.config.Config"):
     db.init_app(app)
     migrate.init_app(app, db)
 
+    from app.models.models import Faculty, Project
     with app.app_context():
         db.create_all()
 
