@@ -43,7 +43,7 @@ class EmbeddingService:
             logging.error(f"Failed to generate and store embedding for faculty {faculty.name}: {e}")
             raise
 
-    def search_similar_faculty(self, query: str, top_k: int = 5) -> typing.List[int]:
+    def search_similar_embeddings(self, query: str, top_k: int = 5) -> typing.List[int]:
         """
         Search for the most similar faculty based on a natural language query.
         :param query: user input query
