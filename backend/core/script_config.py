@@ -1,3 +1,7 @@
+import os
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
 SCHOOLS_TO_SCRAPE = ["SEAS"]
 
 SCHOOL_DEPARTMENT_DATA = {
@@ -64,4 +68,4 @@ OPENAI_CONFIG = {
     "EMBEDDING_DIMENSIONS": 1536,
 }
 
-INDEX_PATH = "../../../instance/index.faiss"
+INDEX_PATH = os.path.join(BASE_DIR, "../../instance/index.faiss")
