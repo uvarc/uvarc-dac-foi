@@ -1,5 +1,5 @@
 from openai import OpenAI
-from backend.app import app
+from app import app
 from backend.core.config import Config
 from backend.core.script_config import SCHOOLS_TO_SCRAPE
 from backend.utils.http_client import HttpClient
@@ -16,6 +16,7 @@ from backend.services.aggregator.data_aggregator import DataAggregator
 # instantiate dependencies
 http_client = HttpClient()
 
+# TODO: refactor instantiation logic to factory
 seas_scraper = SEASScraper(http_client)
 scraper_service = ScraperService([seas_scraper])
 nih_service = NIHReporterService(NIHReporterProxy(http_client))

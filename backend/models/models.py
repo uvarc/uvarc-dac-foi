@@ -1,4 +1,4 @@
-from backend.core import db
+from backend.core.extensions import db
 
 class Faculty(db.Model):
     __tablename__ = 'faculty'

@@ -1,6 +1,6 @@
 import logging
 from flask import Flask
-from backend.core import db
+from backend.core.extensions import db
 from backend.models.models import Faculty
 
 logging.basicConfig(level=logging.INFO)
