@@ -1,5 +1,3 @@
-import logging
-
 from openai import OpenAI
 from app.app import app
 from app.core.config import Config
@@ -14,9 +12,6 @@ from app.services.embedding.embedding_storage import EmbeddingStorage
 from app.services.embedding.embedding_generator import EmbeddingGenerator
 from app.services.embedding.embedding_service import EmbeddingService
 from app.services.aggregator.data_aggregator import DataAggregator
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # instantiate dependencies
 http_client = HttpClient()
@@ -39,5 +34,6 @@ if __name__ == '__main__':
     with app.app_context():
         from app.services.database.database_driver import DatabaseDriver
         database_driver = DatabaseDriver()
+        database_driver.clear()
         for faculty in all_faculty:
             database_driver.create_faculty(faculty)
