@@ -1,9 +1,9 @@
 import logging
 import typing
 from openai import OpenAI
-from app.core.script_config import OPENAI_CONFIG
-from app.services.embedding.preprocessor import Preprocessor
-from app.utils.token_utils import count_tokens
+from backend.core.script_config import OPENAI_CONFIG
+from backend.services.embedding.preprocessor import Preprocessor
+from backend.utils.token_utils import count_tokens
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

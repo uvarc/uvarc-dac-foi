@@ -1,9 +1,9 @@
 import typing
 
-from app.services.embedding.embedding_service import EmbeddingService
-from app.services.nih.nih_reporter_service import NIHReporterService
-from app.services.scraper.scraper_service import ScraperService
-from app.models.models import *
+from backend.services.embedding.embedding_service import EmbeddingService
+from backend.services.nih.nih_reporter_service import NIHReporterService
+from backend.services.scraper.scraper_service import ScraperService
+from backend.models.models import *
 
 
 class DataAggregator:

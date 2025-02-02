@@ -1,7 +1,7 @@
 import typing
 import logging
 from requests import RequestException, Timeout, HTTPError
-from app.utils.http_client import HttpClient
+from backend.utils.http_client import HttpClient
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

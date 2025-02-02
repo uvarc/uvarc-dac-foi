@@ -2,7 +2,7 @@ import faiss
 import logging
 import typing
 import numpy as np
-from app.core.script_config import OPENAI_CONFIG, INDEX_PATH
+from backend.core.script_config import OPENAI_CONFIG, INDEX_PATH
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

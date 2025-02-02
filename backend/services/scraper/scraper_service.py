@@ -2,8 +2,8 @@ import typing
 import logging
 import pandas as pd
 
-from app.services.scraper.base_scraper import BaseScraper
-from app.utils.institution_utils import InstitutionUtils
+from backend.services.scraper.base_scraper import BaseScraper
+from backend.utils.institution_utils import InstitutionUtils
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

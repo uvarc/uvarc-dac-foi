@@ -1,9 +1,9 @@
 import typing
 import logging
-from app.models.models import *
-from app.services.embedding.preprocessor import Preprocessor
-from app.services.embedding.embedding_generator import EmbeddingGenerator
-from app.services.embedding.embedding_storage import EmbeddingStorage
+from backend.models.models import *
+from backend.services.embedding.preprocessor import Preprocessor
+from backend.services.embedding.embedding_generator import EmbeddingGenerator
+from backend.services.embedding.embedding_storage import EmbeddingStorage
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

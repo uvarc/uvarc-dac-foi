@@ -2,7 +2,7 @@ import requests
 import logging
 import typing
 from requests.exceptions import RequestException, Timeout, HTTPError
-from app.utils.institution_utils import InstitutionUtils
+from backend.utils.institution_utils import InstitutionUtils
 
 logger = logging.getLogger(__name__)
 

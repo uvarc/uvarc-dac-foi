@@ -1,6 +1,6 @@
 import logging
-from app.core import db
-from app.models.models import Faculty
+from backend.core import db
+from backend.models.models import Faculty
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
