@@ -8,7 +8,7 @@ class SearchService:
         self.database_driver = database_driver
         self.embedding_service = embedding_service
 
-    def search(self, query: str, k: int) -> typing.List[typing.Dict]:
+    def search(self, query: str, k: int) -> typing.List[Faculty]:
         """
         Search for the most similar faculty based on a natural language query.
         :param query: user input
@@ -17,7 +17,7 @@ class SearchService:
         """
         similar_embeddings = self.embedding_service.search_similar_embeddings(query, k)
         similar_faculty = [self._get_faculty_record(id) for id in similar_embeddings]
-        return [self._convert_to_json(faculty) for faculty in similar_faculty]
+        return similar_faculty
 
     def _get_faculty_record(self, id: int) -> Faculty:
         """
@@ -26,31 +26,3 @@ class SearchService:
         :return: Faculty
         """
         return self.database_driver.get_faculty_by_embedding_id(id)
-
-    @staticmethod
-    def _convert_to_json(faculty: Faculty) -> typing.Dict:
-        """
-        Unpack Faculty into JSON
-        :param faculty: Faculty
-        :return: JSON
-        """
-        return {
-            "name": faculty.name,
-            "school": faculty.school,
-            "department": faculty.department,
-            "about": faculty.about,
-            "emails": faculty.email,
-            "profile_url": faculty.profile_url,
-            "projects": [
-                {
-                    "project_number": project.project_number,
-                    "abstract": project.abstract,
-                    "relevant_terms": project.relevant_terms,
-                    "start_date": project.start_date,
-                    "end_date": project.end_date,
-                    "agency_ic_admin": project.agency_ic_admin,
-                    "activity_code": project.activity_code,
-                }
-                for project in faculty.projects
-            ]
-        }
