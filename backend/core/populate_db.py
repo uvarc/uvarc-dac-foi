@@ -31,9 +31,8 @@ if __name__ == '__main__':
     for school in SCHOOLS_TO_SCRAPE:
         all_faculty.extend(data_aggregator.aggregate_school_faculty_data(school))
 
-    with app.app_context():
-        from backend.services.database.database_driver import DatabaseDriver
-        database_driver = DatabaseDriver()
-        database_driver.clear()
-        for faculty in all_faculty:
-            database_driver.create_faculty(faculty)
+    from backend.services.database.database_driver import DatabaseDriver
+    database_driver = DatabaseDriver(app=app)
+    database_driver.clear()
+    for faculty in all_faculty:
+        database_driver.create_faculty(faculty)
