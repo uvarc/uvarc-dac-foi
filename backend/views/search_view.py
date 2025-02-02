@@ -3,9 +3,8 @@ from flask import Blueprint, request, jsonify
 from backend.models.models import Faculty
 from backend.services.search.search_service import SearchService
 
-search_bp = Blueprint('search', __name__)
-
 def create_search_blueprint(search_service: SearchService):
+    search_bp = Blueprint('search', __name__)
 
     @search_bp.route('/search', methods=["GET"])
     def search():
