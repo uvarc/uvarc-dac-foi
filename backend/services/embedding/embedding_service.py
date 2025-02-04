@@ -11,10 +11,12 @@ logger = logging.getLogger(__name__)
 class EmbeddingService:
     def __init__(self,
                  embedding_generator: EmbeddingGenerator = None,
-                 embedding_storage: EmbeddingStorage = None,):
-        if embedding_generator is None:
+                 embedding_storage: EmbeddingStorage = None,
+                ):
+
+        if not embedding_generator:
             raise ValueError('embedding_generator must be defined')
-        if embedding_storage is None:
+        if not embedding_storage is None:
             raise ValueError('embedding_storage must be defined')
 
         self.embedding_generator = embedding_generator
@@ -57,39 +59,3 @@ class EmbeddingService:
         logging.info(f"Search successful.")
 
         return results
-
-
-# if __name__ == "__main__":
-#     API_KEY =
-#     INDEX_PATH = "../../../data/faculty_index.faiss"
-#
-#     client = OpenAI(api_key=API_KEY)
-#     preprocessor = Preprocessor()
-#     embedding_generator = EmbeddingGenerator(client)
-#     embedding_storage = EmbeddingStorage(INDEX_PATH)
-#     # Initialize the service
-#     service = EmbeddingService(api_key=API_KEY, index_path=INDEX_PATH, preprocessor=preprocessor, embedding_generator=embedding_generator, embedding_storage=embedding_storage)
-#
-#     # Example faculty and projects
-#     faculty_example = Faculty(
-#         faculty_id=1,
-#         name="John Doe",
-#         school="UVA",
-#         department="Biomedical Engineering",
-#         about="Research in neural networks and brain modeling.",
-#         embedding_id=0
-#     )
-#     projects_example = [
-#         Project(
-#             project_id=1,
-#             faculty_id=1,
-#             project_number="12345",
-#             abstract="Investigating neural networks in neuroscience.",
-#             relevant_terms="neural networks, brain modeling",
-#             start_date="2020-01-01",
-#             end_date="2023-12-31"
-#         )
-#     ]
-#
-#     # service.generate_and_store_embedding(faculty_example, projects_example)
-#     print(service.search_similar_faculty("Neural networks"))
