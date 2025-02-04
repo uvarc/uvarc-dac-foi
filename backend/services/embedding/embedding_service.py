@@ -10,17 +10,13 @@ logger = logging.getLogger(__name__)
 
 class EmbeddingService:
     def __init__(self,
-                 preprocessor: Preprocessor = None,
                  embedding_generator: EmbeddingGenerator = None,
                  embedding_storage: EmbeddingStorage = None,):
-        if preprocessor is None:
-            raise ValueError('preprocessor must be defined')
         if embedding_generator is None:
             raise ValueError('embedding_generator must be defined')
         if embedding_storage is None:
             raise ValueError('embedding_storage must be defined')
 
-        self.preprocessor = preprocessor
         self.embedding_generator = embedding_generator
         self.embedding_storage = embedding_storage
 
@@ -33,7 +29,7 @@ class EmbeddingService:
         """
         logging.info(f"Starting embedding generation for faculty: {faculty.name}")
         try:
-            text = self.preprocessor.preprocess_faculty_profile(faculty, projects)
+            text = Preprocessor.preprocess_faculty_profile(faculty, projects)
             embedding = self.embedding_generator.generate_embedding(text)
             embedding_id = self.embedding_storage.add_embedding(faculty.name, embedding)
             logging.info(f"Embedding generated and stored at index: {embedding_id} for faculty: {faculty.name}")
@@ -51,7 +47,7 @@ class EmbeddingService:
         :return: List of faculty IDs
         """
         logging.info(f"Searching similar faculty for query: {query}.")
-        standardized_query = self.preprocessor.preprocess_query(query)
+        standardized_query = Preprocessor.preprocess_query(query)
         query_embedding = self.embedding_generator.generate_embedding(standardized_query)
 
         results = [id for id in self.embedding_storage.search(query_embedding, top_k) if id != -1]
