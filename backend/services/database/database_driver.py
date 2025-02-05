@@ -37,7 +37,7 @@ class DatabaseDriver:
         logger.info(f"Faculty record created successfully for {faculty.name}.")
         db.session.remove()
 
-    def get_faculty_by_embedding_id(self, embedding_id: int) -> "Faculty" | None:
+    def get_faculty_by_embedding_id(self, embedding_id: int) -> "Faculty":
         """
         Retrieve a single Faculty object by corresponding embedding ID.
         :param embedding_id: ID of the embedding.
