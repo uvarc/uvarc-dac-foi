@@ -3,14 +3,13 @@ import logging
 import re
 from backend.utils.token_utils import count_tokens
 from backend.core.script_config import OPENAI_CONFIG
-from backend.models.models import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Preprocessor:
     @staticmethod
-    def preprocess_faculty_profile(faculty: Faculty, projects: typing.List[Project]) -> str:
+    def preprocess_faculty_profile(faculty: "Faculty", projects: typing.List["Project"]) -> str:
         """
         Preprocess faculty and project(s) data into a single string for embedding
         :param faculty: faculty data
