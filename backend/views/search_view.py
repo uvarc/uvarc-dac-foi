@@ -8,7 +8,7 @@ def create_search_blueprint(search_service: SearchService):
 
     @search_bp.route('/', methods=["GET"])
     def search():
-        query_text = request.args.get('q', "")
+        query_text = request.args.get('query', "")
         limit = int(request.args.get('limit', 10))
 
         results = search_service.search(query_text, limit)
@@ -31,7 +31,7 @@ def serialize_faculty(faculty: Faculty) -> typing.Dict:
         "school": faculty.school,
         "department": faculty.department,
         "about": faculty.about,
-        "emails": faculty.email,
+        "emails": faculty.email.split(","),
         "profile_url": faculty.profile_url,
         "projects": [
             {
