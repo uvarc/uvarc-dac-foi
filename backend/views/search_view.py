@@ -6,7 +6,7 @@ from backend.services.search.search_service import SearchService
 def create_search_blueprint(search_service: SearchService):
     search_bp = Blueprint('search', __name__)
 
-    @search_bp.route('/search', methods=["GET"])
+    @search_bp.route('/', methods=["GET"])
     def search():
         query_text = request.args.get('q', "")
         limit = int(request.args.get('limit', 10))
