@@ -15,7 +15,7 @@ class EmbeddingService:
 
         if not embedding_generator:
             raise ValueError('embedding_generator must be defined')
-        if not embedding_storage is None:
+        if not embedding_storage:
             raise ValueError('embedding_storage must be defined')
 
         self.embedding_generator = embedding_generator
