@@ -1,7 +1,6 @@
 import logging
 from flask import Flask
 from backend.core.extensions import db
-from backend.models.models import Faculty
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -14,7 +13,7 @@ class DatabaseDriver:
         """
         self.app = app
 
-    def create_faculty(self, faculty: Faculty):
+    def create_faculty(self, faculty: "Faculty"):
         """
         Persist a single Faculty object and its associated Projects.
         :param faculty: Faculty object.
@@ -30,7 +29,7 @@ class DatabaseDriver:
             raise
 
     @staticmethod
-    def _add_faculty(faculty: Faculty):
+    def _add_faculty(faculty: "Faculty"):
         """Helper function to add faculty to the database."""
         logger.info(f"Creating faculty record for {faculty.name}.")
         db.session.add(faculty)
@@ -38,7 +37,7 @@ class DatabaseDriver:
         logger.info(f"Faculty record created successfully for {faculty.name}.")
         db.session.remove()
 
-    def get_faculty_by_embedding_id(self, embedding_id: int) -> Faculty | None:
+    def get_faculty_by_embedding_id(self, embedding_id: int) -> "Faculty" | None:
         """
         Retrieve a single Faculty object by corresponding embedding ID.
         :param embedding_id: ID of the embedding.
@@ -56,6 +55,7 @@ class DatabaseDriver:
     @staticmethod
     def _query_faculty(embedding_id: int):
         """Helper function to query faculty by embedding ID."""
+        from backend.models.models import Faculty
         faculty = Faculty.query.filter_by(embedding_id=embedding_id).first()
         if faculty:
             logger.info(f"Retrieved faculty record with embedding_id {embedding_id}: {faculty.name}")
@@ -80,6 +80,7 @@ class DatabaseDriver:
     @staticmethod
     def _clear_db():
         """Helper function to clear faculty records."""
+        from backend.models.models import Faculty
         num_deleted = Faculty.query.delete()
         db.session.commit()
         logger.info(f"Deleted {num_deleted} faculty records and their associated projects.")
