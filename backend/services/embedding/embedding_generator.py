@@ -2,8 +2,6 @@ import logging
 import typing
 from openai import OpenAI
 from backend.core.script_config import OPENAI_CONFIG
-from backend.services.embedding.preprocessor import Preprocessor
-from backend.utils.token_utils import count_tokens
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,6 +19,8 @@ class EmbeddingGenerator:
         :return: embedding
         """
         logger.info(f"Generating embedding for text: {text}")
+
+        from backend.utils.token_utils import count_tokens
         token_count = count_tokens(text)
         if token_count <= OPENAI_CONFIG["MAX_TOKENS"]:
             return self._call_embedding_api(text)
@@ -34,7 +34,8 @@ class EmbeddingGenerator:
         :param text: input text
         :return: aggregated embedding
         """
-        chunks = Preprocessor.chunk_text(text)
+        from backend.utils.token_utils import chunk_text
+        chunks = chunk_text(text)
 
         embeddings = []
         for i, chunk in enumerate(chunks):

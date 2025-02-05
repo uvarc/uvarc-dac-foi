@@ -1,16 +1,13 @@
 import typing
 import logging
 import re
-from backend.utils.token_utils import count_tokens
-from backend.core.script_config import OPENAI_CONFIG
-from backend.models.models import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Preprocessor:
     @staticmethod
-    def preprocess_faculty_profile(faculty: Faculty, projects: typing.List[Project]) -> str:
+    def preprocess_faculty_profile(faculty: "Faculty", projects: typing.List["Project"]) -> str:
         """
         Preprocess faculty and project(s) data into a single string for embedding
         :param faculty: faculty data
@@ -46,25 +43,3 @@ class Preprocessor:
         query = re.sub(r"\s+", " ", query).strip()
         return query
 
-    @staticmethod
-    def chunk_text(text: str) -> typing.List[str]:
-        """
-        Split text into chunks that fit within the model's token limit.
-        :param text: input text
-        :return: list of text chunks
-        """
-        words = text.split()
-        chunks = []
-        current_chunk = []
-        current_length = 0
-        for word in words:
-            word_length = count_tokens(word)
-            if current_length + word_length > OPENAI_CONFIG["MAX_TOKENS"]:
-                chunks.append(" ".join(current_chunk))
-                current_chunk = []
-                current_length = 0
-            current_chunk.append(word)
-            current_length += word_length + 1
-        if current_chunk:
-            chunks.append(" ".join(current_chunk))
-        return chunks

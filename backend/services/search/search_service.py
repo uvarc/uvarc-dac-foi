@@ -1,5 +1,4 @@
 import typing
-from backend.models.models import Faculty
 from backend.services.embedding.embedding_service import EmbeddingService
 from backend.services.database.database_driver import DatabaseDriver
 
@@ -8,7 +7,7 @@ class SearchService:
         self.database_driver = database_driver
         self.embedding_service = embedding_service
 
-    def search(self, query: str, k: int) -> typing.List[Faculty]:
+    def search(self, query: str, k: int) -> typing.List["Faculty"]:
         """
         Search for the most similar faculty based on a natural language query.
         :param query: user input
@@ -19,7 +18,7 @@ class SearchService:
         similar_faculty = [self._get_faculty_record(id) for id in similar_embeddings]
         return similar_faculty
 
-    def _get_faculty_record(self, id: int) -> Faculty:
+    def _get_faculty_record(self, id: int) -> "Faculty":
         """
         Get faculty record by embedding id
         :param id: embedding id
