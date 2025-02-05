@@ -1,6 +1,5 @@
 import typing
 import logging
-from backend.models.models import *
 from backend.services.embedding.preprocessor import Preprocessor
 from backend.services.embedding.embedding_generator import EmbeddingGenerator
 from backend.services.embedding.embedding_storage import EmbeddingStorage
@@ -22,7 +21,7 @@ class EmbeddingService:
         self.embedding_generator = embedding_generator
         self.embedding_storage = embedding_storage
 
-    def generate_and_store_embedding(self, faculty: Faculty, projects: typing.List[Project]) -> int:
+    def generate_and_store_embedding(self, faculty: "Faculty", projects: typing.List["Project"]) -> int:
         """
         Preprocess, generate, and store the embedding for a faculty member
         :param faculty: Faculty model object containing faculty data
