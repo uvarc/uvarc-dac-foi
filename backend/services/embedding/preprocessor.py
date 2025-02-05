@@ -1,8 +1,6 @@
 import typing
 import logging
 import re
-from backend.utils.token_utils import count_tokens
-from backend.core.script_config import OPENAI_CONFIG
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
