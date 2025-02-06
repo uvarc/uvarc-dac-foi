@@ -1,26 +1,29 @@
 import typing
 from flask import Blueprint, request, jsonify
-from backend.models.models import Faculty
-from backend.services.search.search_service import SearchService
 
-def create_search_blueprint(search_service: SearchService):
+def create_search_blueprint(search_service: "SearchService"):
     search_bp = Blueprint('search', __name__)
 
-    @search_bp.route('/', methods=["GET"])
-    def search():
-        query_text = request.args.get('query', "")
-        limit = int(request.args.get('limit', 10))
-
-        results = search_service.search(query_text, limit)
-
-        response = {
-            "results": [serialize_faculty(r) for r in results]
-        }
-        return jsonify(response), 200
+    @search_bp.route("/", methods=["GET"])
+    def search_route():
+        return search(search_service)
 
     return search_bp
 
-def serialize_faculty(faculty: Faculty) -> typing.Dict:
+
+def search(search_service: "SearchService"):
+    query_text = request.args.get('query', "")
+    limit = int(request.args.get('limit', 10))
+
+    results = search_service.search(query_text, limit)
+
+    response = {
+        "results": [serialize_faculty(r) for r in results]
+    }
+    return jsonify(response), 200
+
+
+def serialize_faculty(faculty: "Faculty") -> typing.Dict:
     """
     Unpack Faculty into JSON
     :param faculty: Faculty
