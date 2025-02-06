@@ -1,5 +1,9 @@
 import typing
+import logging
 from flask import Blueprint, request, jsonify
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 def create_search_blueprint(search_service: "SearchService"):
     search_bp = Blueprint('search', __name__)
@@ -12,8 +16,9 @@ def create_search_blueprint(search_service: "SearchService"):
 
 
 def search(search_service: "SearchService"):
-    query_text = request.args.get('query', "")
-    limit = int(request.args.get('limit', 10))
+    query_text = request.args.get("query", "")
+    limit = int(request.args.get("limit", 10))
+    logging.info(f"Search query: {query_text}, Limit: {limit}")
 
     results = search_service.search(query_text, limit)
 
