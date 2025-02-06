@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let query = document.getElementById("query").value;
         let limit = document.getElementById("limit").value;
 
-        fetch(`/search?query=${encodeURIComponent(query)}&limit=${encodeURIComponent(limit)}`)
+        fetch(`/api/search?query=${encodeURIComponent(query)}&limit=${encodeURIComponent(limit)}`)
             .then(response => response.json())
             .then(data => {
                 let resultsList = document.getElementById("results");
