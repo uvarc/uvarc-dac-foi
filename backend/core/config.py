@@ -8,5 +8,5 @@ class Config:
     OPENAI_API_KEY = os.getenv("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    STATIC_FOLDER = "../static"
-    TEMPLATES_FOLDER = "../templates"
+    STATIC_FOLDER = "../../frontend/static"
+    TEMPLATES_FOLDER = "../../frontend/templates"
