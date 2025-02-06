@@ -10,3 +10,5 @@ def create_search_ui_blueprint():
     @search_ui_bp.route("/")
     def search_ui():
         return render_template(search_template)
+
+    return search_ui_bp
