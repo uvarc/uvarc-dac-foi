@@ -11,12 +11,14 @@
         <input type="text" id="query" name="query" required>
 
         <label for="limit">Limit:</label>
-        <input type="number" id="limit" name="limit" min="1" value="10" required>
+        <input type="number" id="limit" name="limit" min="1" max="50" required>
 
         <button type="submit">Search</button>
     </form>
 
     <h2>Results</h2>
-    <ul id="results"></ul>
+    <div id="results"></div>
+
+    <script src="../static/js/search.js" defer></script>
 </body>
 </html>
