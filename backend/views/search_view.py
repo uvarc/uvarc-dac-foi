@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 def create_search_blueprint(search_service: "SearchService"):
     search_bp = Blueprint('search', __name__)
 
-    @search_bp.route("/", methods=["GET"])
+    @search_bp.route("/search", methods=["GET"])
     def search_route():
         return search(search_service)
 
