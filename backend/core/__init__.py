@@ -5,7 +5,11 @@ from backend.utils.factory import get_search_service
 
 
 def create_app(config_class=Config, search_service_instance: "SearchService" = None):
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        template_folder=Config.TEMPLATES_FOLDER,
+        static_folder=Config.STATIC_FOLDER,
+                )
     app.config.from_object(config_class)
 
     if not search_service_instance:
