@@ -13,7 +13,10 @@ def create_app(config_class=Config, search_service_instance: "SearchService" = N
 
     from backend.views.search_view import create_search_blueprint
     search_bp = create_search_blueprint(search_service_instance)
-    app.register_blueprint(search_bp, url_prefix="/api/search")
+    app.register_blueprint(search_bp, url_prefix="/api")
+    from backend.views.search_ui_view import create_search_ui_blueprint
+    search_ui_bp = create_search_ui_blueprint()
+    app.register_blueprint(search_ui_bp)
 
     db.init_app(app)
     migrate.init_app(app, db)
