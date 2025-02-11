@@ -77,13 +77,13 @@ class EmbeddingStorage:
 
             if self._empty_filters(school=school, department=department, activity_code=activity_code, agency_ic_admin=agency_ic_admin):
                 logging.info("No filters detected, search entire FAISS index.")
-                distances, indices = self.search_without_filters(
+                distances, indices = self.search_no_parameters(
                     query_vector=query_vector,
                     top_k=top_k
                 )
             else:
                 logging.info("Filters detected, reducing index search space.")
-                distances, indices = self.search_with_filters(
+                distances, indices = self.search_with_parameters(
                     query_vector=query_vector,
                     top_k=top_k,
                     school=school,
@@ -98,18 +98,18 @@ class EmbeddingStorage:
             logging.error(f"Error during search: {e}")
             raise
 
-    def search_without_filters(self,
-                               query_vector: np.ndarray = None,
-                               top_k: int = 10):
+    def search_no_parameters(self,
+                             query_vector: np.ndarray = None,
+                             top_k: int = 10):
         return self.index.search(query_vector, top_k)
 
-    def search_with_filters(self,
-                            query_vector: np.ndarray = None,
-                            top_k: int = 10,
-                            school: str = None,
-                            department: str = None,
-                            activity_code: str = None,
-                            agency_ic_admin: str = None):
+    def search_with_parameters(self,
+                               query_vector: np.ndarray = None,
+                               top_k: int = 10,
+                               school: str = None,
+                               department: str = None,
+                               activity_code: str = None,
+                               agency_ic_admin: str = None):
         filtered_eids = self._filtered_eids(
             school=school,
             department=department,
