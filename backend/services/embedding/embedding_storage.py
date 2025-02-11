@@ -143,8 +143,7 @@ class EmbeddingStorage:
         )
 
     @staticmethod
-    def _empty_filters(self,
-                       school: str = None,
+    def _empty_filters(school: str = None,
                        department: str = None,
                        activity_code: str = None,
                        agency_ic_admin: str = None) -> bool:
