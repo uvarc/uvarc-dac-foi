@@ -67,8 +67,8 @@ class DatabaseDriver:
 
     def get_embedding_ids_by_filters(
             self,
-            department: str = None,
             school: str = None,
+            department: str = None,
             activity_code: str = None,
             agency_ic_admin: str = None
                                     ) -> typing.List[int]:
@@ -77,17 +77,18 @@ class DatabaseDriver:
             if self.app:
                 with self.app.app_context():
                     return self._get_embedding_ids_by_filters(
-                        department=department,
                         school=school,
+                        department=department,
                         activity_code=activity_code,
                         agency_ic_admin=agency_ic_admin
                     )
             return self._get_embedding_ids_by_filters(
-                department=department,
                 school=school,
+                department=department,
                 activity_code=activity_code,
                 agency_ic_admin=agency_ic_admin
             )
+
         except Exception as e:
             logger.error(f"Failed to retrieve faculty record by filters: {e}")
             raise
@@ -95,8 +96,8 @@ class DatabaseDriver:
 
     @staticmethod
     def _get_embedding_ids_by_filters(
-            department: str = None,
             school: str = None,
+            department: str = None,
             activity_code: str = None,
             agency_ic_admin: str = None
                                      ) -> typing.List[int]:
