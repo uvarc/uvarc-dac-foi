@@ -10,17 +10,38 @@ def create_search_blueprint(search_service: "SearchService"):
 
     @search_bp.route("/search", methods=["GET"])
     def search_route():
+        """
+        API endpoint for faculty search
+        """
         return search(search_service)
 
     return search_bp
 
 
 def search(search_service: "SearchService"):
-    query_text = request.args.get("query", "")
-    limit = int(request.args.get("limit", 10))
-    logging.info(f"Search query: {query_text}, Limit: {limit}")
+    """
+    Entry point for faculty search
+    :param search_service: SearchService instance
+    """
+    # TODO: accept school, department, activity code, agency ic admin filter parameters
+    query = request.args.get("query")
+    limit = int(request.args.get("limit"))
+    school = request.args.get("school", None)
+    department = request.args.get("department", None)
+    activity_code = request.args.get("activity_code", None)
+    agency_ic_admin = request.args.get("agency_ic_admin", None)
 
-    results = search_service.search(query_text, limit)
+    logging.info(f"Search query: {query}\nLimit: {limit}\nSchool: {school}\nDepartment: {department}\nActivity Code: \
+{activity_code}\nAgency IC Admin: {agency_ic_admin}")
+
+    results = search_service.search(
+        query=query,
+        limit=limit,
+        school=school,
+        department=department,
+        activity_code=activity_code,
+        agency_ic_admin=agency_ic_admin,
+    )
 
     response = {
         "results": [serialize_faculty(r) for r in results]
