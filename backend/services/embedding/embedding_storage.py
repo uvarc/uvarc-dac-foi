@@ -51,7 +51,7 @@ class EmbeddingStorage:
 
     def search_similar_embeddings(self,
                                   query_embedding: typing.List[float] = None,
-                                  top_k: int = 10,
+                                  top_k: int = None,
                                   school: str = None,
                                   department: str = None,
                                   activity_code: str = None,

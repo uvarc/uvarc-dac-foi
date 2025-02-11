@@ -39,18 +39,36 @@ class EmbeddingService:
             logging.error(f"Failed to generate and store embedding for faculty {faculty.name}: {e}")
             raise
 
-    def search_similar_embeddings(self, query: str, top_k: int = 5) -> typing.List[int]:
+    def search_similar_embeddings(self,
+                                  query: str = None,
+                                  top_k: int = None,
+                                  school: str = None,
+                                  department: str = None,
+                                  activity_code: str = None,
+                                  agency_ic_admin: str = None) -> typing.List[int]:
         """
         Search for the most similar faculty based on a natural language query.
         :param query: user input query
         :param top_k: Number of results to return
-        :return: List of faculty IDs
+        :param school: school name
+        :param department: department name
+        :param activity_code: activity code
+        :param agency_ic_admin: agency ic admin name
+        :return: List of faculty EIDs
         """
         logging.info(f"Searching similar faculty for query: {query}.")
         standardized_query = Preprocessor.preprocess_query(query)
         query_embedding = self.embedding_generator.generate_embedding(standardized_query)
 
-        results = [id for id in self.embedding_storage.search_similar_embeddings(query_embedding, top_k) if id != -1]
+        results = [eid for eid in self.embedding_storage.search_similar_embeddings(
+            query_embedding=query_embedding,
+            top_k=top_k,
+            school=school,
+            department=department,
+            activity_code=activity_code,
+            agency_ic_admin=agency_ic_admin
+        ) if id != -1]
+
         len_results = len(results)
         if len_results < top_k:
             logging.warning(f"Only {len_results} result(s) were found.")
