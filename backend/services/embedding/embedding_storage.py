@@ -150,4 +150,4 @@ class EmbeddingStorage:
         """
         Check if filters are empty
         """
-        return all([school, department, activity_code, agency_ic_admin])
+        return not any([school, department, activity_code, agency_ic_admin])
