@@ -97,7 +97,7 @@ class EmbeddingStorage:
                     agency_ic_admin=agency_ic_admin
                 )
 
-            logging.info(f"Search completed. Found {len(indices.flatten())} results.")
+            logging.info(f"Search completed. Found {len(indices)} results.")
             return indices
 
         except Exception as e:
@@ -106,7 +106,7 @@ class EmbeddingStorage:
 
     def search_no_parameters(self,
                              query_vector: np.ndarray = None,
-                             top_k: int = None):
+                             top_k: int = None) -> typing.List[int]:
         _, indices = self.index.search(query_vector, top_k)
         return indices.flatten().tolist()
 
@@ -116,7 +116,7 @@ class EmbeddingStorage:
                                school: str = None,
                                department: str = None,
                                activity_code: str = None,
-                               agency_ic_admin: str = None):
+                               agency_ic_admin: str = None) -> typing.List[int]:
 
         filtered_eids = self.get_filtered_eids(
             school=school,
@@ -126,9 +126,20 @@ class EmbeddingStorage:
         )
         valid_eids = [eid for eid in filtered_eids if eid < self.index.ntotal]
 
-        selector = faiss.IDSelectorBatch(np.array(valid_eids, dtype=np.int32))
-        _, indices = self.index.search(query_vector, top_k, params={"selector": selector})
-        return indices.flatten().tolist()
+        if not valid_eids:
+            logger.warning("No matching embeddings found after filtering.")
+            return []
+
+        query_vector = query_vector.reshape(1, -1)
+        subset_vectors = np.array(self.index.reconstruct_batch(valid_eids), dtype=np.float32)
+
+        distances = np.linalg.norm(subset_vectors - query_vector, axis=1) ** 2
+        top_k_indices = np.argsort(distances)[:min(top_k, len(valid_eids))]
+
+
+
+
+
 
 
     def get_filtered_eids(self,
