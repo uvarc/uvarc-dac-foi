@@ -66,12 +66,12 @@ class DatabaseDriver:
         return faculty
 
     def get_embedding_ids_by_filters(
-                self,
-                department: str = None,
-                school: str = None,
-                activity_code: str = None,
-                agency_ic_admin: str = None
-            ) -> typing.List[int]:
+            self,
+            department: str = None,
+            school: str = None,
+            activity_code: str = None,
+            agency_ic_admin: str = None
+                                    ) -> typing.List[int]:
 
         try:
             if self.app:
@@ -95,11 +95,11 @@ class DatabaseDriver:
 
     @staticmethod
     def _get_embedding_ids_by_filters(
-               department: str = None,
-               school: str = None,
-               activity_code: str = None,
-               agency_ic_admin: str = None
-           ) -> typing.List[int]:
+            department: str = None,
+            school: str = None,
+            activity_code: str = None,
+            agency_ic_admin: str = None
+                                     ) -> typing.List[int]:
 
         from backend.models.models import Faculty, Project
         query = db.session.query(Faculty.embedding_id).join(Project, isouter=True)
