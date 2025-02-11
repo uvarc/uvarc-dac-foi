@@ -125,28 +125,29 @@ class EmbeddingStorage:
             agency_ic_admin=agency_ic_admin
         )
         valid_eids = [eid for eid in filtered_eids if eid < self.index.ntotal]
-
         if not valid_eids:
-            logger.warning("No matching embeddings found after filtering.")
+            logging.warning("No matching embeddings found after filtering.")
             return []
 
-        query_vector = query_vector.reshape(1, -1)
         subset_vectors = np.array(self.index.reconstruct_batch(valid_eids), dtype=np.float32)
+        query_vector = query_vector.reshape(1, -1)
 
         distances = np.linalg.norm(subset_vectors - query_vector, axis=1) ** 2
-        top_k_indices = np.argsort(distances)[:min(top_k, len(valid_eids))]
+        top_k_indices = np.argsort(distances)[:min(top_k, len(subset_vectors))]
+        return [valid_eids[idx] for idx in top_k_indices]
 
-
-
-
-
-
+        ### NOTE: DEPRECATED LOGIC ###
+        # subset_index = faiss.IndexIDMap(faiss.IndexFlatL2(self.index.d))
+        # subset_vectors = np.array(self.index.reconstruct_batch(filtered_eids), dtype=np.float32)
+        # subset_index.add_with_ids(subset_vectors, np.array(filtered_eids, dtype=np.int64))
+        # _, indices = subset_index.search(query_vector, top_k)
+        # return indices.flatten().tolist()
 
     def get_filtered_eids(self,
                         school: str = None,
                         department: str = None,
                         activity_code: str = None,
-                        agency_ic_admin: str = None) -> "Index":
+                        agency_ic_admin: str = None) -> typing.List[int]:
         """
         Get embedding ids for faculty with matching metadata
         :param school: school name
