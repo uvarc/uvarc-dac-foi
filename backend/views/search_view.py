@@ -36,7 +36,7 @@ def search(search_service: "SearchService"):
 
     results = search_service.search(
         query=query,
-        limit=limit,
+        k=limit,
         school=school,
         department=department,
         activity_code=activity_code,
