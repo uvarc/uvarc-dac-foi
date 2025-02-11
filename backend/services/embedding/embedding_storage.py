@@ -75,15 +75,20 @@ class EmbeddingStorage:
         try:
             query_vector = np.array([query_embedding], dtype=np.float32)
 
-            if self._empty_filters(school=school, department=department, activity_code=activity_code, agency_ic_admin=agency_ic_admin):
+            if self.are_search_parameters_empty(
+                    school=school,
+                    department=department,
+                    activity_code=activity_code,
+                    agency_ic_admin=agency_ic_admin
+            ):
                 logging.info("No filters detected, search entire FAISS index.")
-                distances, indices = self.search_no_parameters(
+                indices = self.search_no_parameters(
                     query_vector=query_vector,
                     top_k=top_k
                 )
             else:
                 logging.info("Filters detected, reducing index search space.")
-                distances, indices = self.search_with_parameters(
+                indices = self.search_with_parameters(
                     query_vector=query_vector,
                     top_k=top_k,
                     school=school,
@@ -93,7 +98,8 @@ class EmbeddingStorage:
                 )
 
             logging.info(f"Search completed. Found {len(indices.flatten())} results.")
-            return indices.flatten().tolist()
+            return indices
+
         except Exception as e:
             logging.error(f"Error during search: {e}")
             raise
@@ -101,7 +107,8 @@ class EmbeddingStorage:
     def search_no_parameters(self,
                              query_vector: np.ndarray = None,
                              top_k: int = 10):
-        return self.index.search(query_vector, top_k)
+        _, indices = self.index.search(query_vector, top_k)
+        return indices.flatten().tolist()
 
     def search_with_parameters(self,
                                query_vector: np.ndarray = None,
@@ -110,19 +117,21 @@ class EmbeddingStorage:
                                department: str = None,
                                activity_code: str = None,
                                agency_ic_admin: str = None):
-        filtered_eids = self._filtered_eids(
+
+        filtered_eids = self.get_filtered_eids(
             school=school,
             department=department,
             activity_code=activity_code,
             agency_ic_admin=agency_ic_admin
         )
-        subset_index = faiss.IndexIDMap(faiss.IndexFlatL2(self.index.d))
-        subset_vectors = np.array([self.index.reconstruct(eid) for eid in filtered_eids], dtype=np.float32)
-        subset_index.add_with_ids(subset_vectors, np.array(filtered_eids, dtype=np.int64))
-        return subset_index.search(query_vector, top_k)
+        valid_eids = [eid for eid in filtered_eids if eid < self.index.ntotal]
+
+        selector = faiss.IDSelectorBatch(np.array(valid_eids, dtype=np.int32))
+        _, indices = self.index.search(query_vector, top_k, params={"selector": selector})
+        return indices.flatten().tolist()
 
 
-    def _filtered_eids(self,
+    def get_filtered_eids(self,
                         school: str = None,
                         department: str = None,
                         activity_code: str = None,
@@ -143,11 +152,8 @@ class EmbeddingStorage:
         )
 
     @staticmethod
-    def _empty_filters(school: str = None,
-                       department: str = None,
-                       activity_code: str = None,
-                       agency_ic_admin: str = None) -> bool:
+    def are_search_parameters_empty(**parameters) -> bool:
         """
-        Check if filters are empty
+        Check if search parameters are empty
         """
-        return not any([school, department, activity_code, agency_ic_admin])
+        return not any(parameters.values())
