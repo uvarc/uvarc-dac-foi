@@ -10,8 +10,7 @@ logger = logging.getLogger(__name__)
 class EmbeddingService:
     def __init__(self,
                  embedding_generator: EmbeddingGenerator = None,
-                 embedding_storage: EmbeddingStorage = None,
-                ):
+                 embedding_storage: EmbeddingStorage = None):
 
         if not embedding_generator:
             raise ValueError('embedding_generator must be defined')
@@ -51,7 +50,7 @@ class EmbeddingService:
         standardized_query = Preprocessor.preprocess_query(query)
         query_embedding = self.embedding_generator.generate_embedding(standardized_query)
 
-        results = [id for id in self.embedding_storage.search(query_embedding, top_k) if id != -1]
+        results = [id for id in self.embedding_storage.search_similar_embeddings(query_embedding, top_k) if id != -1]
         len_results = len(results)
         if len_results < top_k:
             logging.warning(f"Only {len_results} result(s) were found.")

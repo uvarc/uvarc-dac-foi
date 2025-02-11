@@ -65,14 +65,11 @@ class DatabaseDriver:
             logger.warning(f"No faculty record found with embedding_id {embedding_id}.")
         return faculty
 
-    def get_embedding_ids_by_filters(
-            self,
-            school: str = None,
-            department: str = None,
-            activity_code: str = None,
-            agency_ic_admin: str = None
-                                    ) -> typing.List[int]:
-
+    def get_embedding_ids_by_filters(self,
+                                     school: str = None,
+                                     department: str = None,
+                                     activity_code: str = None,
+                                     agency_ic_admin: str = None) -> typing.List[int]:
         try:
             if self.app:
                 with self.app.app_context():
@@ -95,13 +92,10 @@ class DatabaseDriver:
 
 
     @staticmethod
-    def _get_embedding_ids_by_filters(
-            school: str = None,
-            department: str = None,
-            activity_code: str = None,
-            agency_ic_admin: str = None
-                                     ) -> typing.List[int]:
-
+    def _get_embedding_ids_by_filters(school: str = None,
+                                      department: str = None,
+                                      activity_code: str = None,
+                                      agency_ic_admin: str = None) -> typing.List[int]:
         from backend.models.models import Faculty, Project
         query = db.session.query(Faculty.embedding_id).join(Project, isouter=True)
         if department:
