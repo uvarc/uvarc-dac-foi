@@ -106,13 +106,13 @@ class EmbeddingStorage:
 
     def search_no_parameters(self,
                              query_vector: np.ndarray = None,
-                             top_k: int = 10):
+                             top_k: int = None):
         _, indices = self.index.search(query_vector, top_k)
         return indices.flatten().tolist()
 
     def search_with_parameters(self,
                                query_vector: np.ndarray = None,
-                               top_k: int = 10,
+                               top_k: int = None,
                                school: str = None,
                                department: str = None,
                                activity_code: str = None,
