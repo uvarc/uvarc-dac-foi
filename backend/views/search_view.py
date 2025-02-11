@@ -23,7 +23,6 @@ def search(search_service: "SearchService"):
     Entry point for faculty search
     :param search_service: SearchService instance
     """
-    # TODO: accept school, department, activity code, agency ic admin filter parameters
     query = request.args.get("query")
     limit = int(request.args.get("limit"))
     school = request.args.get("school", None)

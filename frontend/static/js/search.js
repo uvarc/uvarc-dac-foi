@@ -2,10 +2,16 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("searchForm").addEventListener("submit", function (event) {
         event.preventDefault();
 
-        let query = document.getElementById("query").value;
-        let limit = document.getElementById("limit").value;
+        const formData = new FormData(this)
+        const params = new URLSearchParams()
 
-        fetch(`/api/search?query=${encodeURIComponent(query)}&limit=${encodeURIComponent(limit)}`)
+        for (const [key, value] of formData.entries()) {
+            if (value) {
+                params.append(key, value)
+            }
+        }
+
+        fetch(`/api/search?${params.toString()}`)
             .then(response => response.json())
             .then(data => {
                 let resultsContainer = document.getElementById("results");
