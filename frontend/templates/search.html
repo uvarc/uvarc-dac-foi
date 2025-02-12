@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- TODO: add title element -->
+</head>
+<body>
+    <h1>Faculty Search</h1>
+    <form id="searchForm">
+        <label for="query">Search Query</label>
+        <input type="text" id="query" name="query" required>
+
+        <label for="limit">Limit:</label>
+        <input type="number" id="limit" name="limit" min="1" max="50" required>
+
+        <label for="school">School:</label>
+        <input type="text" id="school" name="school">
+
+        <label for="department">Department:</label>
+        <input type="text" id="department" name="department">
+
+        <label for="activity_code">Activity Code:</label>
+        <input type="text" id="activity_code" name="activity_code">
+
+        <label for="agency_ic_admin">Agency IC Admin:</label>
+        <input type="text" id="agency_ic_admin" name="agency_ic_admin">
+
+        <!-- TODO: add 'has_finding' search parameter -->
+
+        <button type="submit">Search</button>
+    </form>
+
+    <h2>Results</h2>
+    <div id="results"></div>
+
+    <script src="../static/js/search.js" defer></script>
+</body>
+</html>

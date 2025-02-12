@@ -1,26 +1,54 @@
 import typing
+import logging
 from flask import Blueprint, request, jsonify
-from backend.models.models import Faculty
-from backend.services.search.search_service import SearchService
 
-def create_search_blueprint(search_service: SearchService):
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+def create_search_blueprint(search_service: "SearchService"):
     search_bp = Blueprint('search', __name__)
 
-    @search_bp.route('/', methods=["GET"])
-    def search():
-        query_text = request.args.get('query', "")
-        limit = int(request.args.get('limit', 10))
-
-        results = search_service.search(query_text, limit)
-
-        response = {
-            "results": [serialize_faculty(r) for r in results]
-        }
-        return jsonify(response), 200
+    @search_bp.route("/search", methods=["GET"])
+    def search_route():
+        """
+        API endpoint for faculty search
+        """
+        return search(search_service)
 
     return search_bp
 
-def serialize_faculty(faculty: Faculty) -> typing.Dict:
+
+def search(search_service: "SearchService"):
+    """
+    Entry point for faculty search
+    :param search_service: SearchService instance
+    """
+    query = request.args.get("query")
+    limit = int(request.args.get("limit"))
+    school = request.args.get("school", None)
+    department = request.args.get("department", None)
+    activity_code = request.args.get("activity_code", None)
+    agency_ic_admin = request.args.get("agency_ic_admin", None)
+
+    logging.info(f"Search query: {query}\nLimit: {limit}\nSchool: {school}\nDepartment: {department}\nActivity Code: \
+{activity_code}\nAgency IC Admin: {agency_ic_admin}")
+
+    results = search_service.search(
+        query=query,
+        k=limit,
+        school=school,
+        department=department,
+        activity_code=activity_code,
+        agency_ic_admin=agency_ic_admin,
+    )
+
+    response = {
+        "results": [serialize_faculty(r) for r in results]
+    }
+    return jsonify(response), 200
+
+
+def serialize_faculty(faculty: "Faculty") -> typing.Dict:
     """
     Unpack Faculty into JSON
     :param faculty: Faculty

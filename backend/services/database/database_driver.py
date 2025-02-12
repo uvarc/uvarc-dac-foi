@@ -1,6 +1,8 @@
 import logging
+import typing
 from flask import Flask
 from backend.core.extensions import db
+from backend.models.models import Faculty
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -62,6 +64,52 @@ class DatabaseDriver:
         else:
             logger.warning(f"No faculty record found with embedding_id {embedding_id}.")
         return faculty
+
+    def get_embedding_ids_by_filters(self,
+                                     school: str = None,
+                                     department: str = None,
+                                     activity_code: str = None,
+                                     agency_ic_admin: str = None) -> typing.List[int]:
+        try:
+            if self.app:
+                with self.app.app_context():
+                    return self._get_embedding_ids_by_filters(
+                        school=school,
+                        department=department,
+                        activity_code=activity_code,
+                        agency_ic_admin=agency_ic_admin
+                    )
+            return self._get_embedding_ids_by_filters(
+                school=school,
+                department=department,
+                activity_code=activity_code,
+                agency_ic_admin=agency_ic_admin
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to retrieve faculty record by filters: {e}")
+            raise
+
+
+    @staticmethod
+    def _get_embedding_ids_by_filters(school: str = None,
+                                      department: str = None,
+                                      activity_code: str = None,
+                                      agency_ic_admin: str = None) -> typing.List[int]:
+        from backend.models.models import Faculty, Project
+        query = db.session.query(Faculty.embedding_id).outerjoin(Project)
+
+        if department:
+            query = query.filter(Faculty.department == department)
+        if school:
+            query = query.filter(Faculty.school == school)
+        if activity_code:
+            query = query.filter(Project.activity_code == activity_code)
+        if agency_ic_admin:
+            query = query.filter(Project.agency_ic_admin == agency_ic_admin)
+
+        embedding_ids = [record.embedding_id for record in query.distinct().all()]
+        return embedding_ids
 
     def clear(self):
         """
