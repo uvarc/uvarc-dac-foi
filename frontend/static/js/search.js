@@ -41,8 +41,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     // Add About (truncate to 300 characters)
                     let aboutEl = document.createElement("p");
-                    let truncatedAbout = item.about.length > 300
-                        ? item.about.slice(0, 300) + "..."
+                    let truncatedAbout = item.about.length > 1000
+                        ? item.about.slice(0, 1000) + "..."
                         : item.about;
                     aboutEl.innerHTML = `<strong>About:</strong> ${truncatedAbout}`;
                     resultDiv.appendChild(aboutEl);
