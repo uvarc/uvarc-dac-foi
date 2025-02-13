@@ -1,21 +1,37 @@
 from backend.core.extensions import db
 
+faculty_department_association = db.Table(
+    "faculty_department",
+    db.Column("faculty_id", db.Integer, db.ForeignKey("faculty.faculty_id"), primary_key=True),
+    db.Column("department_id", db.Integer, db.ForeignKey("department.department_id"), primary_key=True),
+)
+
 class Faculty(db.Model):
     __tablename__ = 'faculty'
 
     faculty_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
     school = db.Column(db.String, nullable=False)
-    department = db.Column(db.String, nullable=False)
     about = db.Column(db.Text, nullable=True)
     email = db.Column(db.String, nullable=True)
     profile_url = db.Column(db.String, nullable=True)
     embedding_id = db.Column(db.Integer, nullable=False)
 
-    projects = db.relationship('Project', back_populates='faculty', cascade='all, delete')
+    departments = db.relationship("Department", secondary=faculty_department_association, back_populates="faculty")
+
+    projects = db.relationship("Project", back_populates="faculty", cascade="all, delete")
+
+class Department(db.Model):
+    __tablename__ = "department"
+
+    department_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String, nullable=False, unique=True)
+
+    faculty = db.relationship("Faculty", secondary=faculty_department_association, back_populates="departments")
+
 
 class Project(db.Model):
-    __tablename__ = 'projects'
+    __tablename__ = "projects"
 
     project_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     faculty_id = db.Column(db.Integer, db.ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)
