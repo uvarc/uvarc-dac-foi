@@ -4,7 +4,6 @@ import logging
 from backend.utils.http_client import HttpClient
 from backend.utils.institution_utils import InstitutionUtils
 from backend.services.scraper.base_scraper import BaseScraper
-from backend.core.script_config import SCHOOL_DEPARTMENT_DATA
 from lxml import html
 
 logger = logging.getLogger(__name__)
@@ -136,4 +135,4 @@ class SEASScraper(BaseScraper):
 
     @staticmethod
     def is_systems_e_department(people_url: str) -> bool:
-        return people_url == InstitutionUtils.get_people_url_from_department("Systems Engineering")
+        return people_url == InstitutionUtils.get_people_url_from_department("Systems and Information Engineering")
