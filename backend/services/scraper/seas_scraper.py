@@ -23,7 +23,7 @@ class SEASScraper(BaseScraper):
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
 
-    def get_profile_endpoints_from_people(self, people_url: str, max_pages: int =100) -> typing.List[str]:
+    def get_profile_endpoints_from_people(self, people_url: str, max_pages: int = 20) -> typing.List[str]:
         if not InstitutionUtils.is_valid_url(people_url):
             raise ValueError(f"Invalid URL: {people_url}")
 
@@ -46,7 +46,10 @@ class SEASScraper(BaseScraper):
                 profile_urls.extend(urls)
                 page_number += 1
 
+                # These have no pages
                 if self.is_cs_department(people_url):
+                    break
+                if self.is_cheme_department(people_url):
                     break
 
             except html.etree.XMLSyntaxError as e:
@@ -122,6 +125,11 @@ class SEASScraper(BaseScraper):
             raise
 
     @staticmethod
-    def is_cs_department(people_url) -> bool:
+    def is_cs_department(people_url: str) -> bool:
         cs_people_url = SCHOOL_DEPARTMENT_DATA["SEAS"]["departments"]["Computer Science"]["people_url"]
         return people_url == cs_people_url
+
+    @staticmethod
+    def is_cheme_department(people_url: str) -> bool:
+        cheme_people_url = SCHOOL_DEPARTMENT_DATA["SEAS"]["departments"]["Chemical Engineering"]["people_url"]
+        return people_url == cheme_people_url
