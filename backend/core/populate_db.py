@@ -1,11 +1,13 @@
 from backend.core.script_config import SCHOOLS_TO_SCRAPE
 from backend.utils.http_client import HttpClient
-from backend.utils.factory import get_embedding_service
+from backend.utils.factory import get_embedding_service, get_database_driver
 from backend.services.scraper.seas_scraper import SEASScraper
 from backend.services.scraper.scraper_service import ScraperService
 from backend.services.nih.nih_reporter_proxy import NIHReporterProxy
 from backend.services.nih.nih_reporter_service import NIHReporterService
 from backend.services.aggregator.data_aggregator import DataAggregator
+from app import app
+
 
 # instantiate dependencies
 http_client = HttpClient()
@@ -22,7 +24,7 @@ if __name__ == '__main__':
     for school in SCHOOLS_TO_SCRAPE:
         all_faculty.extend(data_aggregator.aggregate_school_faculty_data(school))
 
-    database_driver = embedding_service.embedding_storage.database_driver
+    database_driver = get_database_driver(app=app)
     database_driver.clear()
     for faculty in all_faculty:
         database_driver.add_or_update_faculty(faculty)
