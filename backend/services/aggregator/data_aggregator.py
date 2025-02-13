@@ -35,10 +35,33 @@ class DataAggregator:
         """
         first_name, last_name = self.extract_faculty_names_from_profile(faculty_profile)
         projects = self.get_faculty_member_projects(first_name, last_name)
-        faculty = self.convert_to_faculty_model(faculty_profile, projects)
+        department = Department(name=faculty_profile.Department)
+
+        faculty = self.convert_to_faculty_model(faculty_profile, projects, department)
+
         embedding_id = self.embedding_service.generate_and_store_embedding(faculty, projects)
         faculty.embedding_id = embedding_id
         return faculty
+
+    @staticmethod
+    def convert_to_faculty_model(faculty_profile: typing.Tuple, projects: typing.List[Project], department: str) -> Faculty:
+        """
+        Use profile, RePORTER project data, and embedding ID to construct Faculty model object
+        :param faculty_profile: namedtuple w/ faculty information
+        :param projects: list of Project model objects
+        :param department: department name
+        :return: Faculty model object
+        """
+        return Faculty(
+            name=faculty_profile.Faculty_Name,
+            school=faculty_profile.School,
+            departments=[department],
+            about=faculty_profile.About_Section,
+            email=faculty_profile.Email_Address,
+            profile_url=faculty_profile.Profile_URL,
+            projects=projects,
+            embedding_id=-1,
+        )
 
     @staticmethod
     def extract_faculty_names_from_profile(faculty_profile: typing.Tuple) -> typing.Tuple[str, str]:
@@ -75,24 +98,4 @@ class DataAggregator:
             end_date=project.end_date,
             agency_ic_admin=project.agency_ic_admin,
             activity_code=project.activity_code
-        )
-
-    @staticmethod
-    def convert_to_faculty_model(faculty_profile: typing.Tuple, projects: typing.List[Project]) -> Faculty:
-        """
-        Use profile, RePORTER project data, and embedding ID to construct Faculty model object
-        :param faculty_profile: namedtuple w/ faculty information
-        :param projects: list of Project model objects
-        :param embedding_id: embedding id
-        :return: Faculty model object
-        """
-        return Faculty(
-            name=faculty_profile.Faculty_Name,
-            school=faculty_profile.School,
-            department=faculty_profile.Department,
-            about=faculty_profile.About_Section,
-            email=faculty_profile.Email_Address,
-            profile_url=faculty_profile.Profile_URL,
-            projects=projects,
-            embedding_id=-1,
         )
