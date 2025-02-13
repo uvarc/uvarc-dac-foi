@@ -43,8 +43,9 @@ class DatabaseDriver:
                 existing_department = Department.query.filter_by(name=department.name).first()
                 if not existing_department:
                     db.session.add(department)
-                if department not in existing_faculty.departments:
-                    existing_faculty.departments.append(department)
+                    db.session.commit()
+                if existing_department not in existing_faculty.departments:
+                    existing_faculty.departments.append(existing_department)
         else:
             logger.info(f"Faculty record created successfully for {faculty.name}.")
             db.session.add(faculty)
