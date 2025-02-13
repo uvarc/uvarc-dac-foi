@@ -31,7 +31,7 @@ class EmbeddingService:
             text = Preprocessor.preprocess_faculty_profile(faculty, projects)
             embedding = self.embedding_generator.generate_embedding(text)
             embedding_id = self.embedding_storage.add_embedding(faculty.name, embedding)
-            logging.info(f"Embedding generated and stored at index: {embedding_id} for faculty: {faculty.name}")
+            logging.info(f"Embedding generated and stored at id: {embedding_id} for faculty: {faculty.name}")
 
             return embedding_id
         except Exception as e:
