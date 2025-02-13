@@ -45,10 +45,13 @@ class SEASScraper(BaseScraper):
                 profile_urls.extend(urls)
                 page_number += 1
 
+                # TODO: I need an automatic way to detect this
                 # These have no pages
                 if self.is_cs_department(people_url):
                     break
-                if self.is_cheme_department(people_url):
+                if self.is_chem_e_department(people_url):
+                    break
+                if self.is_systems_e_department(people_url):
                     break
 
             except html.etree.XMLSyntaxError as e:
@@ -125,10 +128,12 @@ class SEASScraper(BaseScraper):
 
     @staticmethod
     def is_cs_department(people_url: str) -> bool:
-        cs_people_url = SCHOOL_DEPARTMENT_DATA["SEAS"]["departments"]["Computer Science"]["people_url"]
-        return people_url == cs_people_url
+        return people_url == InstitutionUtils.get_people_url_from_department("Computer Science")
 
     @staticmethod
-    def is_cheme_department(people_url: str) -> bool:
-        cheme_people_url = SCHOOL_DEPARTMENT_DATA["SEAS"]["departments"]["Chemical Engineering"]["people_url"]
-        return people_url == cheme_people_url
+    def is_chem_e_department(people_url: str) -> bool:
+        return people_url == InstitutionUtils.get_people_url_from_department("Chemical Engineering")
+
+    @staticmethod
+    def is_systems_e_department(people_url: str) -> bool:
+        return people_url == InstitutionUtils.get_people_url_from_department("Systems Engineering")
