@@ -2,7 +2,6 @@ import typing
 import logging
 import re
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Preprocessor:
@@ -22,8 +21,7 @@ class Preprocessor:
         )
 
         processed_text = (
-            f"Faculty Name: {faculty.name}."
-            f"Department: {faculty.department}."
+            f"Department: {faculty.departments}."
             f"School: {faculty.school}."
             f"About: {faculty.about or ''}."
             f"Projects: {project_details}"
