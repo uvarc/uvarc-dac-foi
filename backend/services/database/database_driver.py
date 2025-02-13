@@ -3,7 +3,6 @@ import typing
 from flask import Flask
 from backend.core.extensions import db
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class DatabaseDriver:

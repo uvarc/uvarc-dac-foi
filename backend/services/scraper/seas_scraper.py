@@ -7,7 +7,6 @@ from backend.services.scraper.base_scraper import BaseScraper
 from backend.core.script_config import SCHOOL_DEPARTMENT_DATA
 from lxml import html
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class SEASScraper(BaseScraper):

@@ -5,7 +5,6 @@ import pandas as pd
 from backend.services.scraper.base_scraper import BaseScraper
 from backend.utils.institution_utils import InstitutionUtils
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class ScraperService:

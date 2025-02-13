@@ -4,7 +4,6 @@ from backend.services.embedding.preprocessor import Preprocessor
 from backend.services.embedding.embedding_generator import EmbeddingGenerator
 from backend.services.embedding.embedding_storage import EmbeddingStorage
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class EmbeddingService:
