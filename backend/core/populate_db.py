@@ -25,4 +25,4 @@ if __name__ == '__main__':
     database_driver = embedding_service.embedding_storage.database_driver
     database_driver.clear()
     for faculty in all_faculty:
-        database_driver.create_faculty(faculty)
+        database_driver.add_or_update_faculty(faculty)

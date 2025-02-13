@@ -2,7 +2,6 @@ import logging
 import typing
 from flask import Flask
 from backend.core.extensions import db
-from backend.models.models import Faculty
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,7 +14,7 @@ class DatabaseDriver:
         """
         self.app = app
 
-    def create_faculty(self, faculty: "Faculty"):
+    def add_or_update_faculty(self, faculty: "Faculty"):
         """
         Persist a single Faculty object and its associated Projects.
         :param faculty: Faculty object.
@@ -23,20 +22,35 @@ class DatabaseDriver:
         try:
             if self.app:
                 with self.app.app_context():
-                    self._add_faculty(faculty)
+                    self._add_or_update_faculty(faculty)
             else:
-                self._add_faculty(faculty)
+                self._add_or_update_faculty(faculty)
         except Exception as e:
             logger.error(f"Failed to create faculty record for {faculty.name}: {e}")
             raise
 
     @staticmethod
-    def _add_faculty(faculty: "Faculty"):
+    def _add_or_update_faculty(faculty: "Faculty"):
         """Helper function to add faculty to the database."""
+        from backend.models.models import Faculty, Department
+
         logger.info(f"Creating faculty record for {faculty.name}.")
-        db.session.add(faculty)
+
+        existing_faculty = Faculty.query.filter_by(name=faculty.name, school=faculty.school).first()
+
+        if existing_faculty:
+            logger.info(f"Faculty already exists for {faculty.name}. Updating department.")
+            for department in faculty.departments:
+                existing_department = Department.query.filter_by(name=department.name).first()
+                if not existing_department:
+                    db.session.add(department)
+                if department not in existing_faculty.departments:
+                    existing_faculty.departments.append(department)
+        else:
+            logger.info(f"Faculty record created successfully for {faculty.name}.")
+            db.session.add(faculty)
+
         db.session.commit()
-        logger.info(f"Faculty record created successfully for {faculty.name}.")
         db.session.remove()
 
     def get_faculty_by_embedding_id(self, embedding_id: int) -> "Faculty":
