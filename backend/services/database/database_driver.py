@@ -31,27 +31,24 @@ class DatabaseDriver:
     @staticmethod
     def _add_or_update_faculty(faculty: "Faculty"):
         """Helper function to add faculty to the database."""
-        from backend.models.models import Faculty, Department
+        from backend.models.models import Faculty
 
         logger.info(f"Creating faculty record for {faculty.name}.")
 
-        existing_faculty = Faculty.query.filter_by(name=faculty.name, school=faculty.school).first()
-
+        existing_faculty = Faculty.query.get(name=faculty.name, school=faculty.school).first()
         if existing_faculty:
-            logger.info(f"Faculty already exists for {faculty.name}. Updating department.")
-            for department in faculty.departments:
-                existing_department = Department.query.filter_by(name=department.name).first()
-                if not existing_department:
-                    db.session.add(department)
-                    db.session.commit()
-                if existing_department not in existing_faculty.departments:
-                    existing_faculty.departments.append(existing_department)
+            logger.info("{faculty.name} already exists in database. Updating data.")
+            existing_departments = set(existing_faculty.department.split(","))
+            new_departments = {department for department in faculty.department}
+            updated_departments = existing_departments.union(new_departments)
+            existing_faculty.department = ",".join(sorted(updated_departments))
         else:
-            logger.info(f"Faculty record created successfully for {faculty.name}.")
+            logger.info(f"{faculty.name} does not exist in database. Adding new faculty record.")
             db.session.add(faculty)
 
         db.session.commit()
         db.session.remove()
+        logger.info(f"Faculty record created successfully for {faculty.name}.")
 
     def get_faculty_by_embedding_id(self, embedding_id: int) -> "Faculty":
         """
