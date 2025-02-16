@@ -49,10 +49,12 @@ class DataAggregator:
         :return: faculty model
         """
         first_name, last_name = self.extract_faculty_names_from_profile(faculty_profile)
+        logger.info(f"Fetching NIH project information for {first_name} {last_name}.")
         projects = self.get_faculty_member_projects(first_name, last_name)
 
         faculty = self.convert_to_faculty_model(faculty_profile, projects)
 
+        logger.info(f"Generating embedding for {first_name} {last_name}.")
         embedding_id = self.embedding_service.generate_and_store_embedding(faculty, projects)
         faculty.embedding_id = embedding_id
         return faculty
