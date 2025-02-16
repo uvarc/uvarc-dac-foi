@@ -1,16 +1,23 @@
 import typing
-
+import logging
+from backend.services.database.database_driver import DatabaseDriver
 from backend.services.embedding.embedding_service import EmbeddingService
 from backend.services.nih.nih_reporter_service import NIHReporterService
 from backend.services.scraper.scraper_service import ScraperService
 from backend.models.models import *
 
+logger = logging.getLogger(__name__)
 
 class DataAggregator:
-    def __init__(self, scraper_service: ScraperService, nih_service: NIHReporterService, embedding_service: EmbeddingService):
+    def __init__(self,
+                 scraper_service: ScraperService,
+                 nih_service: NIHReporterService,
+                 embedding_service: EmbeddingService,
+                 database_driver: DatabaseDriver):
         self.scraper_service = scraper_service
         self.nih_service = nih_service
         self.embedding_service = embedding_service
+        self.database_driver = database_driver
 
     def aggregate_school_faculty_data(self, school: str) -> typing.List[Faculty]:
         """
@@ -23,8 +30,16 @@ class DataAggregator:
         all_faculty = []
         for dept, dept_faculty_df in school_faculty_df.items():
             for faculty_profile in dept_faculty_df.itertuples():
-                faculty = self.build_faculty_model(faculty_profile)
-                all_faculty.append(faculty)
+                name, school, department = faculty_profile.Faculty_Name, faculty_profile.School, faculty_profile.Department
+
+                existing_faculty = self.database_driver.get_faculty_by_name_school(name, school)
+                if existing_faculty:
+                    logger.info(f"Found existing faculty for {name}.")
+                    self.database_driver.update_faculty_department(existing_faculty, department)
+                else:
+                    logger.info(f"Building faculty model for {name}.")
+                    faculty = self.build_faculty_model(faculty_profile)
+                    all_faculty.append(faculty)
         return all_faculty
 
     def build_faculty_model(self, faculty_profile: typing.Tuple) -> Faculty:
@@ -48,7 +63,6 @@ class DataAggregator:
         Use profile, RePORTER project data, and embedding ID to construct Faculty model object
         :param faculty_profile: namedtuple w/ faculty information
         :param projects: list of Project model objects
-        :param department: department name
         :return: Faculty model object
         """
         return Faculty(
