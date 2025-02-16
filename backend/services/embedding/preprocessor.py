@@ -21,7 +21,7 @@ class Preprocessor:
         )
 
         processed_text = (
-            f"Department: {faculty.departments}."
+            f"Department: {faculty.department}."
             f"School: {faculty.school}."
             f"About: {faculty.about or ''}."
             f"Projects: {project_details}"

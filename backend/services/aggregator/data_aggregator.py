@@ -35,16 +35,15 @@ class DataAggregator:
         """
         first_name, last_name = self.extract_faculty_names_from_profile(faculty_profile)
         projects = self.get_faculty_member_projects(first_name, last_name)
-        department = Department(name=faculty_profile.Department)
 
-        faculty = self.convert_to_faculty_model(faculty_profile, projects, department)
+        faculty = self.convert_to_faculty_model(faculty_profile, projects)
 
         embedding_id = self.embedding_service.generate_and_store_embedding(faculty, projects)
         faculty.embedding_id = embedding_id
         return faculty
 
     @staticmethod
-    def convert_to_faculty_model(faculty_profile: typing.Tuple, projects: typing.List[Project], department: str) -> Faculty:
+    def convert_to_faculty_model(faculty_profile: typing.Tuple, projects: typing.List[Project]) -> Faculty:
         """
         Use profile, RePORTER project data, and embedding ID to construct Faculty model object
         :param faculty_profile: namedtuple w/ faculty information
@@ -55,7 +54,7 @@ class DataAggregator:
         return Faculty(
             name=faculty_profile.Faculty_Name,
             school=faculty_profile.School,
-            departments=[department],
+            department=faculty_profile.Department,
             about=faculty_profile.About_Section,
             email=faculty_profile.Email_Address,
             profile_url=faculty_profile.Profile_URL,
