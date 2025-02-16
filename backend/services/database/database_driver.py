@@ -13,7 +13,7 @@ class DatabaseDriver:
         """
         self.app = app
 
-    def add_or_update_faculty(self, faculty: "Faculty"):
+    def add_faculty(self, faculty: "Faculty"):
         """
         Persist a single Faculty object and its associated Projects.
         :param faculty: Faculty object.
@@ -21,34 +21,36 @@ class DatabaseDriver:
         try:
             if self.app:
                 with self.app.app_context():
-                    self._add_or_update_faculty(faculty)
+                    self._add_faculty(faculty)
             else:
-                self._add_or_update_faculty(faculty)
+                self._add_faculty(faculty)
         except Exception as e:
             logger.error(f"Failed to create faculty record for {faculty.name}: {e}")
             raise
 
     @staticmethod
-    def _add_or_update_faculty(faculty: "Faculty"):
+    def _add_faculty(faculty: "Faculty"):
         """Helper function to add faculty to the database."""
         from backend.models.models import Faculty
-
         logger.info(f"Creating faculty record for {faculty.name}.")
-
-        existing_faculty = Faculty.query.get(name=faculty.name, school=faculty.school).first()
-        if existing_faculty:
-            logger.info("{faculty.name} already exists in database. Updating data.")
-            existing_departments = set(existing_faculty.department.split(","))
-            new_departments = {department for department in faculty.department}
-            updated_departments = existing_departments.union(new_departments)
-            existing_faculty.department = ",".join(sorted(updated_departments))
-        else:
-            logger.info(f"{faculty.name} does not exist in database. Adding new faculty record.")
-            db.session.add(faculty)
-
+        db.session.add(faculty)
         db.session.commit()
-        db.session.remove()
         logger.info(f"Faculty record created successfully for {faculty.name}.")
+        db.session.remove()
+
+    def is_faculty_in_db(self, faculty_name: str, school: str) -> bool:
+        try:
+            if self.app:
+                with self.app.app_context():
+                    self._is_faculty_in_db(faculty_name, school)
+            else:
+                self._is_faculty_in_db(faculty_name, school)
+        except Exception as e:
+            logger.error(f"Failed to lookup Faculty record with name {faculty_name} and school {school}: {e}")
+
+    def _is_faculty_in_db(self, faculty_name: str, school: str) -> bool:
+        from backend.models.models import Faculty
+        return Faculty.query.filter_by(name=faculty_name, school=school).first() is not None
 
     def get_faculty_by_embedding_id(self, embedding_id: int) -> "Faculty":
         """
