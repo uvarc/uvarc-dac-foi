@@ -67,7 +67,8 @@ class DatabaseDriver:
                                      school: str = None,
                                      department: str = None,
                                      activity_code: str = None,
-                                     agency_ic_admin: str = None) -> typing.List[int]:
+                                     agency_ic_admin: str = None,
+                                     has_funding: bool = None) -> typing.List[int]:
         """
         Get Faculty embedding IDs that satisfy search parameters.
         :param school: School name
@@ -83,13 +84,15 @@ class DatabaseDriver:
                         school=school,
                         department=department,
                         activity_code=activity_code,
-                        agency_ic_admin=agency_ic_admin
+                        agency_ic_admin=agency_ic_admin,
+                        has_funding=has_funding
                     )
             return self._get_embedding_ids_by_filters(
                 school=school,
                 department=department,
                 activity_code=activity_code,
-                agency_ic_admin=agency_ic_admin
+                agency_ic_admin=agency_ic_admin,
+                has_funding=has_funding
             )
 
         except Exception as e:
@@ -100,7 +103,8 @@ class DatabaseDriver:
     def _get_embedding_ids_by_filters(school: str = None,
                                       department: str = None,
                                       activity_code: str = None,
-                                      agency_ic_admin: str = None) -> typing.List[int]:
+                                      agency_ic_admin: str = None,
+                                      has_funding: bool = None) -> typing.List[int]:
         """Helper function to query faculty by embedding IDs."""
         from backend.models.models import Faculty, Project
         query = db.session.query(Faculty.embedding_id).outerjoin(Project)
@@ -113,6 +117,8 @@ class DatabaseDriver:
             query = query.filter(Project.activity_code == activity_code)
         if agency_ic_admin:
             query = query.filter(Project.agency_ic_admin == agency_ic_admin)
+        if has_funding:
+            query = query.filter(Faculty.has_funding == has_funding)
 
         embedding_ids = [record.embedding_id for record in query.distinct().all()]
         return embedding_ids
