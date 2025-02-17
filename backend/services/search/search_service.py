@@ -23,6 +23,7 @@ class SearchService:
         :param department: department name
         :param activity_code: activity code
         :param agency_ic_admin: agency ic admin name
+        :param has_funding: has funding
         :return: list of Faculty
         """
         similar_embeddings_eids = self.embedding_service.search_similar_embeddings(

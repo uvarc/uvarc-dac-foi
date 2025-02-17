@@ -64,6 +64,7 @@ class EmbeddingStorage:
         :param department: department name
         :param activity_code: activity code
         :param agency_ic_admin: agency ic admin
+        :param has_funding: has funding
         :return: list of indexes
         """
         logging.info(f"Searching FAISS index for {top_k} most similar embeddings.")
@@ -159,6 +160,7 @@ class EmbeddingStorage:
         :param department: department name
         :param activity_code: activity code
         :param agency_ic_admin: agency ic admin
+        :param has_funding: faculty has funding
         """
         logging.info(f"Applying filters to FAISS index.")
         return self.database_driver.get_embedding_ids_by_filters(

@@ -54,6 +54,7 @@ class EmbeddingService:
         :param department: department name
         :param activity_code: activity code
         :param agency_ic_admin: agency ic admin name
+        :param has_funding: faculty has funding
         :return: List of faculty EIDs
         """
         logging.info(f"Searching similar faculty for query: {query}.")
