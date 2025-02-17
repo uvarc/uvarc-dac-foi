@@ -37,28 +37,6 @@ class DatabaseDriver:
         logger.info(f"Faculty record created successfully for {faculty.name}.")
         db.session.remove()
 
-    def get_faculty_by_name_school(self, faculty_name: str, school: str) -> "Faculty":
-        """
-        Retrieve faculties in database with matching name and school.
-        :param faculty_name: Faculty name
-        :param school: School name
-        :return: Faculty
-        """
-        try:
-            if self.app:
-                with self.app.app_context():
-                    self._get_faculty_by_name_school(faculty_name, school)
-            else:
-                self._get_faculty_by_name_school(faculty_name, school)
-        except Exception as e:
-            logger.error(f"Failed to lookup Faculty record with name {faculty_name} and school {school}: {e}")
-
-    @staticmethod
-    def _get_faculty_by_name_school(self, faculty_name: str, school: str) -> "Faculty":
-        """Helper function to retrieve faculty in database with matching name and school."""
-        from backend.models.models import Faculty
-        return Faculty.query.filter_by(name=faculty_name, school=school).first()
-
     def get_faculty_by_embedding_id(self, embedding_id: int) -> "Faculty":
         """
         Retrieve a single Faculty object by corresponding embedding ID.
@@ -138,36 +116,6 @@ class DatabaseDriver:
 
         embedding_ids = [record.embedding_id for record in query.distinct().all()]
         return embedding_ids
-
-    def update_faculty_department(self, faculty: "Faculty", department: str):
-        """
-        Append department to Faculty department field.
-        """
-        try:
-            if self.app:
-                with self.app.app_context():
-                    self._update_faculty_department(faculty, department)
-            else:
-                self._update_faculty_deparment(faculty, department)
-        except Exception as e:
-            logger.error(f"Failed to update department for {faculty.name}: {e}")
-            raise
-
-    def _update_faculty_department(self, faculty: "Faculty", department: str):
-        """Helper function to update faculty department field."""
-        logger.info(f"Updating faculty department for {faculty.name}.")
-        departments = faculty.department.split(",")
-
-        if department in departments:
-            logger.warning("Faculty department already exists.")
-            return
-
-        departments.append(department)
-        faculty.department = ",".join(sorted(departments))
-
-        db.session.commit()
-        logger.info(f"Successfully updated faculty department for {faculty.name}.")
-        db.session.remove()
 
     def clear(self):
         """

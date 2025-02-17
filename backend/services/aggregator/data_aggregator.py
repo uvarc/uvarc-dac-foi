@@ -1,6 +1,5 @@
 import typing
 import logging
-from backend.services.database.database_driver import DatabaseDriver
 from backend.services.embedding.embedding_service import EmbeddingService
 from backend.services.nih.nih_reporter_service import NIHReporterService
 from backend.services.scraper.scraper_service import ScraperService
@@ -12,14 +11,12 @@ class DataAggregator:
     def __init__(self,
                  scraper_service: ScraperService,
                  nih_service: NIHReporterService,
-                 embedding_service: EmbeddingService,
-                 database_driver: DatabaseDriver):
+                 embedding_service: EmbeddingService):
         self.scraper_service = scraper_service
         self.nih_service = nih_service
         self.embedding_service = embedding_service
-        self.database_driver = database_driver
 
-    def aggregate_school_faculty_data(self, school: str) -> typing.List[Faculty]:
+    def aggregate_school_faculty_data(self, school: str) -> typing.Dict[typing.Tuple, Faculty]:
         """
         Aggregate faculty data for school from scrapers, NIH RePORTER API, generate embeddings
         Outputs are DB commit-ready
@@ -27,20 +24,26 @@ class DataAggregator:
         :return: dictionary of department faculty data stored as Faculty model objects
         """
         school_faculty_df = self.scraper_service.get_school_faculty_data(school)
-        all_faculty = []
+        school_faculty = {}
+
         for dept, dept_faculty_df in school_faculty_df.items():
             for faculty_profile in dept_faculty_df.itertuples():
-                name, school, department = faculty_profile.Faculty_Name, faculty_profile.School, faculty_profile.Department
+                name, school, department, email = faculty_profile.Faculty_Name, faculty_profile.School, faculty_profile.Department, faculty_profile.Email_Address
+                faculty_identifier = (name, school, email)
 
-                existing_faculty = self.database_driver.get_faculty_by_name_school(name, school)
-                if existing_faculty:
+                logger.debug(f"Verifying faculty existence for {name} {school} {department}")
+
+                if faculty_identifier in school_faculty:
                     logger.info(f"Found existing faculty for {name}.")
-                    self.database_driver.update_faculty_department(existing_faculty, department)
+                    existing_faculty = school_faculty[faculty_identifier]
+                    school_faculty[faculty_identifier] = self.update_faculty_department(existing_faculty, department)
+
                 else:
-                    logger.info(f"Building faculty model for {name}.")
+                    logger.info(f"Faculty not yet created, building faculty model for {name}.")
                     faculty = self.build_faculty_model(faculty_profile)
-                    all_faculty.append(faculty)
-        return all_faculty
+                    school_faculty[faculty_identifier] = faculty
+
+        return school_faculty
 
     def build_faculty_model(self, faculty_profile: typing.Tuple) -> Faculty:
         """
@@ -114,3 +117,19 @@ class DataAggregator:
             agency_ic_admin=project.agency_ic_admin,
             activity_code=project.activity_code
         )
+
+    @staticmethod
+    def update_faculty_department(faculty: Faculty, department_to_append: str) -> Faculty:
+        """
+        Update faculty department field, used when faculties are encountered more than once across dept pages
+        :param faculty: Faculty object
+        :param department_to_append: faculty department field
+        """
+        # convert to list
+        departments = faculty.department.split(",")
+        # add department
+        departments.append(department_to_append)
+        # convert back to comma separated string
+        new_departments = ",".join(sorted(departments))
+        faculty.department = new_departments
+        return faculty

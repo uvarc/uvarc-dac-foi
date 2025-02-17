@@ -20,7 +20,7 @@ nih_service = NIHReporterService(NIHReporterProxy(http_client))
 embedding_service = get_embedding_service()
 database_driver = get_database_driver(app=app)
 
-data_aggregator = DataAggregator(scraper_service, nih_service, embedding_service, database_driver)
+data_aggregator = DataAggregator(scraper_service, nih_service, embedding_service)
 
 if __name__ == '__main__':
     logger.info("Starting populate_db.")
@@ -32,5 +32,6 @@ if __name__ == '__main__':
     for school in SCHOOLS_TO_SCRAPE:
         all_faculty.extend(data_aggregator.aggregate_school_faculty_data(school))
 
-    for faculty in all_faculty:
-        database_driver.add_faculty(faculty)
+    for school_faculty in all_faculty:
+        for faculty in school_faculty.values():
+            database_driver.add_faculty(faculty)
