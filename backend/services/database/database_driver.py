@@ -110,7 +110,7 @@ class DatabaseDriver:
         query = db.session.query(Faculty.embedding_id).outerjoin(Project)
 
         if department:
-            query = query.filter(Faculty.department == department)
+            query = query.filter(Faculty.department.contains(department))
         if school:
             query = query.filter(Faculty.school == school)
         if activity_code:
