@@ -1,5 +1,6 @@
 import typing
 import logging
+from datetime import date
 from backend.services.embedding.embedding_service import EmbeddingService
 from backend.services.nih.nih_reporter_service import NIHReporterService
 from backend.services.scraper.scraper_service import ScraperService
@@ -62,8 +63,7 @@ class DataAggregator:
         faculty.embedding_id = embedding_id
         return faculty
 
-    @staticmethod
-    def convert_to_faculty_model(faculty_profile: typing.Tuple, projects: typing.List[Project]) -> Faculty:
+    def convert_to_faculty_model(self, faculty_profile: typing.Tuple, projects: typing.List[Project]) -> Faculty:
         """
         Use profile, RePORTER project data, and embedding ID to construct Faculty model object
         :param faculty_profile: namedtuple w/ faculty information
@@ -78,6 +78,7 @@ class DataAggregator:
             email=faculty_profile.Email_Address,
             profile_url=faculty_profile.Profile_URL,
             projects=projects,
+            has_funding=self.has_funding(projects),
             embedding_id=-1,
         )
 
@@ -133,3 +134,16 @@ class DataAggregator:
         new_departments = ",".join(sorted(departments))
         faculty.department = new_departments
         return faculty
+
+    def has_funding(self, projects: typing.List[Project]) -> bool:
+        """
+        Check if any projects have active funding
+        :param projects: list of Project objects
+        :return: True if any projects have active funding else False
+        """
+        return any(self._has_funding(project) for project in projects)
+
+    @staticmethod
+    def _has_funding(project: Project) -> bool:
+        """Helper function to check if project has active funding"""
+        return project.start_date <= date.today() <= project.end_date

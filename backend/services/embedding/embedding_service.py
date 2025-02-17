@@ -44,7 +44,8 @@ class EmbeddingService:
                                   school: str = None,
                                   department: str = None,
                                   activity_code: str = None,
-                                  agency_ic_admin: str = None) -> typing.List[int]:
+                                  agency_ic_admin: str = None,
+                                  has_funding: bool = None) -> typing.List[int]:
         """
         Search for the most similar faculty based on a natural language query.
         :param query: user input query
@@ -53,6 +54,7 @@ class EmbeddingService:
         :param department: department name
         :param activity_code: activity code
         :param agency_ic_admin: agency ic admin name
+        :param has_funding: faculty has funding
         :return: List of faculty EIDs
         """
         logging.info(f"Searching similar faculty for query: {query}.")
@@ -65,7 +67,8 @@ class EmbeddingService:
             school=school,
             department=department,
             activity_code=activity_code,
-            agency_ic_admin=agency_ic_admin
+            agency_ic_admin=agency_ic_admin,
+            has_funding=has_funding
         ) if id != -1]
 
         len_results = len(results)

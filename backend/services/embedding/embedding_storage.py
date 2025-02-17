@@ -54,7 +54,8 @@ class EmbeddingStorage:
                                   school: str = None,
                                   department: str = None,
                                   activity_code: str = None,
-                                  agency_ic_admin: str = None,) -> typing.List[int]:
+                                  agency_ic_admin: str = None,
+                                  has_funding: bool = None) -> typing.List[int]:
         """
         Search the FAISS index for most similar embeddings
         :param query_embedding: embedding generated from user input
@@ -63,6 +64,7 @@ class EmbeddingStorage:
         :param department: department name
         :param activity_code: activity code
         :param agency_ic_admin: agency ic admin
+        :param has_funding: has funding
         :return: list of indexes
         """
         logging.info(f"Searching FAISS index for {top_k} most similar embeddings.")
@@ -78,7 +80,8 @@ class EmbeddingStorage:
                     school=school,
                     department=department,
                     activity_code=activity_code,
-                    agency_ic_admin=agency_ic_admin
+                    agency_ic_admin=agency_ic_admin,
+                    has_funding=has_funding
             ):
                 logging.info("No filters detected, search entire FAISS index.")
                 indices = self.search_no_parameters(
@@ -93,7 +96,8 @@ class EmbeddingStorage:
                     school=school,
                     department=department,
                     activity_code=activity_code,
-                    agency_ic_admin=agency_ic_admin
+                    agency_ic_admin=agency_ic_admin,
+                    has_funding=has_funding
                 )
 
             logging.info(f"Search completed. Found {len(indices)} results.")
@@ -115,13 +119,15 @@ class EmbeddingStorage:
                                school: str = None,
                                department: str = None,
                                activity_code: str = None,
-                               agency_ic_admin: str = None) -> typing.List[int]:
+                               agency_ic_admin: str = None,
+                               has_funding: bool = None) -> typing.List[int]:
 
         filtered_eids = self.get_filtered_eids(
             school=school,
             department=department,
             activity_code=activity_code,
-            agency_ic_admin=agency_ic_admin
+            agency_ic_admin=agency_ic_admin,
+            has_funding=has_funding
         )
         valid_eids = [eid for eid in filtered_eids if eid < self.index.ntotal]
         if not valid_eids:
@@ -146,13 +152,15 @@ class EmbeddingStorage:
                         school: str = None,
                         department: str = None,
                         activity_code: str = None,
-                        agency_ic_admin: str = None) -> typing.List[int]:
+                        agency_ic_admin: str = None,
+                        has_funding: bool = None) -> typing.List[int]:
         """
         Get embedding ids for faculty with matching metadata
         :param school: school name
         :param department: department name
         :param activity_code: activity code
         :param agency_ic_admin: agency ic admin
+        :param has_funding: faculty has funding
         """
         logging.info(f"Applying filters to FAISS index.")
         return self.database_driver.get_embedding_ids_by_filters(
@@ -160,6 +168,7 @@ class EmbeddingStorage:
             department=department,
             activity_code=activity_code,
             agency_ic_admin=agency_ic_admin,
+            has_funding=has_funding
         )
 
     @staticmethod

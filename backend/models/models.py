@@ -10,6 +10,7 @@ class Faculty(db.Model):
     about = db.Column(db.Text, nullable=True)
     email = db.Column(db.String, nullable=True)
     profile_url = db.Column(db.String, nullable=True)
+    has_funding = db.Column(db.Boolean, nullable=False)
     embedding_id = db.Column(db.Integer, nullable=False)
 
     projects = db.relationship("Project", back_populates="faculty", cascade="all, delete")

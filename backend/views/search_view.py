@@ -29,9 +29,10 @@ def search(search_service: "SearchService"):
     department = request.args.get("department", None)
     activity_code = request.args.get("activity_code", None)
     agency_ic_admin = request.args.get("agency_ic_admin", None)
+    has_funding = request.args.get("has_funding", None) is not None
 
     logging.info(f"Search query: {query}\nLimit: {limit}\nSchool: {school}\nDepartment: {department}\nActivity Code: \
-{activity_code}\nAgency IC Admin: {agency_ic_admin}")
+{activity_code}\nAgency IC Admin: {agency_ic_admin}\n Has Funding: {has_funding}")
 
     results = search_service.search(
         query=query,
@@ -40,6 +41,7 @@ def search(search_service: "SearchService"):
         department=department,
         activity_code=activity_code,
         agency_ic_admin=agency_ic_admin,
+        has_funding=has_funding,
     )
 
     response = {
@@ -61,6 +63,7 @@ def serialize_faculty(faculty: "Faculty") -> typing.Dict:
         "about": faculty.about,
         "emails": faculty.email.split(","),
         "profile_url": faculty.profile_url,
+        "has_funding": faculty.has_funding,
         "projects": [
             {
                 "project_number": project.project_number,
