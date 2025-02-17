@@ -16,7 +16,7 @@ class HttpClient:
         self.timeout = timeout
         self.retries = retries
 
-    def request(self, method: str, url: str, **kwargs: typing.Any) -> requests.Response:
+    def request(self, method: str, url: str, **kwargs: typing.Any) -> requests.Response | None:
         """
         Makes an HTTP request with retries.
         :param method: HTTP method (e.g., 'GET', 'POST', 'PUT', 'DELETE').
@@ -74,7 +74,7 @@ class HttpClient:
     def delete(self, url: str, **kwargs: typing.Any) -> requests.Response:
         """
         Convenience method for DELETE requests.
-        :param url (str): API endpoint.
+        :param url: API endpoint.
         :param kwargs: Additional arguments for the DELETE request.
         :return requests.Response: The HTTP response object.
         """

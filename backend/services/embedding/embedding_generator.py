@@ -3,7 +3,6 @@ import typing
 from openai import OpenAI
 from backend.core.script_config import OPENAI_CONFIG
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class EmbeddingGenerator:

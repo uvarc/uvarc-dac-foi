@@ -1,13 +1,17 @@
 import typing
-
+import logging
 from backend.services.embedding.embedding_service import EmbeddingService
 from backend.services.nih.nih_reporter_service import NIHReporterService
 from backend.services.scraper.scraper_service import ScraperService
 from backend.models.models import *
 
+logger = logging.getLogger(__name__)
 
 class DataAggregator:
-    def __init__(self, scraper_service: ScraperService, nih_service: NIHReporterService, embedding_service: EmbeddingService):
+    def __init__(self,
+                 scraper_service: ScraperService,
+                 nih_service: NIHReporterService,
+                 embedding_service: EmbeddingService):
         self.scraper_service = scraper_service
         self.nih_service = nih_service
         self.embedding_service = embedding_service
@@ -20,12 +24,26 @@ class DataAggregator:
         :return: dictionary of department faculty data stored as Faculty model objects
         """
         school_faculty_df = self.scraper_service.get_school_faculty_data(school)
-        all_faculty = []
+        school_faculty = {}
+
         for dept, dept_faculty_df in school_faculty_df.items():
             for faculty_profile in dept_faculty_df.itertuples():
-                faculty = self.build_faculty_model(faculty_profile)
-                all_faculty.append(faculty)
-        return all_faculty
+                name, school, department, email = faculty_profile.Faculty_Name, faculty_profile.School, faculty_profile.Department, faculty_profile.Email_Address
+                faculty_identifier = (name, school, email)
+
+                logger.debug(f"Verifying faculty existence for {name} {school} {department}")
+
+                if faculty_identifier in school_faculty:
+                    logger.info(f"Found existing faculty for {name}.")
+                    existing_faculty = school_faculty[faculty_identifier]
+                    school_faculty[faculty_identifier] = self.update_faculty_department(existing_faculty, department)
+
+                else:
+                    logger.info(f"Faculty not yet created, building faculty model for {name}.")
+                    faculty = self.build_faculty_model(faculty_profile)
+                    school_faculty[faculty_identifier] = faculty
+
+        return list(school_faculty.values())
 
     def build_faculty_model(self, faculty_profile: typing.Tuple) -> Faculty:
         """
@@ -34,11 +52,34 @@ class DataAggregator:
         :return: faculty model
         """
         first_name, last_name = self.extract_faculty_names_from_profile(faculty_profile)
+        logger.info(f"Fetching NIH project information for {first_name} {last_name}.")
         projects = self.get_faculty_member_projects(first_name, last_name)
+
         faculty = self.convert_to_faculty_model(faculty_profile, projects)
+
+        logger.info(f"Generating embedding for {first_name} {last_name}.")
         embedding_id = self.embedding_service.generate_and_store_embedding(faculty, projects)
         faculty.embedding_id = embedding_id
         return faculty
+
+    @staticmethod
+    def convert_to_faculty_model(faculty_profile: typing.Tuple, projects: typing.List[Project]) -> Faculty:
+        """
+        Use profile, RePORTER project data, and embedding ID to construct Faculty model object
+        :param faculty_profile: namedtuple w/ faculty information
+        :param projects: list of Project model objects
+        :return: Faculty model object
+        """
+        return Faculty(
+            name=faculty_profile.Faculty_Name,
+            school=faculty_profile.School,
+            department=faculty_profile.Department,
+            about=faculty_profile.About_Section,
+            email=faculty_profile.Email_Address,
+            profile_url=faculty_profile.Profile_URL,
+            projects=projects,
+            embedding_id=-1,
+        )
 
     @staticmethod
     def extract_faculty_names_from_profile(faculty_profile: typing.Tuple) -> typing.Tuple[str, str]:
@@ -78,21 +119,17 @@ class DataAggregator:
         )
 
     @staticmethod
-    def convert_to_faculty_model(faculty_profile: typing.Tuple, projects: typing.List[Project]) -> Faculty:
+    def update_faculty_department(faculty: Faculty, department_to_append: str) -> Faculty:
         """
-        Use profile, RePORTER project data, and embedding ID to construct Faculty model object
-        :param faculty_profile: namedtuple w/ faculty information
-        :param projects: list of Project model objects
-        :param embedding_id: embedding id
-        :return: Faculty model object
+        Update faculty department field, used when faculties are encountered more than once across dept pages
+        :param faculty: Faculty object
+        :param department_to_append: faculty department field
         """
-        return Faculty(
-            name=faculty_profile.Faculty_Name,
-            school=faculty_profile.School,
-            department=faculty_profile.Department,
-            about=faculty_profile.About_Section,
-            email=faculty_profile.Email_Address,
-            profile_url=faculty_profile.Profile_URL,
-            projects=projects,
-            embedding_id=-1,
-        )
+        # convert to list
+        departments = faculty.department.split(",")
+        # add department
+        departments.append(department_to_append)
+        # convert back to comma separated string
+        new_departments = ",".join(sorted(departments))
+        faculty.department = new_departments
+        return faculty

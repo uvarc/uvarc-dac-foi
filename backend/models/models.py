@@ -12,10 +12,11 @@ class Faculty(db.Model):
     profile_url = db.Column(db.String, nullable=True)
     embedding_id = db.Column(db.Integer, nullable=False)
 
-    projects = db.relationship('Project', back_populates='faculty', cascade='all, delete')
+    projects = db.relationship("Project", back_populates="faculty", cascade="all, delete")
+
 
 class Project(db.Model):
-    __tablename__ = 'projects'
+    __tablename__ = "projects"
 
     project_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     faculty_id = db.Column(db.Integer, db.ForeignKey('faculty.faculty_id', ondelete='CASCADE'), nullable=False)

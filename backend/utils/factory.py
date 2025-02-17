@@ -19,8 +19,10 @@ def get_embedding_service():
         embedding_storage=get_embedding_storage(get_database_driver()),
     )
 
-def get_database_driver():
+def get_database_driver(app: "Flask" = None):
     from backend.services.database.database_driver import DatabaseDriver
+    if app:
+        return DatabaseDriver(app)
     return DatabaseDriver()
 
 def get_search_service():

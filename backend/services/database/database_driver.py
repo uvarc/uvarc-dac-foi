@@ -2,9 +2,7 @@ import logging
 import typing
 from flask import Flask
 from backend.core.extensions import db
-from backend.models.models import Faculty
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class DatabaseDriver:
@@ -15,7 +13,7 @@ class DatabaseDriver:
         """
         self.app = app
 
-    def create_faculty(self, faculty: "Faculty"):
+    def add_faculty(self, faculty: "Faculty"):
         """
         Persist a single Faculty object and its associated Projects.
         :param faculty: Faculty object.
@@ -48,14 +46,14 @@ class DatabaseDriver:
         try:
             if self.app:
                 with self.app.app_context():
-                    return self._query_faculty(embedding_id)
-            return self._query_faculty(embedding_id)
+                    return self._get_faculty_by_embedding_id(embedding_id)
+            return self._get_faculty_by_embedding_id(embedding_id)
         except Exception as e:
             logger.error(f"Failed to retrieve faculty record by embedding_id {embedding_id}: {e}")
             raise
 
     @staticmethod
-    def _query_faculty(embedding_id: int):
+    def _get_faculty_by_embedding_id(embedding_id: int):
         """Helper function to query faculty by embedding ID."""
         from backend.models.models import Faculty
         faculty = Faculty.query.filter_by(embedding_id=embedding_id).first()
@@ -70,6 +68,14 @@ class DatabaseDriver:
                                      department: str = None,
                                      activity_code: str = None,
                                      agency_ic_admin: str = None) -> typing.List[int]:
+        """
+        Get Faculty embedding IDs that satisfy search parameters.
+        :param school: School name
+        :param department: Department name
+        :param activity_code: Activity code
+        :param agency_ic_admin: Agency IC admin
+        :return: List of Faculty embedding IDs
+        """
         try:
             if self.app:
                 with self.app.app_context():
@@ -90,12 +96,12 @@ class DatabaseDriver:
             logger.error(f"Failed to retrieve faculty record by filters: {e}")
             raise
 
-
     @staticmethod
     def _get_embedding_ids_by_filters(school: str = None,
                                       department: str = None,
                                       activity_code: str = None,
                                       agency_ic_admin: str = None) -> typing.List[int]:
+        """Helper function to query faculty by embedding IDs."""
         from backend.models.models import Faculty, Project
         query = db.session.query(Faculty.embedding_id).outerjoin(Project)
 

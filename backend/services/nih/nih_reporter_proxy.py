@@ -3,7 +3,6 @@ import logging
 from requests import RequestException, Timeout, HTTPError
 from backend.utils.http_client import HttpClient
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class NIHReporterProxy:

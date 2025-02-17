@@ -57,7 +57,7 @@ def serialize_faculty(faculty: "Faculty") -> typing.Dict:
     return {
         "name": faculty.name,
         "school": faculty.school,
-        "department": faculty.department,
+        "department": faculty.department.split(","),
         "about": faculty.about,
         "emails": faculty.email.split(","),
         "profile_url": faculty.profile_url,

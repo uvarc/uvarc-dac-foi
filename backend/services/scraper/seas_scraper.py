@@ -4,10 +4,8 @@ import logging
 from backend.utils.http_client import HttpClient
 from backend.utils.institution_utils import InstitutionUtils
 from backend.services.scraper.base_scraper import BaseScraper
-from backend.core.script_config import SCHOOL_DEPARTMENT_DATA
 from lxml import html
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class SEASScraper(BaseScraper):
@@ -23,7 +21,7 @@ class SEASScraper(BaseScraper):
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
 
-    def get_profile_endpoints_from_people(self, people_url: str, max_pages: int =100) -> typing.List[str]:
+    def get_profile_endpoints_from_people(self, people_url: str, max_pages: int = 20) -> typing.List[str]:
         if not InstitutionUtils.is_valid_url(people_url):
             raise ValueError(f"Invalid URL: {people_url}")
 
@@ -46,7 +44,13 @@ class SEASScraper(BaseScraper):
                 profile_urls.extend(urls)
                 page_number += 1
 
+                # TODO: I need an automatic way to detect this
+                # These have no pages
                 if self.is_cs_department(people_url):
+                    break
+                if self.is_chem_e_department(people_url):
+                    break
+                if self.is_systems_e_department(people_url):
                     break
 
             except html.etree.XMLSyntaxError as e:
@@ -122,6 +126,13 @@ class SEASScraper(BaseScraper):
             raise
 
     @staticmethod
-    def is_cs_department(people_url) -> bool:
-        cs_people_url = SCHOOL_DEPARTMENT_DATA["SEAS"]["departments"]["Computer Science"]["people_url"]
-        return people_url == cs_people_url
+    def is_cs_department(people_url: str) -> bool:
+        return people_url == InstitutionUtils.get_people_url_from_department("Computer Science")
+
+    @staticmethod
+    def is_chem_e_department(people_url: str) -> bool:
+        return people_url == InstitutionUtils.get_people_url_from_department("Chemical Engineering")
+
+    @staticmethod
+    def is_systems_e_department(people_url: str) -> bool:
+        return people_url == InstitutionUtils.get_people_url_from_department("Systems and Information Engineering")
