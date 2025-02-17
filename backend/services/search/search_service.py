@@ -25,7 +25,6 @@ class SearchService:
         :param agency_ic_admin: agency ic admin name
         :return: list of Faculty
         """
-        # TODO: accept has_funding parameter
         similar_embeddings_eids = self.embedding_service.search_similar_embeddings(
             query=query,
             top_k=k,
