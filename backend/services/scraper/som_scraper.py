@@ -1,9 +1,9 @@
 import typing
 import logging
 
-from app.utils.http_client import HttpClient
-from app.utils.institution_utils import InstitutionUtils
-from app.services.scraper.base_scraper import BaseScraper
+from backend.utils.http_client import HttpClient
+from backend.utils.institution_utils import InstitutionUtils
+from backend.services.scraper.base_scraper import BaseScraper
 from lxml import html
 
 logging.basicConfig(level=logging.INFO)
@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class SOMScraper(BaseScraper): 
     SCHOOL_ID = "SOM"
+    URL_PREFIX = "https://med.virginia.edu"
     CONTACT_BLOCK_NAME_XPATH = '//a[contains(@href, "?facbio")]'
     SOM_FACULTY_NAME_XPATH= '//h1[@class="post-title"]/text()'
     EMAIL_XPATH = '//a[starts-with(@href, "mailto:")]/@href'
@@ -21,21 +22,7 @@ class SOMScraper(BaseScraper):
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
 
-    def get_profile_endpoints_from_people(self, people_url: str) -> typing.List[str]:
-        """
-        Finds all faculty pages listed on a base url and returns in as a list
-
-        Args:
-            people_url (str): Base url to find faculty page extensions from 
-
-        Raises:
-            ValueError: Invalid URL
-            ValueError: The URL is valid, but no URLs matching the XPATH pattern are found
-
-        Returns:
-            typing.List[str]: A list containing extensions to the base url to fully specify a faculty page
-            e.g. "base.url/`faculty1`" where `faculty1` is what would be returned
-        """
+    def get_profile_endpoints_from_people(self, people_url: str, max_pages: int = 0) -> typing.List[str]:
         if not InstitutionUtils.is_valid_url(people_url):
             logger.error(f'Invalid URL: {people_url}')
             raise ValueError("Invalid URL")
@@ -48,7 +35,12 @@ class SOMScraper(BaseScraper):
             anchors = tree.xpath(self.CONTACT_BLOCK_NAME_XPATH) # all anchor tags 
             links = [(anchor.get('href'), anchor.text_content()) for anchor in anchors] # tuple of form (url, faculty_name) where faculty_name has to be re-formated
             for href, text in links:
-                profile_urls.append(str(href))
+                url = str(href)
+
+                if url.startswith(self.URL_PREFIX):
+                    url = url[len(self.URL_PREFIX):]
+
+                profile_urls.append(url)
 
         except html.etree.XMLSyntaxError as e:
                 logger.error(f"Failed to parse HTML for {[people_url]}: {e}")
@@ -57,23 +49,11 @@ class SOMScraper(BaseScraper):
             logger.error(f"Unexpected error processing page {people_url}: {e}")
             raise
 
-        if not(profile_urls): # ensure url_list isn't empty if no prior errors were raised
+        if not profile_urls: # ensure url_list isn't empty if no prior errors were raised
             raise ValueError(f"There were no HTML errors, but no URLs were found. Are you sure `{self.CONTACT_BLOCK_NAME_XPATH}` is the correct XPATH and/or `{people_url}` is correct?")
-        return list(dict.fromkeys(profile_urls)) # return list with no duplicates and order maintained since dictionary keys are unique 
+        return list(set(profile_urls))
 
     def get_name_from_profile(self, profile_url: str) -> str:
-        """
-        Returns name in Firstname Lastname format for a given SOM faculty page
-
-        Args:
-            profile_url (str): base_url concatenated with specific faculty identifier 
-
-        Raises:
-            ValueError: No name for the XPATH tag
-
-        Returns:
-            str: The faculty member's name, formatted Firstname Lastname
-        """
         if not InstitutionUtils.is_valid_url(profile_url):
             logger.error(f'Invalid URL: {profile_url}')
             raise
@@ -100,18 +80,6 @@ class SOMScraper(BaseScraper):
             raise 
     
     def get_emails_from_profile(self, profile_url: str) -> typing.List[str]:
-        """
-        Returns the email(s) for a faculty member 
-
-        Args:
-            profile_url (str): SOM faculty website 
-
-        Raises:
-            ValueError: Invalid URL
-
-        Returns:
-            typing.List[str]: List of faculty emails as strings
-        """
         if not InstitutionUtils.is_valid_url(profile_url):
             logger.error(f'Invalid URL: {profile_url}')
             raise ValueError("Invalid URL")
@@ -129,21 +97,6 @@ class SOMScraper(BaseScraper):
             raise
     
     def get_about_from_profile(self, profile_url: str) -> str:
-        """
-        String contaning data from `Research Description` and `Research Interests`
-        section from SOM website. Research interests are written as sentences, so it
-        felt more sensible to include them with the about section.
-
-        Args:
-            profile_url (str): SOM faculty website
-
-        Raises:
-            ValueError: Invalid URL
-
-        Returns:
-            str: String contaning data from `Research Description` and `Research Interests`
-            section from SOM website
-        """
         if not InstitutionUtils.is_valid_url(profile_url):
             logger.error(f'Invalid URL: {profile_url}')
             raise ValueError("Invalid URL")
@@ -171,20 +124,6 @@ class SOMScraper(BaseScraper):
             raise
         
     def get_research_interests_from_profile(self, profile_url: str) -> typing.List[str]:
-        """
-        Results from the `Research Discplines` section of a SOM website; somewhat misleading
-        since `Research Interests` from the SOM sites are gathered as part of the about secton
-        data in the above function
-
-        Args:
-            profile_url (str): SOM faculty website
-
-        Raises:
-            ValueError: Invalid URL
-
-        Returns:
-            typing.List[str]: Comma separated research intersts from SOM website
-        """
         if not InstitutionUtils.is_valid_url(profile_url):
             logger.error(f'Invalid URL: {profile_url}')
             raise ValueError("Invalid URL")
@@ -194,7 +133,7 @@ class SOMScraper(BaseScraper):
             raw_research_disciplines = self.extract_text_until_next_section(tree.xpath(self.RESEARCH_DISCIPLINES_XPATH)) 
             if not raw_research_disciplines:
                 logger.warning(f"No research disciplines section text found for profile: {profile_url}")
-                return ""
+                return []
             else:
                 research_disciplines = [item.strip() for item in raw_research_disciplines.split(',')]
                 return research_disciplines
@@ -206,17 +145,6 @@ class SOMScraper(BaseScraper):
             raise
 
     def extract_text_until_next_section(self, start_tag) -> str:
-        """
-        Helper function to go through paragraph breaks in `Research Description`
-        and `Research Interests` text on SOM websites, but can be applied to other
-        sections if needed.
-
-        Args:
-            start_tag (_type_): XPATH tag associated with section of interest
-
-        Returns:
-            str:A All text from the section of interest
-        """
     # Check if start_tag is None or empty
         if not start_tag:
             return "The specified section could not be found."

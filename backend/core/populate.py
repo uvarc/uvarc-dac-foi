@@ -1,5 +1,6 @@
 import logging
 from backend.core.script_config import SCHOOLS_TO_SCRAPE
+from backend.services.scraper.som_scraper import SOMScraper
 from backend.utils.http_client import HttpClient
 from backend.utils.factory import get_embedding_service, get_database_driver
 from backend.services.scraper.seas_scraper import SEASScraper
@@ -15,7 +16,13 @@ logger = logging.getLogger(__name__)
 http_client = HttpClient()
 
 seas_scraper = SEASScraper(http_client)
-scraper_service = ScraperService([seas_scraper])
+som_scraper = SOMScraper(http_client)
+
+scraper_service = ScraperService([
+    SOMScraper(http_client),
+    SEASScraper(http_client),
+])
+
 nih_service = NIHReporterService(NIHReporterProxy(http_client))
 embedding_service = get_embedding_service()
 database_driver = get_database_driver(app=app)

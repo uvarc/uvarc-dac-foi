@@ -146,4 +146,6 @@ class DataAggregator:
     @staticmethod
     def _has_funding(project: Project) -> bool:
         """Helper function to check if project has active funding"""
+        if not project.start_date or not project.end_date:
+            return None
         return project.start_date <= date.today() <= project.end_date

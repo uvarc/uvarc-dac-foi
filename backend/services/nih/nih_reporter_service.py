@@ -115,7 +115,7 @@ class NIHReporterService:
             return parsed_datetime.date()
         except Exception as e:
             logger.error(f"Unexpected error parsing date {raw_date}, returning unprocessed date: {e}")
-            return raw_date
+            return None
 
     @staticmethod
     def build_payload(pi_first_name: str, pi_last_name: str, fiscal_years: typing.List[int]) -> typing.Dict:
