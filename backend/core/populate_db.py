@@ -32,6 +32,5 @@ if __name__ == '__main__':
     for school in SCHOOLS_TO_SCRAPE:
         all_faculty.extend(data_aggregator.aggregate_school_faculty_data(school))
 
-    for school_faculty in all_faculty:
-        for faculty in school_faculty.values():
-            database_driver.add_faculty(faculty)
+    for faculty in all_faculty:
+        database_driver.add_faculty(faculty)

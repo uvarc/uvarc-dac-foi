@@ -16,7 +16,7 @@ class DataAggregator:
         self.nih_service = nih_service
         self.embedding_service = embedding_service
 
-    def aggregate_school_faculty_data(self, school: str) -> typing.Dict[typing.Tuple, Faculty]:
+    def aggregate_school_faculty_data(self, school: str) -> typing.List[Faculty]:
         """
         Aggregate faculty data for school from scrapers, NIH RePORTER API, generate embeddings
         Outputs are DB commit-ready
@@ -43,7 +43,7 @@ class DataAggregator:
                     faculty = self.build_faculty_model(faculty_profile)
                     school_faculty[faculty_identifier] = faculty
 
-        return school_faculty
+        return list(school_faculty.values())
 
     def build_faculty_model(self, faculty_profile: typing.Tuple) -> Faculty:
         """
