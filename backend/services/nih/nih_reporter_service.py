@@ -5,7 +5,7 @@ import copy
 
 from datetime import datetime
 from backend.services.nih.nih_reporter_proxy import NIHReporterProxy
-from backend.core.script_config import NIH_REPORTER_PAYLOAD, DEFAULT_FISCAL_YEARS
+from backend.core.populate_config import NIH_REPORTER_PAYLOAD, DEFAULT_FISCAL_YEARS
 
 logger = logging.getLogger(__name__)
 

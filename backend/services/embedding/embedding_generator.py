@@ -1,7 +1,7 @@
 import logging
 import typing
 from openai import OpenAI
-from backend.core.script_config import OPENAI_CONFIG
+from backend.core.populate_config import OPENAI_CONFIG
 
 logger = logging.getLogger(__name__)
 

@@ -12,8 +12,7 @@ def create_app(config_class=Config, search_service_instance: "SearchService" = N
                 )
     app.config.from_object(config_class)
 
-    if not search_service_instance:
-        search_service_instance = get_search_service()
+    search_service_instance = search_service_instance or get_search_service()
 
     from backend.views.search_view import create_search_blueprint
     search_bp = create_search_blueprint(search_service_instance)

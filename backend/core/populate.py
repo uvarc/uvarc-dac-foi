@@ -1,5 +1,6 @@
 import logging
-from backend.core.script_config import SCHOOLS_TO_SCRAPE
+import os
+from backend.core.populate_config import SCHOOLS_TO_SCRAPE
 from backend.services.scraper.som_scraper import SOMScraper
 from backend.utils.http_client import HttpClient
 from backend.utils.factory import get_embedding_service, get_database_driver
@@ -12,11 +13,7 @@ from app import app
 
 logger = logging.getLogger(__name__)
 
-# instantiate dependencies
 http_client = HttpClient()
-
-seas_scraper = SEASScraper(http_client)
-som_scraper = SOMScraper(http_client)
 
 scraper_service = ScraperService([
     SOMScraper(http_client),
@@ -36,8 +33,13 @@ if __name__ == '__main__':
     logger.info("Clearing database.")
     database_driver.clear()
 
-    for school in SCHOOLS_TO_SCRAPE:
-        all_faculty.extend(data_aggregator.aggregate_school_faculty_data(school))
+    try:
+        for school in SCHOOLS_TO_SCRAPE:
+            all_faculty.extend(data_aggregator.aggregate_school_faculty_data(school))
+    except Exception as e:
+        logger.error(f"Failed to aggregate data: {e}")
+        logger.info("Deleting FAISS index.")
+
 
     for faculty in all_faculty:
         database_driver.add_faculty(faculty)
