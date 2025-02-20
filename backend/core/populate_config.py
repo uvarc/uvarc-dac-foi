@@ -3,7 +3,7 @@ import datetime
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-INDEX_PATH = os.path.join(BASE_DIR, "../../instance/index.faiss")
+INDEX_PATH = os.path.join(BASE_DIR, "..", "..", "instance", "index.faiss")
 
 SCHOOLS_TO_SCRAPE = ["SOM", "SEAS"]
 

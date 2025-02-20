@@ -1,6 +1,6 @@
 import logging
 import os
-from backend.core.populate_config import SCHOOLS_TO_SCRAPE
+from backend.core.populate_config import SCHOOLS_TO_SCRAPE, INDEX_PATH
 from backend.services.scraper.som_scraper import SOMScraper
 from backend.utils.http_client import HttpClient
 from backend.utils.factory import get_embedding_service, get_database_driver
@@ -39,6 +39,8 @@ if __name__ == '__main__':
     except Exception as e:
         logger.error(f"Failed to aggregate data: {e}")
         logger.info("Deleting FAISS index.")
+        if os.path.exists(INDEX_PATH):
+            os.remove(INDEX_PATH)
 
 
     for faculty in all_faculty:
