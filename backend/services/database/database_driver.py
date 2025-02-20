@@ -1,15 +1,18 @@
 import logging
 import typing
-from flask import Flask
 from sqlalchemy import delete
+from contextlib import contextmanager
+from sqlalchemy.orm import joinedload
+
 from backend.core.extensions import db
 
 logger = logging.getLogger(__name__)
 
 class DatabaseDriver:
-    def __init__(self, app: Flask = None):
+    def __init__(self, app):
         self.app = app
 
+    @contextmanager
     def _app_context(self):
         """
         Context manager to handle app context transparently.
@@ -29,7 +32,7 @@ class DatabaseDriver:
             with self._app_context():
                 self._add_faculty(faculty)
         except Exception as e:
-            logger.error(f"Failed to create faculty record for {faculty.name}: {e}")
+            logger.error(f"Failed to create faculty record for {faculty.name}: {e}", exc_info=True)
             raise
 
     @staticmethod
@@ -57,7 +60,7 @@ class DatabaseDriver:
     def _get_faculty_by_embedding_id(embedding_id: int):
         """Helper function to query faculty by embedding ID."""
         from backend.models.models import Faculty
-        faculty = Faculty.query.filter_by(embedding_id=embedding_id).first()
+        faculty = Faculty.query.options(joinedload(Faculty.projects)).filter_by(embedding_id=embedding_id).first()
         if faculty:
             logger.info(f"Retrieved faculty record with embedding_id {embedding_id}: {faculty.name}")
         else:
