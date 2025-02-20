@@ -1,4 +1,3 @@
-import typing
 import logging
 import re
 
@@ -6,18 +5,17 @@ logger = logging.getLogger(__name__)
 
 class Preprocessor:
     @staticmethod
-    def preprocess_faculty_profile(faculty: "Faculty", projects: typing.List["Project"]) -> str:
+    def preprocess_faculty_profile(faculty: "Faculty") -> str:
         """
         Preprocess faculty and project(s) data into a single string for embedding
         :param faculty: faculty data
-        :param projects: project data
         :return: concatenated data string
         """
         logger.info(f"Preprocessing data for faculty: {faculty.name}")
 
         project_details = " ".join(
             f"Abstract: {project.abstract or ''}, Terms: {project.relevant_terms or ''}\n"
-            for project in projects
+            for project in faculty.projects
         )
 
         processed_text = (

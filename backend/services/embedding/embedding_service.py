@@ -19,16 +19,15 @@ class EmbeddingService:
         self.embedding_generator = embedding_generator
         self.embedding_storage = embedding_storage
 
-    def generate_and_store_embedding(self, faculty: "Faculty", projects: typing.List["Project"]) -> int:
+    def generate_and_store_embedding(self, faculty: "Faculty") -> int:
         """
         Preprocess, generate, and store the embedding for a faculty member
         :param faculty: Faculty model object containing faculty data
-        :param projects: List of Project model objects containing project metadata
         :return: Index of the generated embedding in FAISS
         """
         logging.info(f"Starting embedding generation for faculty: {faculty.name}")
         try:
-            text = Preprocessor.preprocess_faculty_profile(faculty, projects)
+            text = Preprocessor.preprocess_faculty_profile(faculty)
             embedding = self.embedding_generator.generate_embedding(text)
             embedding_id = self.embedding_storage.add_embedding(faculty.name, embedding)
             logging.info(f"Embedding generated and stored at id: {embedding_id} for faculty: {faculty.name}")
