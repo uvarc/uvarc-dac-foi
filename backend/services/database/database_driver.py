@@ -1,17 +1,24 @@
 import logging
 import typing
 from flask import Flask
+from sqlalchemy import delete
 from backend.core.extensions import db
 
 logger = logging.getLogger(__name__)
 
 class DatabaseDriver:
     def __init__(self, app: Flask = None):
-        """
-        Optionally initialize with a Flask app instance for use in app contexts.
-        :param app: Flask application instance
-        """
         self.app = app
+
+    def _app_context(self):
+        """
+        Context manager to handle app context transparently.
+        """
+        if self.app:
+            with self.app.app_context():
+                yield
+        else:
+            yield
 
     def add_faculty(self, faculty: "Faculty"):
         """
@@ -19,10 +26,7 @@ class DatabaseDriver:
         :param faculty: Faculty object.
         """
         try:
-            if self.app:
-                with self.app.app_context():
-                    self._add_faculty(faculty)
-            else:
+            with self._app_context():
                 self._add_faculty(faculty)
         except Exception as e:
             logger.error(f"Failed to create faculty record for {faculty.name}: {e}")
@@ -35,7 +39,6 @@ class DatabaseDriver:
         db.session.add(faculty)
         db.session.commit()
         logger.info(f"Faculty record created successfully for {faculty.name}.")
-        db.session.remove()
 
     def get_faculty_by_embedding_id(self, embedding_id: int) -> "Faculty":
         """
@@ -44,10 +47,8 @@ class DatabaseDriver:
         :return: Faculty object or None if not found.
         """
         try:
-            if self.app:
-                with self.app.app_context():
-                    return self._get_faculty_by_embedding_id(embedding_id)
-            return self._get_faculty_by_embedding_id(embedding_id)
+            with self.app.app_context():
+                return self._get_faculty_by_embedding_id(embedding_id)
         except Exception as e:
             logger.error(f"Failed to retrieve faculty record by embedding_id {embedding_id}: {e}")
             raise
@@ -63,12 +64,7 @@ class DatabaseDriver:
             logger.warning(f"No faculty record found with embedding_id {embedding_id}.")
         return faculty
 
-    def get_embedding_ids_by_filters(self,
-                                     school: str = None,
-                                     department: str = None,
-                                     activity_code: str = None,
-                                     agency_ic_admin: str = None,
-                                     has_funding: bool = None) -> typing.List[int]:
+    def get_embedding_ids_by_search_parameters(self, **parameters) -> typing.List[int]:
         """
         Get Faculty embedding IDs that satisfy search parameters.
         :param school: School name
@@ -78,41 +74,26 @@ class DatabaseDriver:
         :return: List of Faculty embedding IDs
         """
         try:
-            if self.app:
-                with self.app.app_context():
-                    return self._get_embedding_ids_by_filters(
-                        school=school,
-                        department=department,
-                        activity_code=activity_code,
-                        agency_ic_admin=agency_ic_admin,
-                        has_funding=has_funding
-                    )
-            return self._get_embedding_ids_by_filters(
-                school=school,
-                department=department,
-                activity_code=activity_code,
-                agency_ic_admin=agency_ic_admin,
-                has_funding=has_funding
-            )
-
+            with self.app.app_context():
+                return self._get_embedding_ids_by_filters(**parameters)
         except Exception as e:
             logger.error(f"Failed to retrieve faculty record by filters: {e}")
             raise
 
     @staticmethod
-    def _get_embedding_ids_by_filters(school: str = None,
-                                      department: str = None,
-                                      activity_code: str = None,
-                                      agency_ic_admin: str = None,
-                                      has_funding: bool = None) -> typing.List[int]:
+    def _get_embedding_ids_by_filters(school=None,
+                                      department=None,
+                                      activity_code=None,
+                                      agency_ic_admin=None,
+                                      has_funding=None) -> typing.List[int]:
         """Helper function to query faculty by embedding IDs."""
         from backend.models.models import Faculty, Project
         query = db.session.query(Faculty.embedding_id).outerjoin(Project)
 
-        if department:
-            query = query.filter(Faculty.department.contains(department))
         if school:
             query = query.filter(Faculty.school == school)
+        if department:
+            query = query.filter(Faculty.department.contains(department))
         if activity_code:
             query = query.filter(Project.activity_code == activity_code)
         if agency_ic_admin:
@@ -120,18 +101,14 @@ class DatabaseDriver:
         if has_funding:
             query = query.filter(Faculty.has_funding == has_funding)
 
-        embedding_ids = [record.embedding_id for record in query.distinct().all()]
-        return embedding_ids
+        return [record.embedding_id for record in query.distinct().all()]
 
     def clear(self):
         """
         Clear database tables.
         """
         try:
-            if self.app:
-                with self.app.app_context():
-                    self._clear_db()
-            else:
+            with self.app.app_context():
                 self._clear_db()
         except Exception as e:
             logger.error(f"Failed to clear faculty records: {e}")
@@ -141,7 +118,6 @@ class DatabaseDriver:
     def _clear_db():
         """Helper function to clear faculty records."""
         from backend.models.models import Faculty
-        num_deleted = Faculty.query.delete()
+        db.session.execute(delete(Faculty))
         db.session.commit()
-        logger.info(f"Deleted {num_deleted} faculty records and their associated projects.")
-        db.session.remove()
+        logger.info("All faculty records deleted.")

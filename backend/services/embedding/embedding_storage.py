@@ -163,7 +163,7 @@ class EmbeddingStorage:
         :param has_funding: faculty has funding
         """
         logging.info(f"Applying filters to FAISS index.")
-        return self.database_driver.get_embedding_ids_by_filters(
+        return self.database_driver.get_embedding_ids_by_search_parameters(
             school=school,
             department=department,
             activity_code=activity_code,
