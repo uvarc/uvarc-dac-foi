@@ -12,9 +12,9 @@ class EmbeddingService:
                  embedding_storage: EmbeddingStorage = None):
 
         if not embedding_generator:
-            raise ValueError('embedding_generator must be defined')
+            raise TypeError('embedding_generator must be defined')
         if not embedding_storage:
-            raise ValueError('embedding_storage must be defined')
+            raise TypeError('embedding_storage must be defined')
 
         self.embedding_generator = embedding_generator
         self.embedding_storage = embedding_storage
@@ -29,10 +29,7 @@ class EmbeddingService:
         try:
             text = Preprocessor.preprocess_faculty_profile(faculty)
             embedding = self.embedding_generator.generate_embedding(text)
-            embedding_id = self.embedding_storage.add_embedding(faculty.name, embedding)
-            logging.info(f"Embedding generated and stored at id: {embedding_id} for faculty: {faculty.name}")
-
-            return embedding_id
+            return self.embedding_storage.add_embedding(faculty.name, embedding)
         except Exception as e:
             logging.error(f"Failed to generate and store embedding for faculty {faculty.name}: {e}")
             raise
@@ -56,11 +53,16 @@ class EmbeddingService:
         :param has_funding: faculty has funding
         :return: List of faculty EIDs
         """
-        logging.info(f"Searching similar faculty for query: {query}.")
+        if not query:
+            logger.error("Invalid query input for similarity search")
+            raise ValueError("Query must be a non-empty string")
+
+        logging.info(f"Performing similarity search for query: '{query}'")
+
         standardized_query = Preprocessor.preprocess_query(query)
         query_embedding = self.embedding_generator.generate_embedding(standardized_query)
 
-        results = [eid for eid in self.embedding_storage.search_similar_embeddings(
+        results = self.embedding_storage.search_similar_embeddings(
             query_embedding=query_embedding,
             top_k=top_k,
             school=school,
@@ -68,11 +70,7 @@ class EmbeddingService:
             activity_code=activity_code,
             agency_ic_admin=agency_ic_admin,
             has_funding=has_funding
-        ) if id != -1]
+        )
 
-        len_results = len(results)
-        if len_results < top_k:
-            logging.warning(f"Only {len_results} result(s) were found.")
-        logging.info(f"Search successful.")
-
+        logging.info(f"Search completed. {len(results)} results found.")
         return results
