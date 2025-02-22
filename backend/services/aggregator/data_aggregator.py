@@ -32,7 +32,7 @@ class DataAggregator:
                 faculty_identifier = (faculty_profile.Faculty_Name, faculty_profile.School, faculty_profile.Email_Address)
 
                 if faculty_identifier in school_faculty:
-                    school_faculty[faculty_identifier] = self.update_faculty_department(school_faculty[faculty_identifier], faculty_profile.Department)
+                    school_faculty[faculty_identifier] = self._update_faculty_department(school_faculty[faculty_identifier], faculty_profile.Department)
 
                 else:
                     faculty = self._build_faculty_model(faculty_profile)
@@ -49,7 +49,7 @@ class DataAggregator:
         """
         first_name, last_name = self._extract_names(faculty_profile)
         logger.info(f"Fetching NIH project information for {first_name} {last_name}.")
-        projects = self._get_faculty_projects(first_name, last_name)
+        projects = self._get_projects(first_name, last_name)
 
         faculty = Faculty(
             name=faculty_profile.Faculty_Name,
@@ -59,12 +59,12 @@ class DataAggregator:
             email=faculty_profile.Email_Address,
             profile_url=faculty_profile.Profile_URL,
             projects=projects,
-            has_funding=self.has_funding(projects),
+            has_funding=self._has_funding(projects),
             embedding_id=-1,
         )
         return faculty
 
-    def _get_faculty_projects(self, pi_first_name: str, pi_last_name: str) -> typing.List[Project]:
+    def _get_projects(self, pi_first_name: str, pi_last_name: str) -> typing.List[Project]:
         """
         Retrieve NIH-funded projects from NIH RePORTER API and convert to Project model object
         :param pi_first_name: PI first name
@@ -102,7 +102,7 @@ class DataAggregator:
         return names[0], names[-1]
 
     @staticmethod
-    def update_faculty_department(faculty: Faculty, new_department: str) -> Faculty:
+    def _update_faculty_department(faculty: Faculty, new_department: str) -> Faculty:
         """
         Update faculty department field, used when faculties are encountered more than once across dept pages
         :param faculty: Faculty object
@@ -111,7 +111,7 @@ class DataAggregator:
         faculty.department = ",".join(sorted(set(faculty.department.split(",") + [new_department])))
         return faculty
 
-    def has_funding(self, projects: typing.List[Project]) -> bool:
+    def _has_funding(self, projects: typing.List[Project]) -> bool:
         """
         Check if any projects have active funding
         :param projects: list of Project objects
