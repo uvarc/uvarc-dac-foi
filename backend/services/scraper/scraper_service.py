@@ -15,7 +15,7 @@ class ScraperService:
         """
         Fetch school faculty data
         :param school: school acronym
-        :return: dictionary mapping school acronym to school faculty data as dataframe
+        :return: dictionary mapping dept acronym to school faculty data as dataframe
         """
         departments = InstitutionUtils.get_departments_from_school(school)
         logger.info(f"Fetching school faculty data for school: {school}")
