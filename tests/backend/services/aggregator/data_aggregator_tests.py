@@ -134,5 +134,19 @@ class TestDataAggregator(unittest.TestCase):
         ]
         self.assertFalse(self.aggregator._has_funding(projects))
 
+    def test_has_funding_missing_date(self):
+        projects = [
+            Project(
+                project_number="TEST1",
+                abstract="TEST2",
+                relevant_terms="TEST3",
+                start_date=None,
+                end_date=date.today() - timedelta(days=5),
+                agency_ic_admin="TEST4",
+                activity_code="TEST5"
+            )
+        ]
+        self.assertFalse(self.aggregator._has_funding(projects))
+
 if __name__ == '__main__':
     unittest.main()
