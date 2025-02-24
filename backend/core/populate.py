@@ -1,6 +1,6 @@
 import logging
 import os
-from app import app
+from backend.app import app
 from backend.core.populate_config import SCHOOLS_TO_SCRAPE, INDEX_PATH
 from backend.services.scraper.som_scraper import SOMScraper
 from backend.utils.http_client import HttpClient

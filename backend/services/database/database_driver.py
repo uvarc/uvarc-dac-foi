@@ -78,17 +78,17 @@ class DatabaseDriver:
         """
         try:
             with self.app.app_context():
-                return self._get_embedding_ids_by_filters(**parameters)
+                return self._get_embedding_ids_by_search_parameters(**parameters)
         except Exception as e:
             logger.error(f"Failed to retrieve faculty record by filters: {e}")
             raise
 
     @staticmethod
-    def _get_embedding_ids_by_filters(school=None,
-                                      department=None,
-                                      activity_code=None,
-                                      agency_ic_admin=None,
-                                      has_funding=None) -> typing.List[int]:
+    def _get_embedding_ids_by_search_parameters(school=None,
+                                                department=None,
+                                                activity_code=None,
+                                                agency_ic_admin=None,
+                                                has_funding=None) -> typing.List[int]:
         """Helper function to query faculty by embedding IDs."""
         from backend.models.models import Faculty, Project
         query = db.session.query(Faculty.embedding_id).outerjoin(Project)
