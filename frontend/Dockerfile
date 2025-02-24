@@ -1,6 +1,7 @@
 FROM nginx:1.21-alpine
 
-COPY templates/ /usr/share/nginx/html
+COPY html/ /usr/share/nginx/html
+COPY html/static/ /usr/share/nginx/html/static
 
 EXPOSE 80
 
