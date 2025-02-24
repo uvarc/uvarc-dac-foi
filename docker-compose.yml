@@ -1,0 +1,21 @@
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: flask-backend
+    ports:
+      - "5001:5000"
+    env_file:
+      - rc-DACFOI.env
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nginx-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend

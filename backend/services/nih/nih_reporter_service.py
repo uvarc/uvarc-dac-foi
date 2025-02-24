@@ -2,10 +2,9 @@ import typing
 import pandas as pd
 import logging
 import copy
-
 from datetime import datetime
 from backend.services.nih.nih_reporter_proxy import NIHReporterProxy
-from backend.core.script_config import NIH_REPORTER_PAYLOAD, DEFAULT_FISCAL_YEARS
+from backend.core.populate_config import NIH_REPORTER_PAYLOAD, DEFAULT_FISCAL_YEARS
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +28,8 @@ class NIHReporterService:
             logger.warning(f"No projects founds for PI '{pi_first_name} {pi_last_name}' and fiscal years '{fiscal_years}'")
             return pd.DataFrame()
 
-        compiled_metadata = []
-        for project in projects:
-            metadata = {
+        compiled_metadata = [
+            {
                 "project_number": self.get_project_number(project),
                 "abstract_text": self.get_abstract_text(project),
                 "terms": self.get_terms(project),
@@ -40,7 +38,8 @@ class NIHReporterService:
                 "agency_ic_admin": self.get_agency_ic_admin(project),
                 "activity_code": self.get_activity_code(project),
             }
-            compiled_metadata.append(metadata)
+            for project in projects
+        ]
 
         return pd.DataFrame(compiled_metadata)
 
@@ -66,7 +65,7 @@ class NIHReporterService:
         """
         return self.safe_get_field(project, "abstract_text")
 
-    def get_terms(self, project: typing.Dict) -> str:
+    def get_terms(self, project: typing.Dict) -> datetime.date:
         """
         Extract terms from API response segment
         :param project: JSON w/ project metadata
@@ -74,7 +73,7 @@ class NIHReporterService:
         """
         return self.safe_get_field(project, "terms")
 
-    def get_project_start_date(self, project: typing.Dict) -> str:
+    def get_project_start_date(self, project: typing.Dict) -> datetime.date:
         """
         Extract project start date from API response segment
         :param project: JSON w/ project metadata

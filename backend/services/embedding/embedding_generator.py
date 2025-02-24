@@ -1,7 +1,8 @@
 import logging
 import typing
 from openai import OpenAI
-from backend.core.script_config import OPENAI_CONFIG
+from backend.core.populate_config import OPENAI_CONFIG
+from backend.utils.token_utils import count_tokens, chunk_text
 
 logger = logging.getLogger(__name__)
 
@@ -17,15 +18,12 @@ class EmbeddingGenerator:
         :param text: input text
         :return: embedding
         """
-        logger.info(f"Generating embedding for text: {text}")
-
-        from backend.utils.token_utils import count_tokens
         token_count = count_tokens(text)
-        if token_count <= OPENAI_CONFIG["MAX_TOKENS"]:
-            return self._call_embedding_api(text)
-
-        logger.warning(f"Text exceeds token limit of {OPENAI_CONFIG['MAX_TOKENS']}. Chunking required.")
-        return self._generate_chunked_embedding(text)
+        return (
+            self._call_embedding_api(text)
+            if token_count <= OPENAI_CONFIG["MAX_TOKENS"]
+            else self._generate_chunked_embedding(text)
+        )
 
     def _generate_chunked_embedding(self, text: str) -> typing.List[float]:
         """
@@ -33,15 +31,9 @@ class EmbeddingGenerator:
         :param text: input text
         :return: aggregated embedding
         """
-        from backend.utils.token_utils import chunk_text
         chunks = chunk_text(text)
-
-        embeddings = []
-        for i, chunk in enumerate(chunks):
-            logging.info(f"Generating embedding for chunk {i + 1}/{len(chunks)}.")
-            embeddings.append(self._call_embedding_api(chunk))
-
-        logging.info("All chunk embeddings generated successfully. Aggregating embeddings.")
+        logger.info(f"Text chunked into {len(chunks)} parts.")
+        embeddings = [self._call_embedding_api(chunk) for chunk in chunks]
         return self._aggregate_embeddings(embeddings)
 
     @staticmethod
@@ -53,9 +45,7 @@ class EmbeddingGenerator:
         """
         logging.info("Aggregating embeddings using mean pooling.")
         try:
-            aggregated_embedding = [sum(x) / len(embeddings) for x in zip(*embeddings)]
-            logging.info("Successfully aggregated embeddings.")
-            return aggregated_embedding
+            return [sum(x) / len(embeddings) for x in zip(*embeddings)]
         except Exception as e:
             logging.error(f"Failed to aggregate embeddings: {e}")
             raise

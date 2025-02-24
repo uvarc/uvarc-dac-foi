@@ -2,7 +2,7 @@ import re
 import typing
 import logging
 
-from backend.core.script_config import *
+from backend.core.populate_config import *
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
