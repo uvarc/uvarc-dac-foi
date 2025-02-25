@@ -8,4 +8,3 @@ rc-DACFOI.env
 data
 database.db
 index.faiss
-nginx
