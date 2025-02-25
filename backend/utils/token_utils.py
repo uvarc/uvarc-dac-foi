@@ -1,6 +1,6 @@
 import tiktoken
 import typing
-from backend.core.script_config import OPENAI_CONFIG
+from backend.core.populate_config import OPENAI_CONFIG
 
 def count_tokens(text: str) -> int:
     """

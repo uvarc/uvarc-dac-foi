@@ -1,6 +1,9 @@
 import os
+import datetime
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+INDEX_PATH = os.path.join(BASE_DIR, "..", "..", "instance", "index.faiss")
 
 SCHOOLS_TO_SCRAPE = ["SOM", "SEAS"]
 
@@ -18,7 +21,7 @@ SCHOOL_DEPARTMENT_DATA = {
                 "people_url": "https://engineering.virginia.edu/department/civil-and-environmental-engineering/people?keyword=&position=2&impact_area=All&research_area=All",
             },
             "Computer Engineering": {
-                "people_url": "https://engineering.virginia.edu/department/civil-and-environmental-engineering/people?keyword=&position=2&impact_area=All&research_area=All",
+                "people_url": "https://engineering.virginia.edu/offices-programs/computer-engineering-program/faculty?keyword=&position=2&impact_area=All&research_area=All",
             },
             "Computer Science": {
                 "people_url": "https://engineering.virginia.edu/department/computer-science/people?keyword=&position=2&impact_area=All&research_area=All"
@@ -63,7 +66,7 @@ SCHOOL_DEPARTMENT_DATA = {
     },
 }
 
-DEFAULT_FISCAL_YEARS = [2020 + i for i in range(6)]
+DEFAULT_FISCAL_YEARS = list(range(datetime.datetime.now().year - 5, datetime.datetime.now().year + 1))
 
 NIH_REPORTER_PAYLOAD = {
     "criteria": {
@@ -88,5 +91,3 @@ OPENAI_CONFIG = {
     "MAX_TOKENS": 8192,
     "EMBEDDING_DIMENSIONS": 1536,
 }
-
-INDEX_PATH = os.path.join(BASE_DIR, "../../instance/index.faiss")

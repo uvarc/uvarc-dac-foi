@@ -25,52 +25,33 @@ class DataAggregator:
         :return: dictionary of department faculty data stored as Faculty model objects
         """
         school_faculty_df = self.scraper_service.get_school_faculty_data(school)
-        school_faculty = {}
+        school_faculty = dict()
 
         for dept, dept_faculty_df in school_faculty_df.items():
             for faculty_profile in dept_faculty_df.itertuples():
-                name, school, department, email = faculty_profile.Faculty_Name, faculty_profile.School, faculty_profile.Department, faculty_profile.Email_Address
-                faculty_identifier = (name, school, email)
-
-                logger.debug(f"Verifying faculty existence for {name} {school} {department}")
+                faculty_identifier = (faculty_profile.Faculty_Name, faculty_profile.School, faculty_profile.Email_Address)
 
                 if faculty_identifier in school_faculty:
-                    logger.info(f"Found existing faculty for {name}.")
-                    existing_faculty = school_faculty[faculty_identifier]
-                    school_faculty[faculty_identifier] = self.update_faculty_department(existing_faculty, department)
+                    school_faculty[faculty_identifier] = self._update_faculty_department(school_faculty[faculty_identifier], faculty_profile.Department)
 
                 else:
-                    logger.info(f"Faculty not yet created, building faculty model for {name}.")
-                    faculty = self.build_faculty_model(faculty_profile)
+                    faculty = self._build_faculty_model(faculty_profile)
+                    faculty.embedding_id = self.embedding_service.generate_and_store_embedding(faculty)
                     school_faculty[faculty_identifier] = faculty
 
         return list(school_faculty.values())
 
-    def build_faculty_model(self, faculty_profile: typing.Tuple) -> Faculty:
+    def _build_faculty_model(self, faculty_profile: typing.Tuple) -> Faculty:
         """
         Build faculty model from faculty profile
         :param faculty_profile: faculty data
         :return: faculty model
         """
-        first_name, last_name = self.extract_faculty_names_from_profile(faculty_profile)
+        first_name, last_name = self._extract_names(faculty_profile)
         logger.info(f"Fetching NIH project information for {first_name} {last_name}.")
-        projects = self.get_faculty_member_projects(first_name, last_name)
+        projects = self._get_projects(first_name, last_name)
 
-        faculty = self.convert_to_faculty_model(faculty_profile, projects)
-
-        logger.info(f"Generating embedding for {first_name} {last_name}.")
-        embedding_id = self.embedding_service.generate_and_store_embedding(faculty, projects)
-        faculty.embedding_id = embedding_id
-        return faculty
-
-    def convert_to_faculty_model(self, faculty_profile: typing.Tuple, projects: typing.List[Project]) -> Faculty:
-        """
-        Use profile, RePORTER project data, and embedding ID to construct Faculty model object
-        :param faculty_profile: namedtuple w/ faculty information
-        :param projects: list of Project model objects
-        :return: Faculty model object
-        """
-        return Faculty(
+        faculty = Faculty(
             name=faculty_profile.Faculty_Name,
             school=faculty_profile.School,
             department=faculty_profile.Department,
@@ -78,21 +59,12 @@ class DataAggregator:
             email=faculty_profile.Email_Address,
             profile_url=faculty_profile.Profile_URL,
             projects=projects,
-            has_funding=self.has_funding(projects),
+            has_funding=self._has_funding(projects),
             embedding_id=-1,
         )
+        return faculty
 
-    @staticmethod
-    def extract_faculty_names_from_profile(faculty_profile: typing.Tuple) -> typing.Tuple[str, str]:
-        """
-        Extract faculty names from namedtuple
-        :param faculty_profile: named tuple w/ faculty information
-        :return: first and last name of faculty member
-        """
-        names = faculty_profile.Faculty_Name.split(" ")
-        return names[0], names[-1]
-
-    def get_faculty_member_projects(self, pi_first_name: str, pi_last_name: str) -> typing.List[Project]:
+    def _get_projects(self, pi_first_name: str, pi_last_name: str) -> typing.List[Project]:
         """
         Retrieve NIH-funded projects from NIH RePORTER API and convert to Project model object
         :param pi_first_name: PI first name
@@ -100,10 +72,10 @@ class DataAggregator:
         :return: list of Project model objects
         """
         projects_df = self.nih_service.compile_project_metadata(pi_first_name, pi_last_name)
-        return [self.convert_to_project_model(project) for project in projects_df.itertuples()]
+        return [self._convert_to_project_model(project) for project in projects_df.itertuples()]
 
     @staticmethod
-    def convert_to_project_model(project: typing.Tuple) -> Project:
+    def _convert_to_project_model(project: typing.Tuple) -> Project:
         """
         Convert namedtuple to Project model object
         :param project: namedtuple
@@ -120,31 +92,35 @@ class DataAggregator:
         )
 
     @staticmethod
-    def update_faculty_department(faculty: Faculty, department_to_append: str) -> Faculty:
+    def _extract_names(faculty_profile: typing.Tuple) -> typing.Tuple[str, str]:
+        """
+        Extract faculty names from NamedTuple
+        :param faculty_profile: named tuple w/ faculty information
+        :return: first and last name of faculty member
+        """
+        names = faculty_profile.Faculty_Name.split(" ")
+        return names[0], names[-1]
+
+    @staticmethod
+    def _update_faculty_department(faculty: Faculty, new_department: str) -> Faculty:
         """
         Update faculty department field, used when faculties are encountered more than once across dept pages
         :param faculty: Faculty object
-        :param department_to_append: faculty department field
+        :param new_department: faculty department field
         """
-        # convert to list
-        departments = faculty.department.split(",")
-        # add department
-        departments.append(department_to_append)
-        # convert back to comma separated string
-        new_departments = ",".join(sorted(departments))
-        faculty.department = new_departments
+        faculty.department = ",".join(sorted(set(faculty.department.split(",") + [new_department])))
         return faculty
 
-    def has_funding(self, projects: typing.List[Project]) -> bool:
+    def _has_funding(self, projects: typing.List[Project]) -> bool:
         """
         Check if any projects have active funding
         :param projects: list of Project objects
         :return: True if any projects have active funding else False
         """
-        return any(self._has_funding(project) for project in projects)
+        return any(self._is_project_funded(project) for project in projects)
 
     @staticmethod
-    def _has_funding(project: Project) -> bool:
+    def _is_project_funded(project: Project) -> bool | None:
         """Helper function to check if project has active funding"""
         if not project.start_date or not project.end_date:
             return None

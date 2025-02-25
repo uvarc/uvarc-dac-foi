@@ -1,5 +1,6 @@
 .idea/
 venv/
+instance/
 .DS_Store/
 **/.DS_Store/
 **/__pycache__
@@ -7,3 +8,4 @@ rc-DACFOI.env
 data
 database.db
 index.faiss
+nginx
