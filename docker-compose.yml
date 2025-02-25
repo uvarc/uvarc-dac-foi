@@ -1,21 +1,30 @@
 services:
-
-  backend:
+  flask:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
-    container_name: flask-backend
-    ports:
-      - "5001:5000"
+    container_name: flask_app
+    restart: always
     env_file:
       - rc-DACFOI.env
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: nginx-frontend
     ports:
-      - "80:80"
+      - "8000:8000"
+    expose:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+      - ./instance:/app/instance
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    container_name: nginx_server
+    restart: always
+    ports:
+      - "8080:80"
     depends_on:
-      - backend
+      - flask
+    volumes:
+      - ./frontend:/frontend
