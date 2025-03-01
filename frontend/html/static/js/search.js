@@ -1,4 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
+    function updateDetailView(content) {
+        facultyDetails = document.getElementById("facultyDetails");
+        facultyDetails.innerHTML = content;
+        document.getElementById("detailBox").classList.remove("hidden");
+    }
+    function hideSearch() {
+        document.getElementById("searchForm").classList.add("hidden");
+        document.getElementById("results").classList.add("hidden");
+        console.log(document.getElementById("resultsHeading"))
+    }
+    document.getElementById("backToSearch").addEventListener("click", function() {
+        document.getElementById("facultyDetails").innerHTML = "";
+        document.getElementById("searchForm").classList.remove("hidden");
+        document.getElementById("results").classList.remove("hidden");
+        document.getElementById("resultsHeading").classList.remove("hidden");
+        document.getElementById("detailBox").classList.add("hidden");
+    });
     document.getElementById("searchForm").addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -20,9 +37,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 data.results.forEach(item => {
                     // Create a result container div
                     let resultDiv = document.createElement("div");
-                    resultDiv.style.marginBottom = "40px"; // Add space between results
-                    resultDiv.style.borderBottom = "1px solid #ccc"; // Optional: Add a divider for clarity
-                    resultDiv.style.paddingBottom = "20px"; // Add padding within the result container
+                    resultDiv.className = "result";
+
+                    // Add button to view details
+                    let viewDetailsButton = document.createElement("button");
+                    viewDetailsButton.innerHTML = "View Details";
+                    viewDetailsButton.style.marginBottom = "20px";
+                    viewDetailsButton.addEventListener("click", function() {
+                        hideSearch();
+                        updateDetailView(`
+                            <h2>${item.name}</h2>
+                            <p><strong>School:</strong> ${item.school}</p>
+                            <p><strong>Department:</strong> ${item.department}</p>
+                            <p><strong>About:</strong> ${item.about}</p>
+                            <p><strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a></p>
+                        `);
+                    });
+                    resultDiv.appendChild(viewDetailsButton);
 
                     // Add Name
                     let nameEl = document.createElement("p");

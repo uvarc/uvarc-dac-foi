@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <!-- TODO: add title element -->
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
     <h1>Faculty Search</h1>
+    <div id="detailBox" class="hidden">
+        <button id="backToSearch">Back to Search</button>
+        <span id="facultyDetails"></span>
+    </div>
     <form id="searchForm">
         <label for="query">Search Query</label>
         <input type="text" id="query" name="query" required>
@@ -31,8 +36,9 @@
         <button type="submit">Search</button>
     </form>
 
-    <h2>Results</h2>
-    <div id="results"></div>
+    <h2 id="resultsHeading">Results</h2>
+    <div id="results">
+    </div>
 
     <script src="static/js/search.js" defer></script>
 </body>

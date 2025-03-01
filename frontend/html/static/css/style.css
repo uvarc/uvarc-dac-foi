@@ -1,0 +1,12 @@
+.hidden {
+    display: none;
+}
+
+.result {
+    /* Add space between results */
+    margin-bottom: 40px;
+    /* Add a divider for clarity */
+    border-bottom: 1px solid #ccc;
+    /* Add padding within the result container */
+    padding-bottom: 20px;
+}
