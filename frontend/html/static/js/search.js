@@ -72,7 +72,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Add button to view details
                     let viewDetailsButton = document.createElement("button");
                     viewDetailsButton.innerHTML = "View Details →";
-                    viewDetailsButton.style.marginBottom = "20px";
                     viewDetailsButton.addEventListener("click", function() {
                         hideSearch();
                         updateDetailView(`
