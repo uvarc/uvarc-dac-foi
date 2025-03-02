@@ -21,7 +21,7 @@ scraper_service = ScraperService([
 ])
 
 nih_service = NIHReporterService(NIHReporterProxy(http_client))
-embedding_service = get_embedding_service()
+embedding_service = get_embedding_service(app)
 database_driver = get_database_driver(app)
 
 data_aggregator = DataAggregator(scraper_service, nih_service, embedding_service)
