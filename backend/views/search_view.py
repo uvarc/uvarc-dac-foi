@@ -3,7 +3,6 @@ import logging
 from flask import Blueprint, request, jsonify
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 def create_search_blueprint(search_service: "SearchService"):
     search_bp = Blueprint('search', __name__)
