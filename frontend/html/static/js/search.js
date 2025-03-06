@@ -83,8 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <p><strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a></p>
                             <h3>Projects</h3>
                                 ${item.projects.map(project => {
-                                    let numTerms = project.relevant_terms.split("><").length;
-                                    let relevantTerms = project.relevant_terms.split("><").join(", ").replace(/(<|>)/g, "");
+                                    let relTerms = project.relevant_terms.split("><");
                                     return `
                                     <div class="result">
                                         <strong>Project Number:</strong> ${project.project_number}<br>
@@ -93,14 +92,14 @@ document.addEventListener("DOMContentLoaded", function () {
                                             ? `<details class="truncated"><summary><strong>Abstract:</strong> <span>${project.abstract.slice(0, 200)}...</span></summary>${project.abstract}</details>`
                                             : "<strong>Abstract:</strong> " + project.abstract + "<br>"
                                         }
-                                            ${numTerms < 10 ? "<strong>Relevant Terms:</strong> " + relevantTerms + "<br>": `
+                                            ${relTerms.length < 10 ? "<strong>Relevant Terms:</strong> " + relTerms.join(", ").replace(/(<|>)/g, "") + "<br>": `
                                         <details class="truncated">
-                                            <summary><strong>Relevant Terms (${numTerms}):</strong> <span>${relevantTerms.slice(0, 200)}...</span>
+                                            <summary><strong>Relevant Terms (${relTerms.length}):</strong> <span>${relTerms.slice(0, 10).join(", ").replace(/(<|>)/g, "")}...</span>
                                             </summary>
-                                            ${relevantTerms}
+                                            ${relTerms.join(", ").replace(/(<|>)/g, "")}
                                         </details>`}
-                                        <strong>Start Date:</strong> ${project.start_date}<br>
-                                        <strong>End Date:</strong> ${project.end_date}<br>
+                                        <strong>Dates:</strong> ${new Date(project.start_date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}
+                                         — ${new Date(project.end_date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}<br>
                                         <strong>Agency IC Admin:</strong> ${project.agency_ic_admin}<br>
                                         <strong>Activity Code:</strong> ${project.activity_code}
                                     </div>`;
