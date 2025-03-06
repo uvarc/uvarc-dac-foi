@@ -75,6 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     viewDetailsButton.innerHTML = "View Details →";
                     viewDetailsButton.addEventListener("click", function() {
                         hideSearch();
+                        window.scrollTo(0, 0);
                         updateDetailView(`
                             <h2>${item.name}</h2>
                             <p><strong>School:</strong> ${item.school}</p>
