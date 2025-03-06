@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 data.results.forEach(item => {
                     // Create a result container div
                     let resultDiv = document.createElement("div");
-                    resultDiv.className = "result";
+                    resultDiv.className = "result searchResult";
 
                     // Add Name
                     let nameEl = document.createElement("p");

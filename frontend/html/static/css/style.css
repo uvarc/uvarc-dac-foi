@@ -21,8 +21,16 @@ label:not([for="has_funding"]) {
     margin-bottom: 5px; /* Add some space below the labels */
 }
 
+.checkboxContainer {
+    display: flex;
+    flex-direction: column;
+    div {
+        margin-bottom: 5px;
+    }
+}
+
 button {
-    padding: 12px 20px;
+    padding: 11px 20px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -34,7 +42,6 @@ button[type="submit"] {
     background-color: #007bff;
     color: white;
     margin-top: auto;
-    margin-bottom: 10px;
 }
 
 .hidden {
@@ -47,6 +54,9 @@ button[type="submit"] {
     box-shadow: 0 2px 8px 0 rgba(0,0,0,0.2);
     border-radius: 10px;
     padding: 30px;
+}
+
+.searchResult {
     padding-top: 10px;
 }
 
@@ -61,10 +71,6 @@ button[type="submit"] {
     flex-wrap: wrap; /* Allow wrapping to the next line if necessary */
 }
 
-input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-}
 
 details.truncated[open] > summary > span {
     display: none;
