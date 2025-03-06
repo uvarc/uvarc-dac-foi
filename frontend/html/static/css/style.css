@@ -38,7 +38,7 @@ button[type="submit"] {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .result {
@@ -64,4 +64,8 @@ button[type="submit"] {
 input[type="checkbox"] {
     width: 18px;
     height: 18px;
+}
+
+details.truncated[open] > summary > span {
+    display: none;
 }

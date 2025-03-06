@@ -80,6 +80,30 @@ document.addEventListener("DOMContentLoaded", function () {
                             <p><strong>Department:</strong> ${item.department}</p>
                             <p><strong>About:</strong> ${item.about}</p>
                             <p><strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a></p>
+                            <h3>Projects</h3>
+                                ${item.projects.map(project => {
+                                    let numTerms = project.relevant_terms.split("><").length;
+                                    let relevantTerms = project.relevant_terms.split("><").join(", ").replace(/(<|>)/g, "");
+                                    return `
+                                    <div class="result">
+                                        <strong>Project Number:</strong> ${project.project_number}<br>
+                                        ${
+                                        project.abstract.length > 200 
+                                            ? `<details class="truncated"><summary><strong>Abstract:</strong> <span>${project.abstract.slice(0, 200)}...</span></summary>${project.abstract}</details>`
+                                            : "<strong>Abstract:</strong> " + project.abstract + "<br>"
+                                        }
+                                            ${numTerms < 10 ? "<strong>Relevant Terms:</strong> " + relevantTerms + "<br>": `
+                                        <details class="truncated">
+                                            <summary><strong>Relevant Terms (${numTerms}):</strong> <span>${relevantTerms.slice(0, 200)}...</span>
+                                            </summary>
+                                            ${relevantTerms}
+                                        </details>`}
+                                        <strong>Start Date:</strong> ${project.start_date}<br>
+                                        <strong>End Date:</strong> ${project.end_date}<br>
+                                        <strong>Agency IC Admin:</strong> ${project.agency_ic_admin}<br>
+                                        <strong>Activity Code:</strong> ${project.activity_code}
+                                    </div>`;
+                                }).join("")}
                         `);
                     });
                     resultDiv.appendChild(viewDetailsButton);
