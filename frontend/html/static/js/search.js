@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
+        document.getElementById("loadingSpinner").classList.remove("hidden");
         fetch(`/api/search?${params.toString()}`)
             .then(response => response.json())
             .then(data => {
@@ -110,6 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     // Append the result div to the results container
                     resultsContainer.appendChild(resultDiv);
+                    document.getElementById("loadingSpinner").classList.add("hidden");
                 });
             })
             .catch(error => console.error("Error fetching data:", error));
