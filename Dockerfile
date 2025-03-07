@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY backend /app/backend
 COPY frontend /app/frontend
+COPY instance /app/instance
 
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 

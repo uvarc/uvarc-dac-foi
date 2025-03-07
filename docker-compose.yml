@@ -9,10 +9,10 @@ services:
       - rc-DACFOI.env
     expose:
       - "8000:8000"
-    volumes:
-      - ./backend:/app/backend
-      - ./frontend:/app/frontend
-      - ./instance:/app/instance
+#    volumes:
+#      - ./backend:/app/backend
+#      - ./frontend:/app/frontend
+#      - ./instance:/app/instance
 
   nginx:
     build:
