@@ -3,7 +3,6 @@ venv
 .git
 __pycache__
 rc-DACFOI.env
-instance
 .idea
 tests
 README.md

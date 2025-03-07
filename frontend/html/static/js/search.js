@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
+        document.getElementById("loadingSpinner").classList.remove("hidden");
         fetch(`/api/search?${params.toString()}`)
             .then(response => response.json())
             .then(data => {
@@ -39,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 data.results.forEach(item => {
                     // Create a result container div
                     let resultDiv = document.createElement("div");
-                    resultDiv.className = "result";
+                    resultDiv.className = "result searchResult";
 
                     // Add Name
                     let nameEl = document.createElement("p");
@@ -74,18 +75,43 @@ document.addEventListener("DOMContentLoaded", function () {
                     viewDetailsButton.innerHTML = "View Details →";
                     viewDetailsButton.addEventListener("click", function() {
                         hideSearch();
+                        window.scrollTo(0, 0);
                         updateDetailView(`
                             <h2>${item.name}</h2>
                             <p><strong>School:</strong> ${item.school}</p>
                             <p><strong>Department:</strong> ${item.department}</p>
                             <p><strong>About:</strong> ${item.about}</p>
                             <p><strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a></p>
+                            <h3>Projects</h3>
+                                ${item.projects.map(project => {
+                                    let relTerms = project.relevant_terms.split("><");
+                                    return `
+                                    <div class="result">
+                                        <strong>Project Number:</strong> ${project.project_number}<br>
+                                        ${
+                                        project.abstract.length > 200 
+                                            ? `<details class="truncated"><summary><strong>Abstract:</strong> <span>${project.abstract.slice(0, 200)}...</span></summary>${project.abstract}</details>`
+                                            : "<strong>Abstract:</strong> " + project.abstract + "<br>"
+                                        }
+                                            ${relTerms.length < 10 ? "<strong>Relevant Terms:</strong> " + relTerms.join(", ").replace(/(<|>)/g, "") + "<br>": `
+                                        <details class="truncated">
+                                            <summary><strong>Relevant Terms (${relTerms.length}):</strong> <span>${relTerms.slice(0, 10).join(", ").replace(/(<|>)/g, "")}...</span>
+                                            </summary>
+                                            ${relTerms.join(", ").replace(/(<|>)/g, "")}
+                                        </details>`}
+                                        <strong>Dates:</strong> ${new Date(project.start_date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}
+                                         — ${new Date(project.end_date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}<br>
+                                        <strong>Agency IC Admin:</strong> ${project.agency_ic_admin}<br>
+                                        <strong>Activity Code:</strong> ${project.activity_code}
+                                    </div>`;
+                                }).join("")}
                         `);
                     });
                     resultDiv.appendChild(viewDetailsButton);
 
                     // Append the result div to the results container
                     resultsContainer.appendChild(resultDiv);
+                    document.getElementById("loadingSpinner").classList.add("hidden");
                 });
             })
             .catch(error => console.error("Error fetching data:", error));
