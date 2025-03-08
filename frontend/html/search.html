@@ -23,17 +23,18 @@
             </div>
             <div class="inputContainer">
                 <label for="school">School:</label>
-                <!-- dropdown input for blank, SEAS, SOM -->
                 <select id="school" name="school">
                     <option value="">Any</option>
                     <option value="SEAS">School of Engineering</option>
                     <option value="SOM">School of Medicine</option>
                 </select>
-                <!-- <input type="text" id="school" name="school"> -->
             </div>
             <div class="inputContainer">
                 <label for="department">Department:</label>
-                <input type="text" id="department" name="department">
+                <!-- dropdown input for department based on school choice -->
+                <select id="department" name="department" disabled>
+                    <option value="">Any</option>
+                </select>
             </div>
             <div class="inputContainer">
                 <label for="activity_code">Activity Code:</label>

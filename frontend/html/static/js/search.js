@@ -1,3 +1,21 @@
+schoolDepartments = {
+    "SOM": ["Cell Biology",
+        "Biochemistry and Molecular Genetics",
+        "Microbiology, Immunology, Cancer Biology",
+        "Molecular Physiology and Biological Physics",
+        "Pharmacology"],
+    "SEAS": ["Biomedical Engineering",
+        "Chemical Engineering",
+        "Civil and Environmental Engineering",
+        "Computer Engineering",
+        "Computer Science",
+        "Electrical and Computer Engineering",
+        "Engineering and Society",
+        "Materials Science and Engineering",
+        "Mechanical and Aerospace Engineering",
+        "Systems and Information Engineering"],
+};
+
 document.addEventListener("DOMContentLoaded", function () {
     function updateDetailView(content) {
         facultyDetails = document.getElementById("facultyDetails");
@@ -16,6 +34,28 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("resultsHeading").classList.remove("hidden");
         document.getElementById("detailBox").classList.add("hidden");
     });
+    // change the department dropdown's options based on the school dropdown's selection
+    document.getElementById("school").addEventListener("change", function() {
+        let school = this.value;
+        let departmentDropdown = document.getElementById("department");
+        departmentDropdown.innerHTML = ""; // Clear previous options
+
+        let blankOption = document.createElement("option");
+        blankOption.value = "";
+        blankOption.text = "Any";
+        departmentDropdown.appendChild(blankOption);
+
+        schoolDepartments[school].forEach(department => {
+            let option = document.createElement("option");
+            option.value = department;
+            option.text = department;
+            departmentDropdown.appendChild(option);
+        });
+        
+        departmentDropdown.disabled = !school;
+    });
+
+
     document.getElementById("searchForm").addEventListener("submit", function (event) {
         event.preventDefault();
 
