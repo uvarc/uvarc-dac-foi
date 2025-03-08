@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 resultsContainer.innerHTML = ""; // Clear previous results
                 
                 document.getElementById("resultsHeading").classList.remove("hidden");
-
+                document.getElementById("loadingSpinner").classList.add("hidden");
                 data.results.forEach(item => {
                     // Create a result container div
                     let resultDiv = document.createElement("div");
@@ -111,9 +111,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     // Append the result div to the results container
                     resultsContainer.appendChild(resultDiv);
-                    document.getElementById("loadingSpinner").classList.add("hidden");
                 });
             })
-            .catch(error => console.error("Error fetching data:", error));
+            .catch(error => {
+                document.getElementById("loadingSpinner").classList.add("hidden");
+                return console.error("Error fetching data:", error);
+            });
     });
 });
