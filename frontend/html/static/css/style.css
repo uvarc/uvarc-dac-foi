@@ -9,15 +9,28 @@ body {
 input[type="text"], input[type="number"] {
     box-sizing: border-box;
     padding: 10px;
-    margin-bottom: 5px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
-} 
+    display: block; /* Make input elements block-level */
+    width: 100%; /* Make input elements take full width of their container */
+}
 
+label:not([for="has_funding"]) {
+    display: block; /* Make label elements block-level */
+    margin-bottom: 5px; /* Add some space below the labels */
+}
+
+.checkboxContainer {
+    display: flex;
+    flex-direction: column;
+    div {
+        margin-bottom: 5px;
+    }
+}
 
 button {
-    padding: 10px 20px;
+    padding: 11px 20px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -28,10 +41,11 @@ button[type="submit"] {
     border: none;
     background-color: #007bff;
     color: white;
+    margin-top: auto;
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .result {
@@ -40,5 +54,24 @@ button[type="submit"] {
     box-shadow: 0 2px 8px 0 rgba(0,0,0,0.2);
     border-radius: 10px;
     padding: 30px;
+}
+
+.searchResult {
     padding-top: 10px;
+}
+
+.inputContainer {
+    width: 300px; /* Set a specific width */
+    margin: 0 10px 10px 0; /* Add right and bottom margin */
+}
+
+#searchForm {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrapping to the next line if necessary */
+}
+
+
+details.truncated[open] > summary > span {
+    display: none;
 }

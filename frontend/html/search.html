@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Faculty Search</title>
     <link rel="stylesheet" href="static/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
     <h1>Faculty Search</h1>
@@ -12,29 +13,51 @@
         <span id="facultyDetails"></span>
     </div>
     <form id="searchForm">
-            <label for="query">Search Query</label>
-            <input type="text" id="query" name="query" required>
-            <label for="limit">Limit:</label>
-            <input type="number" id="limit" name="limit" min="1" max="50" required>
+            <div class="inputContainer">
+                <label for="query">Search Query</label>
+                <input type="text" id="query" name="query" required>
+            </div>
+            <div class="inputContainer">
+                <label for="limit">Limit:</label>
+                <input type="number" id="limit" name="limit" min="1" max="50" required>
+            </div>
+            <div class="inputContainer">
+                <label for="school">School:</label>
+                <input type="text" id="school" name="school">
+            </div>
+            <div class="inputContainer">
+                <label for="department">Department:</label>
+                <input type="text" id="department" name="department">
+            </div>
+            <div class="inputContainer">
+                <label for="activity_code">Activity Code:</label>
+                <input type="text" id="activity_code" name="activity_code">
+            </div>
+            <div class="inputContainer">
+                <label for="agency_ic_admin">Agency IC Admin:</label>
+                <input type="text" id="agency_ic_admin" name="agency_ic_admin">
+            </div>
+            <div class="inputContainer checkboxContainer">
+                <div>
+                    <label for="has_funding">Has Funding:</label>
+                    <input type="checkbox" id="has_funding" name="has_funding">
+                </div>
+                <button type="submit">🔍︎ Search</button>
+            </div>
 
-            <label for="school">School:</label>
-            <input type="text" id="school" name="school">
-
-            <label for="department">Department:</label>
-            <input type="text" id="department" name="department">
-
-            <label for="activity_code">Activity Code:</label>
-            <input type="text" id="activity_code" name="activity_code">
-
-            <label for="agency_ic_admin">Agency IC Admin:</label>
-            <input type="text" id="agency_ic_admin" name="agency_ic_admin">
-
-            <label for="has_funding">Has Funding:</label>
-            <input type="checkbox" id="has_funding" name="has_funding">
-
-            <button type="submit">Search</button>
     </form>
-
+    <svg class="hidden" id="loadingSpinner" width="50px" height="50px" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="25" cy="25" r="20" fill="none" stroke="#4A90E2" stroke-width="4" stroke-linecap="round"
+            stroke-dasharray="90 150" stroke-dashoffset="0">
+            <animate attributeName="stroke-dasharray" values="1,150; 90,150; 1,150" dur="2s" keyTimes="0; 0.5; 1"
+                calcMode="spline" keySplines="0.25,1,0.5,1; 0.25,1,0.5,1" repeatCount="indefinite" />
+            <animate attributeName="stroke-dashoffset" values="0;-60;-120" dur="2s" keyTimes="0; 0.5; 1" calcMode="spline"
+                keySplines="0.25,1,0.5,1; 0.25,1,0.5,1" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="2s"
+                repeatCount="indefinite" calcMode="linear" />
+        </circle>
+    </svg>
+      
     <h2 id="resultsHeading" class="hidden">Results</h2>
     <div id="results">
     </div>
