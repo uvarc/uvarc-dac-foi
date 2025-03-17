@@ -6,7 +6,7 @@ body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-input[type="text"], input[type="number"] {
+input[type="text"], input[type="number"], select {
     box-sizing: border-box;
     padding: 10px;
     font-size: 16px;
@@ -35,6 +35,7 @@ button {
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
+    transition: filter 0.3s;
 }
 
 button[type="submit"] {
@@ -42,6 +43,10 @@ button[type="submit"] {
     background-color: #007bff;
     color: white;
     margin-top: auto;
+}
+
+button:hover {
+    filter: brightness(90%);
 }
 
 .hidden {
@@ -74,4 +79,28 @@ button[type="submit"] {
 
 details.truncated[open] > summary > span {
     display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #222;
+        color: white;
+    }
+
+    input[type="text"], input[type="number"], select {
+        background-color: #444;
+        color: white;
+    }
+
+    button[type="submit"] {
+        background-color: #0056b3;
+    }
+
+    .result {
+        background-color: #444;
+    }
+
+    a {
+        color: #248eff;
+    }
 }
