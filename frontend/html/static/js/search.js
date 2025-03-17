@@ -87,23 +87,21 @@ document.addEventListener("DOMContentLoaded", function () {
                     nameEl.innerHTML = `<h3>${item.name}</h3>`;
                     resultDiv.appendChild(nameEl);
 
-                    // Add School
-                    let schoolEl = document.createElement("p");
-                    schoolEl.innerHTML = `<strong>School:</strong> ${item.school}`;
-                    resultDiv.appendChild(schoolEl);
-
                     // Add Department
                     let departmentEl = document.createElement("p");
-                    departmentEl.innerHTML = `<strong>Department:</strong> ${item.department}`;
+                    departmentEl.innerHTML = `<strong>Department:</strong> ${item.school} › ${item.department}`;
                     resultDiv.appendChild(departmentEl);
 
+                    
                     // Add About (truncate to 300 characters)
-                    let aboutEl = document.createElement("p");
-                    let truncatedAbout = item.about.length > 1000
-                        ? item.about.slice(0, 1000) + "..."
-                        : item.about;
-                    aboutEl.innerHTML = `<strong>About:</strong> ${truncatedAbout}`;
-                    resultDiv.appendChild(aboutEl);
+                    if (item.about?.length > 0) {
+                        let aboutEl = document.createElement("p");
+                        let truncatedAbout = item.about.length > 1000
+                            ? item.about.slice(0, 1000) + "..."
+                            : item.about;
+                        aboutEl.innerHTML = `<strong>About:</strong> ${truncatedAbout}`;
+                        resultDiv.appendChild(aboutEl);
+                    }
 
                     // Add Profile URL (as a clickable link)
                     let profileUrlEl = document.createElement("p");
@@ -122,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <p><strong>Department:</strong> ${item.department}</p>
                             <p><strong>About:</strong> ${item.about}</p>
                             <p><strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a></p>
-                            <h3>Projects</h3>
+                            <h3>Projects (${item.projects.length})</h3>
                                 ${item.projects.map(project => {
                                     let relTerms = project.relevant_terms.split("><");
                                     return `
@@ -140,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                             ${relTerms.join(", ").replace(/(<|>)/g, "")}
                                         </details>`}
                                         <strong>Dates:</strong> ${new Date(project.start_date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}
-                                         — ${new Date(project.end_date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}<br>
+                                         – ${new Date(project.end_date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'})}<br>
                                         <strong>Agency IC Admin:</strong> ${project.agency_ic_admin}<br>
                                         <strong>Activity Code:</strong> ${project.activity_code}
                                     </div>`;
