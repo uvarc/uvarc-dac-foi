@@ -1,0 +1,30 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    #    nginx.org/websocket-services: "{{ include "uvarc-dac-foi.fullname" . }}"
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-cluster-issuer
+    nginx.org/proxy-connect-timeout: "600s"
+    nginx.org/proxy-read-timeout: "600s"
+    nginx.org/proxy-send-timeout: "600s"
+  name: {{ include "uvarc-dac-foi.fullname" . }}
+spec:
+  rules:
+    - host: {{ include "uvarc-dac-foi.fullname" . }}.pods.uvarc.io
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: {{ include "uvarc-dac-foi.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+  tls:
+    - hosts:
+        - {{ include "uvarc-dac-foi.fullname" . }}.pods.uvarc.io
+      secretName: {{ include "uvarc-dac-foi.fullname" . }}-nginx-tls-ingress-secret
