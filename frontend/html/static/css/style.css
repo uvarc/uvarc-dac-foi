@@ -29,9 +29,13 @@ label:not([for="has_funding"]) {
     }
 }
 
-button {
+button, a.button {
     padding: 11px 20px;
     font-size: 16px;
+    background-color: #ededed;
+    text-decoration: none;
+    color: black;
+    font-weight: normal;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
@@ -45,12 +49,18 @@ button[type="submit"] {
     margin-top: auto;
 }
 
-button:hover {
+button:hover, a.button:hover {
     filter: brightness(90%);
 }
 
 .hidden {
     display: none !important;
+}
+
+#resultsHeading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .result {
@@ -101,6 +111,6 @@ details.truncated[open] > summary > span {
     }
 
     a {
-        color: #248eff;
+        color: #75b7fd;
     }
 }
