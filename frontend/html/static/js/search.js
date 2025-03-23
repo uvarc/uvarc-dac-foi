@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     // Add Department
                     let departmentEl = document.createElement("p");
-                    departmentEl.innerHTML = `<strong>Department:</strong> ${item.school} › ${item.department}`;
+                    departmentEl.innerHTML = `<strong>Department:</strong> ${item.school} › ${item?.department.join(", ")}`;
                     resultDiv.appendChild(departmentEl);
 
                     
