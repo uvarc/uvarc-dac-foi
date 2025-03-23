@@ -77,14 +77,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 document.getElementById("resultsHeading").classList.remove("hidden");
                 document.getElementById("loadingSpinner").classList.add("hidden");
+                let csvUri = "data:text/csv;charset=utf-8,Name,Email"
                 data.results.forEach(item => {
+                    csvUri += `\n"${item.name}","${item?.emails[0]}"`
                     // Create a result container div
                     let resultDiv = document.createElement("div");
                     resultDiv.className = "result searchResult";
 
                     // Add Name
-                    let nameEl = document.createElement("p");
-                    nameEl.innerHTML = `<h3>${item.name}</h3>`;
+                    let nameEl = document.createElement("h3");
+                    nameEl.innerHTML = `${item.name}`;
                     resultDiv.appendChild(nameEl);
 
                     // Add Department
@@ -108,6 +110,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     profileUrlEl.innerHTML = `<strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a>`;
                     resultDiv.appendChild(profileUrlEl);
 
+                    // Add Email (add every email with mailto link)
+                    let emailEl = document.createElement("p");
+                    emailEl.innerHTML = `<strong>Email:</strong> ${item?.emails.map(email => `<a href="mailto:${email}">${email}</a>`).join(", ") || "none"}`;
+                    resultDiv.appendChild(emailEl);
+
                     // Add button to view details
                     let viewDetailsButton = document.createElement("button");
                     viewDetailsButton.innerHTML = "View Details →";
@@ -121,6 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <p><strong>Department:</strong> ${item.department}</p>
                             <p><strong>About:</strong> ${item.about}</p>
                             <p><strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a></p>
+                            <p><strong>Email:</strong> ${item?.emails.map(email => `<a href="mailto:${email}">${email}</a>`).join(", ") || "none"}</p>
                             <h3>Projects (${item.projects.length})</h3>
                                 ${item.projects.map(project => {
                                     let relTerms = project.relevant_terms?.split("><") || ["none"];
@@ -156,6 +164,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Append the result div to the results container
                     resultsContainer.appendChild(resultDiv);
                 });
+                let downloadCSVButton = document.getElementById("downloadCSVButton");
+                downloadCSVButton.href = encodeURI(csvUri);
             })
             .catch(error => {
                 document.getElementById("loadingSpinner").classList.add("hidden");
