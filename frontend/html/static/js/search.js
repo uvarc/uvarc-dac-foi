@@ -114,7 +114,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     viewDetailsButton.addEventListener("click", function() {
                         hideSearch();
                         window.scrollTo(0, 0);
-                        updateDetailView(`
+                        try {
+                            updateDetailView(`
                             <h2>${item.name}</h2>
                             <p><strong>School:</strong> ${item.school}</p>
                             <p><strong>Department:</strong> ${item.department}</p>
@@ -122,14 +123,14 @@ document.addEventListener("DOMContentLoaded", function () {
                             <p><strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a></p>
                             <h3>Projects (${item.projects.length})</h3>
                                 ${item.projects.map(project => {
-                                    let relTerms = project.relevant_terms.split("><");
+                                    let relTerms = project.relevant_terms?.split("><") || ["none"];
                                     return `
                                     <div class="result">
                                         <strong>Project Number:</strong> ${project.project_number}<br>
                                         ${
-                                        project.abstract.length > 200 
+                                        project.abstract?.length > 200 // returns false if abstract is null or less than 200 characters
                                             ? `<details class="truncated"><summary><strong>Abstract:</strong> <span>${project.abstract.slice(0, 200)}...</span></summary>${project.abstract}</details>`
-                                            : "<strong>Abstract:</strong> " + project.abstract + "<br>"
+                                            : "<strong>Abstract:</strong> " + (project.abstract || "none") + "<br>"
                                         }
                                             ${relTerms.length < 10 ? "<strong>Relevant Terms:</strong> " + relTerms.join(", ").replace(/(<|>)/g, "") + "<br>": `
                                         <details class="truncated">
@@ -144,6 +145,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                     </div>`;
                                 }).join("")}
                         `);
+                        }
+                        catch (e) {
+                            console.error(e);
+                            updateDetailView("<br><h2>⚠ Error loading details</h2>");
+                        }
                     });
                     resultDiv.appendChild(viewDetailsButton);
 
