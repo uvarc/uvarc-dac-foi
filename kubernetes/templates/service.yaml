@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "uvarc-dac-foi.fullname" . }}
+  name: {{ include "dacfoi.fullname" . }}
   labels:
-    {{- include "uvarc-dac-foi.labels" . | nindent 4 }}
+    {{- include "dacfoi.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "uvarc-dac-foi.selectorLabels" . | nindent 4 }}
+    {{- include "dacfoi.selectorLabels" . | nindent 4 }}
