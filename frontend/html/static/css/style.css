@@ -71,6 +71,10 @@ button:hover, a.button:hover {
     padding: 30px;
 }
 
+.result a, .facultyDetails a {
+     word-wrap: break-word;
+}
+
 .searchResult {
     padding-top: 10px;
 }
