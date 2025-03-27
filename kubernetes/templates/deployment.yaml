@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "dacfoi.fullname" . }}
+  name: {{ include "uvarc-dac-foi.fullname" . }}
   labels:
-    {{- include "dacfoi.labels" . | nindent 4 }}
+    {{- include "uvarc-dac-foi.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "dacfoi.selectorLabels" . | nindent 6 }}
+      {{- include "uvarc-dac-foi.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -16,7 +16,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "dacfoi.labels" . | nindent 8 }}
+        {{- include "uvarc-dac-foi.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -42,12 +42,12 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "dacfoi.fullname" . }}
+                  name: {{ include "uvarc-dac-foi.fullname" . }}
                   key: DATABASE_URL
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "dacfoi.fullname" . }}
+                  name: {{ include "uvarc-dac-foi.fullname" . }}
                   key: OPENAI_API_KEY
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
