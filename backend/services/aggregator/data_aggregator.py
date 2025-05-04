@@ -25,21 +25,15 @@ class DataAggregator:
         :return: dictionary of department faculty data stored as Faculty model objects
         """
         school_faculty_df = self.scraper_service.get_school_faculty_data(school)
-        school_faculty = dict()
+        faculty_list = []
 
         for dept, dept_faculty_df in school_faculty_df.items():
             for faculty_profile in dept_faculty_df.itertuples():
-                faculty_identifier = (faculty_profile.Faculty_Name, faculty_profile.School, faculty_profile.Email_Address)
+                faculty = self._build_faculty_model(faculty_profile)
+                faculty.embedding_id = self.embedding_service.generate_and_store_embedding(faculty)
+                faculty_list.append(faculty)
 
-                if faculty_identifier in school_faculty:
-                    school_faculty[faculty_identifier] = self._update_faculty_department(school_faculty[faculty_identifier], faculty_profile.Department)
-
-                else:
-                    faculty = self._build_faculty_model(faculty_profile)
-                    faculty.embedding_id = self.embedding_service.generate_and_store_embedding(faculty)
-                    school_faculty[faculty_identifier] = faculty
-
-        return list(school_faculty.values())
+        return faculty_list
 
     def _build_faculty_model(self, faculty_profile: typing.Tuple) -> Faculty:
         """
@@ -100,16 +94,6 @@ class DataAggregator:
         """
         names = faculty_profile.Faculty_Name.split(" ")
         return names[0], names[-1]
-
-    @staticmethod
-    def _update_faculty_department(faculty: Faculty, new_department: str) -> Faculty:
-        """
-        Update faculty department field, used when faculties are encountered more than once across dept pages
-        :param faculty: Faculty object
-        :param new_department: faculty department field
-        """
-        faculty.department = ",".join(sorted(set(faculty.department.split(",") + [new_department])))
-        return faculty
 
     def _has_funding(self, projects: typing.List[Project]) -> bool:
         """
