@@ -25,40 +25,22 @@ class SEASScraper(BaseScraper):
         if not InstitutionUtils.is_valid_url(people_url):
             raise ValueError(f"Invalid URL: {people_url}")
 
-        page_number = 0
         profile_urls = []
+        logger.info(f"Processing page {people_url}")
 
-        while page_number < max_pages:
-            page_url = f"{people_url}&page={page_number}"
-            logger.info(f"Processing page {page_number}: {page_url}")
+        try:
+            response = self.http_client.get(people_url)
+            tree = html.fromstring(response.content)
+            urls = tree.xpath(self.CONTACT_BLOCK_NAME_XPATH)
+            profile_urls.extend(urls)
 
-            try:
-                response = self.http_client.get(page_url)
-                tree = html.fromstring(response.content)
-                no_results = tree.xpath(self.NO_RESULTS_XPATH)
+        except html.etree.XMLSyntaxError as e:
+            logger.error(f"Failed to parse HTML for {people_url}: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error processing page {people_url}: {e}")
+            raise
 
-                if no_results:
-                    logger.info(f"No results found for page {page_number}: {page_url}")
-                    break
-                urls = tree.xpath(self.CONTACT_BLOCK_NAME_XPATH)
-                profile_urls.extend(urls)
-                page_number += 1
-
-                # TODO: I need an automatic way to detect this
-                # These have no pages
-                if self.is_cs_department(people_url):
-                    break
-                if self.is_chem_e_department(people_url):
-                    break
-                if self.is_systems_e_department(people_url):
-                    break
-
-            except html.etree.XMLSyntaxError as e:
-                logger.error(f"Failed to parse HTML for {page_url}: {e}")
-                raise
-            except Exception as e:
-                logger.error(f"Unexpected error processing page {page_number}: {e}")
-                raise
         return profile_urls
 
     def get_name_from_profile(self, profile_url: str) -> str:
@@ -124,15 +106,3 @@ class SEASScraper(BaseScraper):
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
             raise
-
-    @staticmethod
-    def is_cs_department(people_url: str) -> bool:
-        return people_url == InstitutionUtils.get_people_url_from_department("Computer Science")
-
-    @staticmethod
-    def is_chem_e_department(people_url: str) -> bool:
-        return people_url == InstitutionUtils.get_people_url_from_department("Chemical Engineering")
-
-    @staticmethod
-    def is_systems_e_department(people_url: str) -> bool:
-        return people_url == InstitutionUtils.get_people_url_from_department("Systems and Information Engineering")
