@@ -41,7 +41,9 @@ class EmbeddingService:
                                   department: str = None,
                                   activity_code: str = None,
                                   agency_ic_admin: str = None,
-                                  has_funding: bool = None) -> typing.List[int]:
+                                  has_funding: bool = None,
+                                  exact_words: bool = None
+                                  ) -> typing.List[int]:
         """
         Search for the most similar faculty based on a natural language query.
         :param query: user input query
@@ -61,16 +63,27 @@ class EmbeddingService:
 
         standardized_query = Preprocessor.preprocess_query(query)
         query_embedding = self.embedding_generator.generate_embedding(standardized_query)
-
-        results = self.embedding_storage.search_similar_embeddings(
-            query_embedding=query_embedding,
-            top_k=top_k,
-            school=school,
-            department=department,
-            activity_code=activity_code,
-            agency_ic_admin=agency_ic_admin,
-            has_funding=has_funding
-        )
+        results = None
+        if not exact_words:
+            results = self.embedding_storage.search_similar_embeddings(
+                query_embedding=query_embedding,
+                top_k=top_k,
+                school=school,
+                department=department,
+                activity_code=activity_code,
+                agency_ic_admin=agency_ic_admin,
+                has_funding=has_funding
+            )
+        else:
+            results = self.embedding_storage.search_exact_words(
+                query=standardized_query,
+                top_k=top_k,
+                school=school,
+                department=department,
+                activity_code=activity_code,
+                agency_ic_admin=agency_ic_admin,
+                has_funding=has_funding
+            )
 
         logging.info(f"Search completed. {len(results)} results found.")
         return results
