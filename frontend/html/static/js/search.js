@@ -75,6 +75,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 let resultsContainer = document.getElementById("results");
                 resultsContainer.innerHTML = ""; // Clear previous results
                 
+                document.getElementById("resultCount").classList.remove("hidden");
+                document.getElementById("resultCount").innerText = `(${data.results.length})`;
                 document.getElementById("resultsHeading").classList.remove("hidden");
                 document.getElementById("loadingSpinner").classList.add("hidden");
                 let csvUri = "data:text/csv;charset=utf-8,Name,Email"
