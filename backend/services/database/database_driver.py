@@ -155,10 +155,6 @@ class DatabaseDriver:
             faculty_query = faculty_query.filter(Faculty.projects.any(Project.activity_code == activity_code))
         if agency_ic_admin:
             faculty_query = faculty_query.filter(Faculty.projects.any(Project.agency_ic_admin == agency_ic_admin))
-        # if activity_code:
-        #     faculty_query = faculty_query.join(Project).filter(Project.activity_code == activity_code)
-        # if agency_ic_admin:
-        #     faculty_query = faculty_query.join(Project).filter(Project.agency_ic_admin == agency_ic_admin)
         if has_funding is not None:
             faculty_query = faculty_query.filter(Faculty.has_funding == has_funding)
         return [record.embedding_id for record in faculty_query.distinct().limit(top_k).all()]
