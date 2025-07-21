@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     // change the department dropdown's options based on the school dropdown's selection
     document.getElementById("school").addEventListener("change", function() {
-        let school = this.value;
+        let sch = this.value; // not named school because school refers to the school <select> element
         let departmentDropdown = document.getElementById("department");
         departmentDropdown.innerHTML = ""; // Clear previous options
 
@@ -45,14 +45,19 @@ document.addEventListener("DOMContentLoaded", function () {
         blankOption.text = "Any";
         departmentDropdown.appendChild(blankOption);
 
-        schoolDepartments[school].forEach(department => {
-            let option = document.createElement("option");
-            option.value = department;
-            option.text = department;
-            departmentDropdown.appendChild(option);
-        });
+        if (schoolDepartments[sch]) {
+            schoolDepartments[sch].forEach(department => {
+                let option = document.createElement("option");
+                option.value = department;
+                option.text = department;
+                departmentDropdown.appendChild(option);
+            });
+        }
         
-        departmentDropdown.disabled = !school;
+        departmentDropdown.disabled = !sch; // gray out the department dropdown if no school is selected
+        if (departmentDropdown.disabled) {
+            departmentDropdown.title = "Select a school first to filter by department";
+        }
     });
 
 
@@ -171,6 +176,8 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => {
                 document.getElementById("loadingSpinner").classList.add("hidden");
+                document.getElementById("resultsHeading").classList.add("hidden");
+                document.getElementById("results").innerHTML = "<h2>Error fetching data.</h2>";
                 return console.error("Error fetching data:", error);
             });
     });
