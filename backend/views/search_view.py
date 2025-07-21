@@ -29,6 +29,7 @@ def search(search_service: "SearchService"):
     activity_code = request.args.get("activity_code", None)
     agency_ic_admin = request.args.get("agency_ic_admin", None)
     has_funding = request.args.get("has_funding", None) is not None
+    exact_words = request.args.get("exact_words", None) is not None
 
     logging.info(f"Search query: {query}\nLimit: {limit}\nSchool: {school}\nDepartment: {department}\nActivity Code: \
 {activity_code}\nAgency IC Admin: {agency_ic_admin}\n Has Funding: {has_funding}")
@@ -41,6 +42,7 @@ def search(search_service: "SearchService"):
         activity_code=activity_code,
         agency_ic_admin=agency_ic_admin,
         has_funding=has_funding,
+        exact_words=exact_words
     )
 
     response = {
