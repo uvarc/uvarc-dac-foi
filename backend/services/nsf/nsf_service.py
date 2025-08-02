@@ -8,7 +8,7 @@ from backend.core.populate_config import NIH_REPORTER_PAYLOAD, DEFAULT_FISCAL_YE
 
 logger = logging.getLogger(__name__)
 
-class NIHReporterService:
+class NSFService:
 
     def __init__(self, proxy: NSFProxy):
         self.proxy = proxy
