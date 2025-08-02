@@ -2,7 +2,7 @@ services:
   flask:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     container_name: flask_app
     restart: always
     env_file:
@@ -17,7 +17,7 @@ services:
   nginx:
     build:
       context: .
-      dockerfile: Dockerfile.nginx
+      dockerfile: docker/Dockerfile.nginx
     container_name: nginx_server
     restart: always
     ports:

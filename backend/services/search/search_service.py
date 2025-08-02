@@ -14,7 +14,8 @@ class SearchService:
                department: str = None,
                activity_code: str = None,
                agency_ic_admin: str = None,
-               has_funding: bool = None) -> typing.List["Faculty"]:
+               has_funding: bool = None,
+               exact_words: bool = False) -> typing.List["Faculty"]:
         """
         Search for the most similar faculty based on a natural language query.
         :param query: user natural language query
@@ -33,7 +34,8 @@ class SearchService:
             department=department,
             activity_code=activity_code,
             agency_ic_admin=agency_ic_admin,
-            has_funding=has_funding
+            has_funding=has_funding,
+            exact_words=exact_words
         )
 
         similar_faculty = [self._get_faculty_record(eid) for eid in similar_embeddings_eids]
