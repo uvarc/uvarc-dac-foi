@@ -21,22 +21,23 @@ class NIHReporterService:
         :param fiscal_years: fiscal years during which projects were/are active
         :return: dataframe of given PI's project metadata
         """
+        resp = self.proxy.call_nsf_api(payload={
+            "coPDPI": pi_first_name + " " + pi_last_name
+        }) if pi_first_name and pi_last_name else None
+
         response = self.invoke_proxy(pi_first_name=pi_first_name, pi_last_name=pi_last_name, fiscal_years=fiscal_years)
 
-        projects = response["results"]
+        projects = resp["response"]["award"]
         if len(projects) == 0:
             logger.warning(f"No projects founds for PI '{pi_first_name} {pi_last_name}' and fiscal years '{fiscal_years}'")
             return pd.DataFrame()
 
         compiled_metadata = [
             {
-                "project_number": self.get_project_number(project),
-                "abstract_text": self.get_abstract_text(project),
-                "terms": self.get_terms(project),
-                "start_date": self.get_project_start_date(project),
-                "end_date": self.get_project_end_date(project),
-                "agency_ic_admin": self.get_agency_ic_admin(project),
-                "activity_code": self.get_activity_code(project),
+                "id": self.safe_get_field(project, "id"),
+                "date": self.safe_get_field(project, "date"),
+                "start_date": self.safe_get_field(project, "start_date"),
+                "title": self.safe_get_field(project, "title"),
             }
             for project in projects
         ]
@@ -47,70 +48,12 @@ class NIHReporterService:
         if pi_first_name is None or pi_last_name is None:
             raise ValueError("pi_first_name and pi_last_name cannot be None")
         payload = self.build_payload(pi_first_name, pi_last_name, fiscal_years)
-        return self.proxy.call_reporter_api(payload)
-
-    def get_project_number(self, project: typing.Dict) -> str:
-        """
-        Extract unique project number from API response segment
-        :param project: JSON w/ project metadata
-        :return: project number
-        """
-        return self.safe_get_field(project, "project_num")
-
-    def get_abstract_text(self, project: typing.Dict) -> str:
-        """
-        Extract abstract text from API response segment
-        :param project: JSON w/ project metadata
-        :return: abstract text
-        """
-        return self.safe_get_field(project, "abstract_text")
-
-    def get_terms(self, project: typing.Dict) -> datetime.date:
-        """
-        Extract terms from API response segment
-        :param project: JSON w/ project metadata
-        :return list of key terms relevant to project
-        """
-        return self.safe_get_field(project, "terms")
-
-    def get_project_start_date(self, project: typing.Dict) -> datetime.date:
-        """
-        Extract project start date from API response segment
-        :param project: JSON w/ project metadata
-        :return: project start date
-        """
-        raw_start_date = self.safe_get_field(project, "project_start_date")
-        return self.process_date_string(raw_start_date)
-
-    def get_project_end_date(self, project: typing.Dict) -> str:
-        """
-        Extract project end date from API response segment
-        :param project: JSON w/ project metadata
-        :return: project end date
-        """
-        raw_end_date = self.safe_get_field(project, "project_end_date")
-        return self.process_date_string(raw_end_date)
-
-    def get_agency_ic_admin(self, project: typing.Dict) -> str:
-        """
-        Extract NIH agency administering project from API response segment
-        :param project: JSON w/ project metadata
-        :return: NIH agency
-        """
-        return self.safe_get_field(project, "agency_ic_admin")
-
-    def get_activity_code(self, project: typing.Dict) -> str:
-        """
-        Extract activity code from API response segment
-        :param project: JSON w/ project metadata
-        :return: activity code
-        """
-        return self.safe_get_field(project, "activity_code")
+        return self.proxy.call_nsf_api(payload)
 
     @staticmethod
     def process_date_string(raw_date: str) -> datetime.date:
         try:
-            parsed_datetime = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S")
+            parsed_datetime = datetime.strptime(raw_date, "%m/%d/%Y")
             return parsed_datetime.date()
         except Exception as e:
             logger.error(f"Unexpected error parsing date {raw_date}, returning unprocessed date: {e}")

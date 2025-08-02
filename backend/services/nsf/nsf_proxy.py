@@ -11,7 +11,7 @@ class NSFProxy:
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
 
-    def call_reporter_api(self, payload: typing.Dict) -> typing.Dict:
+    def call_nsf_api(self, payload: typing.Dict) -> typing.Dict:
         """
         Call the NSF API with the given payload
         :param payload: the payload for the POST request
