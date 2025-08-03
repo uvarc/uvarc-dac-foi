@@ -13,8 +13,8 @@ class DataAggregator:
     def __init__(self,
                  scraper_service: ScraperService,
                  nih_service: NIHReporterService,
-                 nsf_service: NSFService,
-                 embedding_service: EmbeddingService):
+                 embedding_service: EmbeddingService,
+                 nsf_service: NSFService = None):
         self.scraper_service = scraper_service
         self.nih_service = nih_service
         self.embedding_service = embedding_service
