@@ -22,7 +22,7 @@ class NSFService:
         :return: dataframe of given PI's project metadata
         """
         resp = self.proxy.call_nsf_api(payload={
-            "coPDPI": pi_first_name + " " + pi_last_name,
+            "coPDPI": '"' + pi_first_name + " " + pi_last_name + '"',
             "expDateStart": date.today().strftime("%m/%d/%Y"), # date format: 11/02/2023
         }) if pi_first_name and pi_last_name else None
 
@@ -37,7 +37,7 @@ class NSFService:
             {
                 "id": self.safe_get_field(project, "id"),
                 "date": self.safe_get_field(project, "date"),
-                "start_date": self.safe_get_field(project, "start_date"),
+                "start_date": self.safe_get_field(project, "startDate"),
                 "title": self.safe_get_field(project, "title"),
             }
             for project in projects
