@@ -7,5 +7,5 @@ python -m backend.core.populate
 ```
 ### Running the server
 ```bash
-python -m backend.core.populate
+flask --app backend/app.py run --debug
 ```
