@@ -2,7 +2,7 @@ import typing
 import pandas as pd
 import logging
 import copy
-from datetime import datetime
+from datetime import datetime, date
 from backend.services.nsf.nsf_proxy import NSFProxy
 from backend.core.populate_config import NIH_REPORTER_PAYLOAD, DEFAULT_FISCAL_YEARS
 
@@ -22,7 +22,8 @@ class NSFService:
         :return: dataframe of given PI's project metadata
         """
         resp = self.proxy.call_nsf_api(payload={
-            "coPDPI": pi_first_name + " " + pi_last_name
+            "coPDPI": pi_first_name + " " + pi_last_name,
+            "expDateStart": date.today().strftime("%m/%d/%Y"), # date format: 11/02/2023
         }) if pi_first_name and pi_last_name else None
 
         response = self.invoke_proxy(pi_first_name=pi_first_name, pi_last_name=pi_last_name, fiscal_years=fiscal_years)
