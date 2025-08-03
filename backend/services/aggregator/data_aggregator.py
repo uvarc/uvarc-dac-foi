@@ -3,6 +3,7 @@ import logging
 from datetime import date
 from backend.services.embedding.embedding_service import EmbeddingService
 from backend.services.nih.nih_reporter_service import NIHReporterService
+from backend.services.nsf.nsf_service import NSFService
 from backend.services.scraper.scraper_service import ScraperService
 from backend.models.models import *
 
@@ -12,10 +13,12 @@ class DataAggregator:
     def __init__(self,
                  scraper_service: ScraperService,
                  nih_service: NIHReporterService,
+                 nsf_service: NSFService,
                  embedding_service: EmbeddingService):
         self.scraper_service = scraper_service
         self.nih_service = nih_service
         self.embedding_service = embedding_service
+        self.nsf_service = nsf_service
 
     def aggregate_school_faculty_data(self, school: str) -> typing.List[Faculty]:
         """
