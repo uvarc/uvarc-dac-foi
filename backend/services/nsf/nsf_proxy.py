@@ -1,6 +1,7 @@
 import typing
 import logging
 from requests import RequestException, Timeout, HTTPError
+import requests
 from backend.utils.http_client import HttpClient
 
 logger = logging.getLogger(__name__)
@@ -9,7 +10,7 @@ class NSFProxy:
     NSF_REPORTER_ENDPOINT = "http://api.nsf.gov/services/v1/awards.json"
 
     def __init__(self, http_client: HttpClient):
-        self.http_client = http_client
+        pass
 
     def call_nsf_api(self, payload: typing.Dict) -> typing.Dict:
         """
@@ -20,7 +21,8 @@ class NSFProxy:
         """
         try:
             logger.info(f"Invoking NSF API with payload: {payload}")
-            response = self.http_client.post(self.NSF_REPORTER_ENDPOINT, json=payload)
+            response = requests.get(self.NSF_REPORTER_ENDPOINT, params=payload)
+            response.raise_for_status()
             return response.json()
         except (RequestException, Timeout, HTTPError) as e:
             logger.error(f"NSF API request failed: {e}")
