@@ -127,6 +127,6 @@ summary h6 {
     display: inline; /* to appear in the same line as dropdown arrow */
 }
 
-.card-dropdown summary {
+.card-dropdown > summary {
     margin-bottom: 1rem;
 }
