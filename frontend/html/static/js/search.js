@@ -136,6 +136,16 @@ document.addEventListener("DOMContentLoaded", function () {
                             <p><strong>About:</strong> ${item.about}</p>
                             <p><strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a></p>
                             <p><strong>Email:</strong> ${item?.emails.map(email => `<a href="mailto:${email}">${email}</a>`).join(", ") || "none"}</p>
+                            <h3>NSF Grants (${item.grants.length})</h3>
+                                ${item.grants.map(grant => `
+                                    <div class="result">
+                                        <strong>Title:</strong> ${grant.title || "none"}<br>
+                                        <strong>NSF ID:</strong> 
+                                        <a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=${grant.nsf_id}" target="_blank">${grant.nsf_id}</a><br>
+                                        <strong>Date:</strong> ${grant.date ? new Date(grant.date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}) : "none"}<br>
+                                        <strong>Start Date:</strong> ${grant.start_date ? new Date(grant.start_date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}) : "none"}<br>
+                                    </div>
+                                `).join("")}
                             <h3>Projects (${item.projects.length})</h3>
                                 ${item.projects.map(project => {
                                     let relTerms = project.relevant_terms?.split("><") || ["none"];

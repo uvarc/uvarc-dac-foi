@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class NSFProxy:
     NSF_REPORTER_ENDPOINT = "http://api.nsf.gov/services/v1/awards.json"
 
-    def __init__(self, http_client: HttpClient):
+    def __init__(self):
         pass
 
     def call_nsf_api(self, payload: typing.Dict) -> typing.Dict:

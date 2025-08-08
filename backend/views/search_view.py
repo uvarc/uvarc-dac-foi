@@ -65,6 +65,7 @@ def serialize_faculty(faculty: "Faculty") -> typing.Dict:
         "emails": faculty.email.split(","),
         "profile_url": faculty.profile_url,
         "has_funding": faculty.has_funding,
+        # "grant_ids": faculty.grant_ids.split(",") if faculty.grant_ids else [],
         "projects": [
             {
                 "project_number": project.project_number,
@@ -76,5 +77,14 @@ def serialize_faculty(faculty: "Faculty") -> typing.Dict:
                 "activity_code": project.activity_code,
             }
             for project in faculty.projects
+        ],
+        "grants": [
+            {
+                "nsf_id": grant.nsf_id,
+                "date": grant.date,
+                "start_date": grant.start_date,
+                "title": grant.title,
+            }
+            for grant in faculty.grants
         ]
     }

@@ -7,7 +7,7 @@ import pandas as pd
 if __name__ == "__main__":
     fname = "Chris"
     lname = "Paolucci"
-    pr = NSFProxy(http_client=HttpClient())
+    pr = NSFProxy()
 
     # print(len(pr.call_nsf_api(payload={
     #         "coPDPI": fname + " " + lname,
@@ -18,3 +18,4 @@ if __name__ == "__main__":
     df = nsf_service.compile_project_metadata(pi_first_name=fname, pi_last_name=lname)
     print(df.shape)
     print(df.head())
+    print(type(df.loc[0]["date"]))

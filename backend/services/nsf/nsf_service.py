@@ -26,11 +26,11 @@ class NSFService:
             "expDateStart": date.today().strftime("%m/%d/%Y"), # date format: 11/02/2023
         }) if pi_first_name and pi_last_name else None
 
-        response = self.invoke_proxy(pi_first_name=pi_first_name, pi_last_name=pi_last_name, fiscal_years=fiscal_years)
+        # response = self.invoke_proxy(pi_first_name=pi_first_name, pi_last_name=pi_last_name, fiscal_years=fiscal_years)
 
         projects = resp["response"]["award"]
         if len(projects) == 0:
-            logger.warning(f"No projects founds for PI '{pi_first_name} {pi_last_name}' and fiscal years '{fiscal_years}'")
+            logger.warning(f"No unexpired NSF grants found for PI '{pi_first_name} {pi_last_name}'.")
             return pd.DataFrame()
 
         compiled_metadata = [
