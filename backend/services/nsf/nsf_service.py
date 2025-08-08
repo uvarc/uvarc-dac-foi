@@ -21,10 +21,12 @@ class NSFService:
         :param fiscal_years: fiscal years during which projects were/are active
         :return: dataframe of given PI's project metadata
         """
+        if not pi_first_name and not pi_last_name:
+            raise Exception("No name provided.")
         resp = self.proxy.call_nsf_api(payload={
-            "coPDPI": '"' + pi_first_name + " " + pi_last_name + '"',
+            "coPDPI": '"' + pi_first_name + (" " + pi_last_name if pi_last_name else "") + '"',
             "expDateStart": date.today().strftime("%m/%d/%Y"), # date format: 11/02/2023
-        }) if pi_first_name and pi_last_name else None
+        })
 
         # response = self.invoke_proxy(pi_first_name=pi_first_name, pi_last_name=pi_last_name, fiscal_years=fiscal_years)
 
