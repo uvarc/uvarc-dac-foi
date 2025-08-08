@@ -117,3 +117,16 @@ details.truncated[open] > summary > span {
         color: #75b7fd;
     }
 }
+
+summary h1,
+summary h2,
+summary h3,
+summary h4,
+summary h5,
+summary h6 {
+    display: inline; /* to appear in the same line as dropdown arrow */
+}
+
+.card-dropdown summary {
+    margin-bottom: 1rem;
+}

@@ -122,6 +122,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     emailEl.innerHTML = `<strong>Email:</strong> ${item?.emails.map(email => `<a href="mailto:${email}">${email}</a>`).join(", ") || "none"}`;
                     resultDiv.appendChild(emailEl);
 
+                    console.log(item);
+                    let hasGrants = item.grants?.length > 0;
+                    let hasProjects = item.projects?.length > 0;
+
                     // Add button to view details
                     let viewDetailsButton = document.createElement("button");
                     viewDetailsButton.innerHTML = "View Details →";
@@ -136,7 +140,11 @@ document.addEventListener("DOMContentLoaded", function () {
                             <p><strong>About:</strong> ${item.about}</p>
                             <p><strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a></p>
                             <p><strong>Email:</strong> ${item?.emails.map(email => `<a href="mailto:${email}">${email}</a>`).join(", ") || "none"}</p>
-                            <h3>NSF Grants (${item.grants.length})</h3>
+                            ${hasGrants ? `<details open class="card-dropdown">
+                                    <summary>
+                                        <h3>Grants (${item.grants.length})</h3>
+                                    </summary>
+                            ` : "<h3>Grants (0)</h3>"}
                                 ${item.grants.map(grant => `
                                     <div class="result">
                                         <strong>Title:</strong> ${grant.title || "none"}<br>
@@ -146,7 +154,14 @@ document.addEventListener("DOMContentLoaded", function () {
                                         <strong>Start Date:</strong> ${grant.start_date ? new Date(grant.start_date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}) : "none"}<br>
                                     </div>
                                 `).join("")}
-                            <h3>Projects (${item.projects.length})</h3>
+                            ${hasGrants ? "</details>" : ""}
+                            ${hasProjects ? `  
+                            <details open class="card-dropdown">
+                                    <summary>
+                                        <h3>Projects (${item.projects.length})</h3>
+                                    </summary>
+                            ` : "<h3>Projects (0)</h3>"
+                            }
                                 ${item.projects.map(project => {
                                     let relTerms = project.relevant_terms?.split("><") || ["none"];
                                     return `
@@ -169,6 +184,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                         <strong>Activity Code:</strong> ${project.activity_code}
                                     </div>`;
                                 }).join("")}
+                            ${hasProjects ? "</details>" : ""}
                         `);
                         }
                         catch (e) {
