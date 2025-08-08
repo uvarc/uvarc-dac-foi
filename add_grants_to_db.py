@@ -2,7 +2,7 @@ import logging
 from backend.services.nsf.nsf_service import NSFService
 from backend.services.nsf.nsf_proxy import NSFProxy
 from backend.models.models import Grant, Faculty
-
+import requests
 from backend.core.extensions import db
 from backend.app import app
 
@@ -47,6 +47,30 @@ def update_has_funding_bool():
             print(f"Faculty {faculty.name} has_funding set to {faculty.has_funding}")
         db.session.commit()
 
+def check_recipient_inst_of_all_nsf_grants():
+    ''' Check the recipient institution of all NSF grants
+    '''
+    with app.app_context():
+        all_grants = db.session.query(Grant).all()
+        for grant in all_grants:
+            id = grant.nsf_id
+            '''
+            Use nsf api to check the recipient institution
+            '''
+            endpt = f"https://api.nsf.gov/services/v1/awards/{id}.json"
+            try:
+                response = requests.get(endpt)
+                response.raise_for_status()
+                data = response.json()
+                # print(data)
+                inst = data['response']['award']
+                for award in inst:
+                    print(f"Grant {id} recipient institution: {award["awardeeName"]}")
+            except requests.RequestException as e:
+                print(f"Error fetching data for grant {id}: {e}")
+                continue
+
 if __name__ == "__main__":
-    add_grants_to_db()
+    # add_grants_to_db()
     # update_has_funding_bool()
+    check_recipient_inst_of_all_nsf_grants()
