@@ -36,5 +36,17 @@ def add_grants_to_db():
                 print(f"Added grant {grant.nsf_id} ({grant.title})")
         db.session.commit()
 
+def update_has_funding_bool():
+    ''' Update the has_funding boolean for each faculty member based on their grants
+    '''
+    with app.app_context():
+        all_faculty = db.session.query(Faculty).all()
+        for faculty in all_faculty:
+            print(f"Updating has_funding for {faculty.name}")
+            faculty.has_funding = faculty.has_funding or len(faculty.grants if isinstance(faculty.grants, list) else faculty.grants.all()) > 0
+            print(f"Faculty {faculty.name} has_funding set to {faculty.has_funding}")
+        db.session.commit()
+
 if __name__ == "__main__":
     add_grants_to_db()
+    # update_has_funding_bool()

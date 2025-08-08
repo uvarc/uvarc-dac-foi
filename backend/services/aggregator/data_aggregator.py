@@ -81,7 +81,7 @@ class DataAggregator:
             projects=projects,
             # grant_ids=",".join(grant_ids) if grant_ids else None,
             grants=grants_list,
-            has_funding=self._has_funding(projects),
+            has_funding=self._has_funding(projects) or len(grants_list) > 0,
             embedding_id=-1,
         )
         return faculty
