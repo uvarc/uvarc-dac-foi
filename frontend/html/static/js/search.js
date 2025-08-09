@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     // change the department dropdown's options based on the school dropdown's selection
     document.getElementById("school").addEventListener("change", function() {
-        let school = this.value;
+        let sch = this.value; // not named school because school refers to the school <select> element
         let departmentDropdown = document.getElementById("department");
         departmentDropdown.innerHTML = ""; // Clear previous options
 
@@ -45,14 +45,19 @@ document.addEventListener("DOMContentLoaded", function () {
         blankOption.text = "Any";
         departmentDropdown.appendChild(blankOption);
 
-        schoolDepartments[school].forEach(department => {
-            let option = document.createElement("option");
-            option.value = department;
-            option.text = department;
-            departmentDropdown.appendChild(option);
-        });
+        if (schoolDepartments[sch]) {
+            schoolDepartments[sch].forEach(department => {
+                let option = document.createElement("option");
+                option.value = department;
+                option.text = department;
+                departmentDropdown.appendChild(option);
+            });
+        }
         
-        departmentDropdown.disabled = !school;
+        departmentDropdown.disabled = !sch; // gray out the department dropdown if no school is selected
+        if (departmentDropdown.disabled) {
+            departmentDropdown.title = "Select a school first to filter by department";
+        }
     });
 
 
@@ -75,21 +80,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 let resultsContainer = document.getElementById("results");
                 resultsContainer.innerHTML = ""; // Clear previous results
                 
+                document.getElementById("resultCount").classList.remove("hidden");
+                document.getElementById("resultCount").innerText = `(${data.results.length})`;
                 document.getElementById("resultsHeading").classList.remove("hidden");
                 document.getElementById("loadingSpinner").classList.add("hidden");
+                let csvUri = "data:text/csv;charset=utf-8,Name,Email"
                 data.results.forEach(item => {
+                    csvUri += `\n"${item.name}","${item?.emails[0]}"`
                     // Create a result container div
                     let resultDiv = document.createElement("div");
                     resultDiv.className = "result searchResult";
 
                     // Add Name
-                    let nameEl = document.createElement("p");
-                    nameEl.innerHTML = `<h3>${item.name}</h3>`;
+                    let nameEl = document.createElement("h3");
+                    nameEl.innerHTML = `${item.name}`;
                     resultDiv.appendChild(nameEl);
 
                     // Add Department
                     let departmentEl = document.createElement("p");
-                    departmentEl.innerHTML = `<strong>Department:</strong> ${item.school} › ${item.department}`;
+                    departmentEl.innerHTML = `<strong>Department:</strong> ${item.school} › ${item?.department.join(", ")}`;
                     resultDiv.appendChild(departmentEl);
 
                     
@@ -108,28 +117,60 @@ document.addEventListener("DOMContentLoaded", function () {
                     profileUrlEl.innerHTML = `<strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a>`;
                     resultDiv.appendChild(profileUrlEl);
 
+                    // Add Email (add every email with mailto link)
+                    let emailEl = document.createElement("p");
+                    emailEl.innerHTML = `<strong>Email:</strong> ${item?.emails.map(email => `<a href="mailto:${email}">${email}</a>`).join(", ") || "none"}`;
+                    resultDiv.appendChild(emailEl);
+
+                    console.log(item);
+                    let hasGrants = item.grants?.length > 0;
+                    let hasProjects = item.projects?.length > 0;
+
                     // Add button to view details
                     let viewDetailsButton = document.createElement("button");
                     viewDetailsButton.innerHTML = "View Details →";
                     viewDetailsButton.addEventListener("click", function() {
                         hideSearch();
                         window.scrollTo(0, 0);
-                        updateDetailView(`
+                        try {
+                            updateDetailView(`
                             <h2>${item.name}</h2>
                             <p><strong>School:</strong> ${item.school}</p>
                             <p><strong>Department:</strong> ${item.department}</p>
                             <p><strong>About:</strong> ${item.about}</p>
                             <p><strong>Profile URL:</strong> <a href="${item.profile_url}" target="_blank">${item.profile_url}</a></p>
-                            <h3>Projects (${item.projects.length})</h3>
+                            <p><strong>Email:</strong> ${item?.emails.map(email => `<a href="mailto:${email}">${email}</a>`).join(", ") || "none"}</p>
+                            ${hasGrants ? `<details open class="card-dropdown">
+                                    <summary>
+                                        <h3>Grants (${item.grants.length})</h3>
+                                    </summary>
+                            ` : "<h3>Grants (0)</h3>"}
+                                ${item.grants.map(grant => `
+                                    <div class="result">
+                                        <strong>Title:</strong> ${grant.title || "none"}<br>
+                                        <strong>NSF ID:</strong> 
+                                        <a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=${grant.nsf_id}" target="_blank">${grant.nsf_id}</a><br>
+                                        <strong>Date:</strong> ${grant.date ? new Date(grant.date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}) : "none"}<br>
+                                        <strong>Start Date:</strong> ${grant.start_date ? new Date(grant.start_date).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}) : "none"}<br>
+                                    </div>
+                                `).join("")}
+                            ${hasGrants ? "</details>" : ""}
+                            ${hasProjects ? `  
+                            <details open class="card-dropdown">
+                                    <summary>
+                                        <h3>Projects (${item.projects.length})</h3>
+                                    </summary>
+                            ` : "<h3>Projects (0)</h3>"
+                            }
                                 ${item.projects.map(project => {
-                                    let relTerms = project.relevant_terms.split("><");
+                                    let relTerms = project.relevant_terms?.split("><") || ["none"];
                                     return `
                                     <div class="result">
                                         <strong>Project Number:</strong> ${project.project_number}<br>
                                         ${
-                                        project.abstract.length > 200 
+                                        project.abstract?.length > 200 // returns false if abstract is null or less than 200 characters
                                             ? `<details class="truncated"><summary><strong>Abstract:</strong> <span>${project.abstract.slice(0, 200)}...</span></summary>${project.abstract}</details>`
-                                            : "<strong>Abstract:</strong> " + project.abstract + "<br>"
+                                            : "<strong>Abstract:</strong> " + (project.abstract || "none") + "<br>"
                                         }
                                             ${relTerms.length < 10 ? "<strong>Relevant Terms:</strong> " + relTerms.join(", ").replace(/(<|>)/g, "") + "<br>": `
                                         <details class="truncated">
@@ -143,16 +184,26 @@ document.addEventListener("DOMContentLoaded", function () {
                                         <strong>Activity Code:</strong> ${project.activity_code}
                                     </div>`;
                                 }).join("")}
+                            ${hasProjects ? "</details>" : ""}
                         `);
+                        }
+                        catch (e) {
+                            console.error(e);
+                            updateDetailView("<br><h2>⚠ Error loading details</h2>");
+                        }
                     });
                     resultDiv.appendChild(viewDetailsButton);
 
                     // Append the result div to the results container
                     resultsContainer.appendChild(resultDiv);
                 });
+                let downloadCSVButton = document.getElementById("downloadCSVButton");
+                downloadCSVButton.href = encodeURI(csvUri);
             })
             .catch(error => {
                 document.getElementById("loadingSpinner").classList.add("hidden");
+                document.getElementById("resultsHeading").classList.add("hidden");
+                document.getElementById("results").innerHTML = "<h2>Error fetching data.</h2>";
                 return console.error("Error fetching data:", error);
             });
     });

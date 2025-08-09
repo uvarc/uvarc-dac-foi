@@ -110,7 +110,7 @@ class NIHReporterService:
     @staticmethod
     def process_date_string(raw_date: str) -> datetime.date:
         try:
-            parsed_datetime = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%SZ")
+            parsed_datetime = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S")
             return parsed_datetime.date()
         except Exception as e:
             logger.error(f"Unexpected error parsing date {raw_date}, returning unprocessed date: {e}")

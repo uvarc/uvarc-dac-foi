@@ -9,6 +9,8 @@ from backend.services.scraper.seas_scraper import SEASScraper
 from backend.services.scraper.scraper_service import ScraperService
 from backend.services.nih.nih_reporter_proxy import NIHReporterProxy
 from backend.services.nih.nih_reporter_service import NIHReporterService
+from backend.services.nsf.nsf_proxy import NSFProxy
+from backend.services.nsf.nsf_service import NSFService
 from backend.services.aggregator.data_aggregator import DataAggregator
 
 logger = logging.getLogger(__name__)
@@ -23,8 +25,9 @@ scraper_service = ScraperService([
 nih_service = NIHReporterService(NIHReporterProxy(http_client))
 embedding_service = get_embedding_service(app)
 database_driver = get_database_driver(app)
+nsf_service = NSFService(NSFProxy())
 
-data_aggregator = DataAggregator(scraper_service, nih_service, embedding_service)
+data_aggregator = DataAggregator(scraper_service, nih_service, embedding_service, nsf_service)
 
 if __name__ == '__main__':
     logger.info("Starting populate_db.")
