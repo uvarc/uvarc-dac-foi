@@ -29,6 +29,7 @@ def search(search_service: "SearchService"):
     activity_code = request.args.get("activity_code", None)
     agency_ic_admin = request.args.get("agency_ic_admin", None)
     has_funding = request.args.get("has_funding", None) is not None
+    exact_words = request.args.get("exact_words", None) is not None
 
     logging.info(f"Search query: {query}\nLimit: {limit}\nSchool: {school}\nDepartment: {department}\nActivity Code: \
 {activity_code}\nAgency IC Admin: {agency_ic_admin}\n Has Funding: {has_funding}")
@@ -41,6 +42,7 @@ def search(search_service: "SearchService"):
         activity_code=activity_code,
         agency_ic_admin=agency_ic_admin,
         has_funding=has_funding,
+        exact_words=exact_words
     )
 
     response = {
@@ -63,6 +65,7 @@ def serialize_faculty(faculty: "Faculty") -> typing.Dict:
         "emails": faculty.email.split(","),
         "profile_url": faculty.profile_url,
         "has_funding": faculty.has_funding,
+        # "grant_ids": faculty.grant_ids.split(",") if faculty.grant_ids else [],
         "projects": [
             {
                 "project_number": project.project_number,
@@ -74,5 +77,14 @@ def serialize_faculty(faculty: "Faculty") -> typing.Dict:
                 "activity_code": project.activity_code,
             }
             for project in faculty.projects
+        ],
+        "grants": [
+            {
+                "nsf_id": grant.nsf_id,
+                "date": grant.date,
+                "start_date": grant.start_date,
+                "title": grant.title,
+            }
+            for grant in faculty.grants
         ]
     }

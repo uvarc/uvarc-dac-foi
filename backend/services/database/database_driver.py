@@ -1,6 +1,6 @@
 import logging
 import typing
-from sqlalchemy import delete
+from sqlalchemy import delete, or_
 from contextlib import contextmanager
 from sqlalchemy.orm import joinedload
 
@@ -105,6 +105,60 @@ class DatabaseDriver:
             query = query.filter(Faculty.has_funding == has_funding)
 
         return [record.embedding_id for record in query.distinct().all()]
+
+    def search_exact_words(self, query: str, top_k: int, 
+                           school: str = None,
+                           department: str = None,
+                           activity_code: str = None,
+                           agency_ic_admin: str = None,
+                           has_funding: bool = None) -> typing.List[int]:
+        """
+        Search for faculty with exact words in their profiles.
+        :param query: Exact words to search for
+        :param top_k: Number of results to return
+        :param school: School name
+        :param department: Department name
+        :param activity_code: Activity code
+        :param agency_ic_admin: Agency IC admin name
+        :param has_funding: Faculty has funding
+        :return: List of faculty EIDs
+        """
+        try:
+            with self.app.app_context():
+                return self._search_exact_words(query, top_k, school, department, activity_code, agency_ic_admin, has_funding)
+                
+        except Exception as e:
+            logger.error(f"Failed to search exact words '{query}': {e}")
+            raise
+    
+    @staticmethod
+    def _search_exact_words(query: str, top_k: int,
+                            school: str = None,
+                            department: str = None,
+                            activity_code: str = None,
+                            agency_ic_admin: str = None,
+                            has_funding: bool = None) -> typing.List[int]:
+        """Helper function to search for exact words in faculty profiles."""
+        from backend.models.models import Faculty, Project
+        faculty_query = db.session.query(Faculty.embedding_id).outerjoin(Faculty.projects).filter(
+            or_(
+            Faculty.about.ilike(f"%{query}%"),
+            Project.abstract.ilike(f"%{query}%"),
+            Project.relevant_terms.ilike(f"%{query}%")
+            )
+        )
+        if school:
+            faculty_query = faculty_query.filter(Faculty.school == school)
+        if department:
+            faculty_query = faculty_query.filter(Faculty.department.contains(department))
+        if activity_code:
+            faculty_query = faculty_query.filter(Faculty.projects.any(Project.activity_code == activity_code))
+        if agency_ic_admin:
+            faculty_query = faculty_query.filter(Faculty.projects.any(Project.agency_ic_admin == agency_ic_admin))
+        if has_funding is not None:
+            faculty_query = faculty_query.filter(Faculty.has_funding == has_funding)
+        return [record.embedding_id for record in faculty_query.distinct().limit(top_k).all()]
+        
 
     def clear(self):
         """

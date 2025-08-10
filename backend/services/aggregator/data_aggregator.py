@@ -3,8 +3,10 @@ import logging
 from datetime import date
 from backend.services.embedding.embedding_service import EmbeddingService
 from backend.services.nih.nih_reporter_service import NIHReporterService
+from backend.services.nsf.nsf_service import NSFService
 from backend.services.scraper.scraper_service import ScraperService
 from backend.models.models import *
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -12,10 +14,12 @@ class DataAggregator:
     def __init__(self,
                  scraper_service: ScraperService,
                  nih_service: NIHReporterService,
-                 embedding_service: EmbeddingService):
+                 embedding_service: EmbeddingService,
+                 nsf_service: NSFService):
         self.scraper_service = scraper_service
         self.nih_service = nih_service
         self.embedding_service = embedding_service
+        self.nsf_service = nsf_service
 
     def aggregate_school_faculty_data(self, school: str) -> typing.List[Faculty]:
         """
@@ -50,7 +54,24 @@ class DataAggregator:
         first_name, last_name = self._extract_names(faculty_profile)
         logger.info(f"Fetching NIH project information for {first_name} {last_name}.")
         projects = self._get_projects(first_name, last_name)
-
+        # nsf_grants = self.nsf_service.compile_project_metadata(pi_first_name=first_name, pi_last_name=last_name) if self.nsf_service else pd.DataFrame()
+        logger.info(f"Fetching NSF grants for {first_name} {last_name}.")
+        # grant_ids = self.get_nsf_grant_ids(first_name, last_name)
+        # if not grant_ids:
+        #     logger.warning(f"No NSF grant IDs found for {first_name} {last_name}.")
+        # else:
+        #     logger.info(f"IDs for {first_name} {last_name}: {', '.join(grant_ids)}")
+        grants = self.get_nsf_grants(first_name, last_name)
+        grants_list = []
+        if grants.empty:
+            logger.warning(f"No NSF grants found for {first_name} {last_name}.")
+        else:
+            grants_list = [Grant(
+                    nsf_id=row['id'],
+                    date=self.nsf_service.process_date_string(row['date']), 
+                    start_date=self.nsf_service.process_date_string(row['start_date']), 
+                    title=row['title']
+                ) for _, row in grants.iterrows()]
         faculty = Faculty(
             name=faculty_profile.Faculty_Name,
             school=faculty_profile.School,
@@ -59,7 +80,9 @@ class DataAggregator:
             email=faculty_profile.Email_Address,
             profile_url=faculty_profile.Profile_URL,
             projects=projects,
-            has_funding=self._has_funding(projects),
+            # grant_ids=",".join(grant_ids) if grant_ids else None,
+            grants=grants_list,
+            has_funding=self._has_funding(projects) or len(grants_list) > 0,
             embedding_id=-1,
         )
         return faculty
@@ -90,6 +113,41 @@ class DataAggregator:
             agency_ic_admin=project.agency_ic_admin,
             activity_code=project.activity_code
         )
+
+    def get_nsf_grant_ids(self, first_name: str, last_name: str) -> typing.List[str]:
+        """
+        Retrieve NSF grant IDs for a given PI
+        :param first_name: PI first name
+        :param last_name: PI last name
+        :return: list of NSF grant IDs
+        """
+        # if not first_name or not last_name:
+        #     raise ValueError("First name and last name must be provided to retrieve NSF grant IDs.")
+        try:
+            grants_df = self.nsf_service.compile_project_metadata(pi_first_name=first_name, pi_last_name=last_name)
+            return grants_df['id'].tolist() if not grants_df.empty else []
+        except Exception as e:
+            logger.error(f"Error retrieving NSF grant IDs for {first_name} {last_name}: {e}")
+            return []
+
+    def get_nsf_grants(self, first_name: str, last_name: str) -> pd.DataFrame:
+        """
+        Retrieve NSF grants for a given PI
+        :param first_name: PI first name
+        :param last_name: PI last name
+        :return: DataFrame of NSF grants
+        """
+        if not first_name or not last_name:
+            raise ValueError("First name and last name must be provided to retrieve NSF grants.")
+        try:
+            grants_df = self.nsf_service.compile_project_metadata(pi_first_name=first_name, pi_last_name=last_name)
+            if grants_df.empty:
+                # logger.warning(f"No NSF grants found for PI '{first_name} {last_name}'.")
+                return pd.DataFrame()
+            return grants_df
+        except Exception as e:
+            logger.error(f"Error retrieving NSF grants for {first_name} {last_name}: {e}")
+            return pd.DataFrame()
 
     @staticmethod
     def _extract_names(faculty_profile: typing.Tuple) -> typing.Tuple[str, str]:

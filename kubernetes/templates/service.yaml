@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "uvarc-dac-foi.fullname" . }}
+  labels:
+    {{- include "uvarc-dac-foi.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "uvarc-dac-foi.selectorLabels" . | nindent 4 }}
