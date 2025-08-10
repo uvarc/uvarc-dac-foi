@@ -141,7 +141,7 @@ class DataAggregator:
         try:
             grants_df = self.nsf_service.compile_project_metadata(pi_first_name="Example", pi_last_name="Smith")
             if grants_df.empty:
-                logger.warning(f"No NSF grants found for PI '{first_name} {last_name}'.")
+                # logger.warning(f"No NSF grants found for PI '{first_name} {last_name}'.")
                 return pd.DataFrame()
             return grants_df
         except Exception as e:
