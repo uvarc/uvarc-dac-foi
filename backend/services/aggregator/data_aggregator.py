@@ -62,6 +62,7 @@ class DataAggregator:
         # else:
         #     logger.info(f"IDs for {first_name} {last_name}: {', '.join(grant_ids)}")
         grants = self.get_nsf_grants(first_name, last_name)
+        grants_list = []
         if grants.empty:
             logger.warning(f"No NSF grants found for {first_name} {last_name}.")
         else:
@@ -123,7 +124,7 @@ class DataAggregator:
         # if not first_name or not last_name:
         #     raise ValueError("First name and last name must be provided to retrieve NSF grant IDs.")
         try:
-            grants_df = self.nsf_service.compile_project_metadata(pi_first_name="Example", pi_last_name="Smith")
+            grants_df = self.nsf_service.compile_project_metadata(pi_first_name=first_name, pi_last_name=last_name)
             return grants_df['id'].tolist() if not grants_df.empty else []
         except Exception as e:
             logger.error(f"Error retrieving NSF grant IDs for {first_name} {last_name}: {e}")
@@ -139,7 +140,7 @@ class DataAggregator:
         if not first_name or not last_name:
             raise ValueError("First name and last name must be provided to retrieve NSF grants.")
         try:
-            grants_df = self.nsf_service.compile_project_metadata(pi_first_name="Example", pi_last_name="Smith")
+            grants_df = self.nsf_service.compile_project_metadata(pi_first_name=first_name, pi_last_name=last_name)
             if grants_df.empty:
                 # logger.warning(f"No NSF grants found for PI '{first_name} {last_name}'.")
                 return pd.DataFrame()
