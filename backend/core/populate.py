@@ -34,8 +34,27 @@ if __name__ == '__main__':
     database_driver.clear()
 
     try:
+        faculty_dict = dict()
+
         for school in SCHOOLS_TO_SCRAPE:
-            all_faculty.extend(data_aggregator.aggregate_school_faculty_data(school))
+            school_faculty = data_aggregator.aggregate_school_faculty_data(school)
+
+            for faculty in school_faculty:
+                faculty_identifier = (faculty.name, faculty.email)
+
+                if faculty_identifier in faculty_dict:
+                    existing = faculty_dict[faculty_identifier]
+
+                    # Merge departments
+                    existing.department = ",".join(
+                        sorted(set(existing.department.split(",") + faculty.department.split(","))))
+
+                    # Merge schools
+                    existing.school = ",".join(sorted(set(existing.school.split(",") + faculty.school.split(","))))
+                else:
+                    faculty_dict[faculty_identifier] = faculty
+
+        all_faculty = list(faculty_dict.values())
 
         for faculty in all_faculty:
             database_driver.add_faculty(faculty)

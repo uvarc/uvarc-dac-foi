@@ -2,9 +2,10 @@ import typing
 import pandas as pd
 import logging
 import copy
-from datetime import datetime
 from backend.services.nih.nih_reporter_proxy import NIHReporterProxy
 from backend.core.populate_config import NIH_REPORTER_PAYLOAD, DEFAULT_FISCAL_YEARS
+from datetime import datetime
+from dateutil.parser import parse
 
 logger = logging.getLogger(__name__)
 
@@ -110,10 +111,9 @@ class NIHReporterService:
     @staticmethod
     def process_date_string(raw_date: str) -> datetime.date:
         try:
-            parsed_datetime = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%SZ")
-            return parsed_datetime.date()
+            return parse(raw_date).date()
         except Exception as e:
-            logger.error(f"Unexpected error parsing date {raw_date}, returning unprocessed date: {e}")
+            logger.warning(f"Unexpected error parsing date {raw_date}, returning unprocessed date: {e}")
             return None
 
     @staticmethod
