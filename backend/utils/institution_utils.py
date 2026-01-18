@@ -47,3 +47,12 @@ class InstitutionUtils:
     @staticmethod
     def is_valid_url(url: str) -> bool:
         return bool(re.match(r"^https?://[^\s/$.?#].[^\s]*$", url))
+
+    @staticmethod
+    def decode_cloudflare_email(encoded_str: str) -> str:
+        r = int(encoded_str[:2], 16)
+        email = ''.join(
+            chr(int(encoded_str[i:i + 2], 16) ^ r)
+            for i in range(2, len(encoded_str), 2)
+        )
+        return email
