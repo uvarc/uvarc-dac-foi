@@ -162,8 +162,12 @@ class NursingScraper(BaseScraper):
 
             # Parse the HTML
             tree = html.fromstring(response.content)
-            tree.make_links_absolute(urljoin(self.PEOPLE_URL, "/"))
-            research_areas_raw: str = tree.xpath(self.RESEARCH_AREAS_XPATH(profile_url))[0]
+            tree.make_links_absolute(
+                urljoin(self.PEOPLE_URL, "/")
+            )  # change all links from relative to absolute
+            research_areas_raw: str = tree.xpath(
+                self.RESEARCH_AREAS_XPATH(profile_url)
+            )[0]
             research_areas = (
                 research_areas_raw.replace("RESEARCH AREAS:", "").strip().split(", ")
             )
