@@ -15,8 +15,8 @@ class BattenScraper(BaseScraper):
     PROFILE_URL_XPATH = (
         '//a[contains(@class, "title-link") and starts-with(@href, "/people/")]/@href'
     )
-    NAME_XPATH = "//meta[@property='og:title']/@content" # Open Graph title meta tag, normally intended for link previews
-    RAW_EMAIL_XPATH = '(//*[contains(concat(" ", normalize-space(@class), " "), " __cf_email__ ")])[1]/@data-cfemail'
+    NAME_XPATH = "//meta[@property='og:title']/@content" # selects Open Graph title meta tag, normally intended for link previews
+    ENCODED_EMAIL_XPATH = '(//*[contains(concat(" ", normalize-space(@class), " "), " __cf_email__ ")])[1]/@data-cfemail' # selects Cloudflare protected email
     BIO_CONTAINER_XPATH = '//div[contains(@class, "person__field-biography")]'
     RESEARCH_AREAS_XPATH = '//div[contains(@class, "person__field-relfocus")]//div[contains(@class, "field__item")]'
 
@@ -95,7 +95,7 @@ class BattenScraper(BaseScraper):
             response.raise_for_status()
 
             tree = html.fromstring(response.content)
-            encoded_email = tree.xpath(self.RAW_EMAIL_XPATH)
+            encoded_email = tree.xpath(self.ENCODED_EMAIL_XPATH)
             if encoded_email:
                 decoded_email = InstitutionUtils.decode_cloudflare_email(encoded_email[0])
                 return [decoded_email]
