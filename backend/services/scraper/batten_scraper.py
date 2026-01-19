@@ -15,7 +15,7 @@ class BattenScraper(BaseScraper):
     PROFILE_URL_XPATH = (
         '//a[contains(@class, "title-link") and starts-with(@href, "/people/")]/@href'
     )
-    NAME_XPATH = "//meta[@property='og:title']/@content"
+    NAME_XPATH = "//meta[@property='og:title']/@content" # Open Graph title meta tag, normally intended for link previews
     RAW_EMAIL_XPATH = '(//*[contains(concat(" ", normalize-space(@class), " "), " __cf_email__ ")])[1]/@data-cfemail'
     BIO_CONTAINER_XPATH = '//div[contains(@class, "person__field-biography")]'
     RESEARCH_AREAS_XPATH = '//div[contains(@class, "person__field-relfocus")]//div[contains(@class, "field__item")]'
