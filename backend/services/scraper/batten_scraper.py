@@ -16,7 +16,7 @@ class BattenScraper(BaseScraper):
         '//a[contains(@class, "title-link") and starts-with(@href, "/people/")]/@href'
     )
     NAME_XPATH = "//meta[@property='og:title']/@content" # selects Open Graph title meta tag, normally intended for link previews
-    ENCODED_EMAIL_XPATH = '(//*[contains(concat(" ", normalize-space(@class), " "), " __cf_email__ ")])[1]/@data-cfemail' # selects Cloudflare protected email
+    ENCODED_EMAIL_XPATH = '(//*[contains(concat(" ", normalize-space(@class), " "), " __cf_email__ ")])[1]/@data-cfemail' # selects first Cloudflare protected email on page
     BIO_CONTAINER_XPATH = '//div[contains(@class, "person__field-biography")]'
     RESEARCH_AREAS_XPATH = '//div[contains(@class, "person__field-relfocus")]//div[contains(@class, "field__item")]'
 
