@@ -6,6 +6,7 @@ from backend.services.scraper.som_scraper import SOMScraper
 from backend.utils.http_client import HttpClient
 from backend.utils.factory import get_embedding_service, get_database_driver
 from backend.services.scraper.seas_scraper import SEASScraper
+from backend.services.scraper.batten_scraper import BattenScraper
 from backend.services.scraper.scraper_service import ScraperService
 from backend.services.nih.nih_reporter_proxy import NIHReporterProxy
 from backend.services.nih.nih_reporter_service import NIHReporterService
@@ -18,6 +19,7 @@ http_client = HttpClient()
 scraper_service = ScraperService([
     SOMScraper(http_client),
     SEASScraper(http_client),
+    BattenScraper(http_client),
 ])
 
 nih_service = NIHReporterService(NIHReporterProxy(http_client))

@@ -8,6 +8,14 @@ INDEX_PATH = os.path.join(BASE_DIR, "..", "..", "instance", "index.faiss")
 SCHOOLS_TO_SCRAPE = ["SOM", "SEAS"]
 
 SCHOOL_DEPARTMENT_DATA = {
+    "BATTEN": {
+        "base_url": "",
+        "departments": {
+            "Batten (all)": {
+                "people_url": "https://batten.virginia.edu/faculty-research/faculty"
+            }
+        }
+    },
     "SEAS": {
         "base_url": "https://engineering.virginia.edu",
         "departments": {
