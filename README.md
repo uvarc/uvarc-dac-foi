@@ -3,12 +3,12 @@
 ### Populating the database
 Set API keys in `rc-DACFOI.env`:
 #### OpenAI API
-```toml
+```
 OPENAI_API_KEY="your-api-key"
 DATABASE_URL="sqlite:///database.db"
 ```
 #### Azure OpenAI
-```toml
+```
 OPENAI_API_KEY="your-api-key"
 OPENAI_BASE_URL="https://YOUR-RESOURCE-NAME.openai.azure.com/openai/v1"
 DATABASE_URL="sqlite:///database.db"
