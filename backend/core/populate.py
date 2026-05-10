@@ -1,9 +1,10 @@
 import logging
 import os
 from backend.app import app
-from backend.core.populate_config import SCHOOLS_TO_SCRAPE, INDEX_PATH
+from backend.core.populate_config import SCHOOLS_TO_SCRAPE, SCHOOL_DEPARTMENT_DATA, INDEX_PATH
 from backend.services.scraper.som_scraper import SOMScraper
 from backend.utils.http_client import HttpClient
+from backend.utils.http_client_cached import HttpClientCached
 from backend.utils.factory import get_embedding_service, get_database_driver
 from backend.services.scraper.seas_scraper import SEASScraper
 from backend.services.scraper.batten_scraper import BattenScraper
@@ -14,7 +15,7 @@ from backend.services.aggregator.data_aggregator import DataAggregator
 
 logger = logging.getLogger(__name__)
 
-http_client = HttpClient()
+http_client = HttpClientCached()
 
 scraper_service = ScraperService([
     SOMScraper(http_client),
@@ -34,12 +35,18 @@ if __name__ == '__main__':
 
     logger.info("Clearing database.")
     database_driver.clear()
+    
+    logger.info("Deleting FAISS index.")
+    if os.path.exists(INDEX_PATH):
+        os.remove(INDEX_PATH)
 
     try:
         faculty_dict = dict()
 
         for school in SCHOOLS_TO_SCRAPE:
-            school_faculty = data_aggregator.aggregate_school_faculty_data(school)
+            school_config = SCHOOL_DEPARTMENT_DATA.get(school, {})
+            add_nih_data = school_config.get("add_nih_data", True)
+            school_faculty = data_aggregator.aggregate_school_faculty_data(school, add_nih_data=add_nih_data)
 
             for faculty in school_faculty:
                 faculty_identifier = (faculty.name, faculty.email)

@@ -120,7 +120,8 @@ class DatabaseDriver:
     @staticmethod
     def _clear_db():
         """Helper function to clear faculty records."""
-        from backend.models.models import Faculty
+        from backend.models.models import Faculty, Project
         db.session.execute(delete(Faculty))
+        db.session.execute(delete(Project))
         db.session.commit()
         logger.info("All faculty records deleted.")
