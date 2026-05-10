@@ -10,6 +10,7 @@ SCHOOLS_TO_SCRAPE = ["SOM", "SEAS"]
 SCHOOL_DEPARTMENT_DATA = {
     "BATTEN": {
         "base_url": "",
+        "add_nih_data": False,
         "departments": {
             "Batten (all)": {
                 "people_url": "https://batten.virginia.edu/faculty-research/faculty"
