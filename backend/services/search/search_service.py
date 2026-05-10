@@ -1,6 +1,9 @@
+import logging
 import typing
 from backend.services.embedding.embedding_service import EmbeddingService
 from backend.services.database.database_driver import DatabaseDriver
+
+logger = logging.getLogger(__name__)
 
 class SearchService:
     def __init__(self, database_driver: DatabaseDriver, embedding_service: EmbeddingService):
@@ -37,7 +40,11 @@ class SearchService:
         )
 
         similar_faculty = [self._get_faculty_record(eid) for eid in similar_embeddings_eids]
-        return similar_faculty
+        similar_faculty_no_nulls = [faculty for faculty in similar_faculty if faculty is not None]
+        if len(similar_faculty) > len(similar_faculty_no_nulls):
+            missing = len(similar_faculty) - len(similar_faculty_no_nulls)
+            logger.warning(f"{missing} embedding ID(s) had no matching faculty record and were excluded from results.")
+        return similar_faculty_no_nulls
 
     def _get_faculty_record(self, eid: int) -> "Faculty":
         """

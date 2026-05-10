@@ -1,7 +1,10 @@
 def get_openai_client():
     from backend.core.config import Config
     from openai import OpenAI
-    return OpenAI(api_key=Config.OPENAI_API_KEY)
+    if Config.OPENAI_BASE_URL:
+        return OpenAI(api_key=Config.OPENAI_API_KEY, base_url=Config.OPENAI_BASE_URL)
+    else:
+        return OpenAI(api_key=Config.OPENAI_API_KEY)
 
 def get_embedding_generator():
     from backend.services.embedding.embedding_service import EmbeddingGenerator
