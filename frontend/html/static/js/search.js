@@ -14,6 +14,7 @@ schoolDepartments = {
         "Materials Science and Engineering",
         "Mechanical and Aerospace Engineering",
         "Systems and Information Engineering"],
+    "BATTEN": [],
 };
 
 document.addEventListener("DOMContentLoaded", function () {

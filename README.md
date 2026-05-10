@@ -20,6 +20,7 @@ Then set database population options in `backend/core/populate_config.py`, then 
 ```bash
 python -m backend.core.populate
 ```
+Note that you must be on the UVA network.
 ### Running the server
 ```bash
 flask --app backend/app.py run --debug
