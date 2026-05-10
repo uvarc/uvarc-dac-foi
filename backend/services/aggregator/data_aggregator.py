@@ -17,12 +17,17 @@ class DataAggregator:
         self.nih_service = nih_service
         self.embedding_service = embedding_service
 
-    def aggregate_school_faculty_data(self, school: str, add_nih_data: bool = True) -> typing.List[Faculty]:
+    def aggregate_school_faculty_data(
+            self,
+            school: str,
+            add_nih_data: bool = True,
+            generate_embeddings: bool = True) -> typing.List[Faculty]:
         """
         Aggregate faculty data for school from scrapers, NIH RePORTER API, generate embeddings
         Outputs are DB commit-ready
         :param school: school acronym
         :param add_nih_data: if False, skip NIH RePORTER API calls for this school
+        :param generate_embeddings: if False, leave embedding IDs unset for a later index rebuild
         :return: dictionary of department faculty data stored as Faculty model objects
         """
         school_faculty_df = self.scraper_service.get_school_faculty_data(school)
@@ -31,7 +36,8 @@ class DataAggregator:
         for dept, dept_faculty_df in school_faculty_df.items():
             for faculty_profile in dept_faculty_df.itertuples():
                 faculty = self._build_faculty_model(faculty_profile, add_nih_data=add_nih_data)
-                faculty.embedding_id = self.embedding_service.generate_and_store_embedding(faculty)
+                if generate_embeddings:
+                    faculty.embedding_id = self.embedding_service.generate_and_store_embedding(faculty)
                 faculty_list.append(faculty)
 
         return faculty_list

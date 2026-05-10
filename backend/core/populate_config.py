@@ -5,7 +5,9 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 INDEX_PATH = os.path.join(BASE_DIR, "..", "..", "instance", "index.faiss")
 
-SCHOOLS_TO_SCRAPE = ["SOM", "SEAS"]
+KEEP_EXISTING_SCHOOLS = True
+
+SCHOOLS_TO_SCRAPE = ["BATTEN"]
 
 SCHOOL_DEPARTMENT_DATA = {
     "BATTEN": {
