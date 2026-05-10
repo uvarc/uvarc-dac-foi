@@ -1,6 +1,6 @@
 import logging
 import typing
-from sqlalchemy import delete
+from sqlalchemy import delete, or_
 from contextlib import contextmanager
 from sqlalchemy.orm import joinedload
 
@@ -82,6 +82,76 @@ class DatabaseDriver:
         except Exception as e:
             logger.error(f"Failed to retrieve faculty record by filters: {e}")
             raise
+
+    def get_all_faculty(self) -> typing.List["Faculty"]:
+        """
+        Retrieve all Faculty records with associated Projects.
+        :return: List of Faculty objects.
+        """
+        try:
+            with self.app.app_context():
+                return self._get_all_faculty()
+        except Exception as e:
+            logger.error(f"Failed to retrieve faculty records: {e}")
+            raise
+
+    @staticmethod
+    def _get_all_faculty() -> typing.List["Faculty"]:
+        """Helper function to query all faculty records."""
+        from backend.models.models import Faculty
+        return Faculty.query.options(joinedload(Faculty.projects)).all()
+
+    def update_faculty_embedding_id(self, faculty_id: int, embedding_id: int):
+        """
+        Update a Faculty record's embedding ID.
+        :param faculty_id: Faculty primary key.
+        :param embedding_id: New embedding ID.
+        """
+        try:
+            with self.app.app_context():
+                self._update_faculty_embedding_id(faculty_id, embedding_id)
+        except Exception as e:
+            logger.error(f"Failed to update embedding_id for faculty_id {faculty_id}: {e}")
+            raise
+
+    @staticmethod
+    def _update_faculty_embedding_id(faculty_id: int, embedding_id: int):
+        """Helper function to update a faculty embedding ID."""
+        from backend.models.models import Faculty
+        faculty = db.session.get(Faculty, faculty_id)
+        if not faculty:
+            raise RuntimeError(f"No faculty record found with faculty_id {faculty_id}")
+        faculty.embedding_id = embedding_id
+        db.session.commit()
+
+    def delete_faculty_by_schools(self, schools: typing.List[str]):
+        """
+        Delete Faculty records belonging to any of the specified schools.
+        :param schools: List of school acronyms.
+        """
+        try:
+            with self.app.app_context():
+                self._delete_faculty_by_schools(schools)
+        except Exception as e:
+            logger.error(f"Failed to delete faculty records for schools {schools}: {e}")
+            raise
+
+    @staticmethod
+    def _delete_faculty_by_schools(schools: typing.List[str]):
+        """Helper function to delete faculty records for selected schools."""
+        from backend.models.models import Faculty
+        if not schools:
+            return
+
+        faculty_records = Faculty.query.filter(
+            or_(*(Faculty.school.contains(school) for school in schools))
+        ).all()
+
+        for faculty in faculty_records:
+            db.session.delete(faculty)
+
+        db.session.commit()
+        logger.info(f"Deleted {len(faculty_records)} faculty records for schools: {schools}.")
 
     @staticmethod
     def _get_embedding_ids_by_search_parameters(school=None,
