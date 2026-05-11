@@ -5,9 +5,15 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 INDEX_PATH = os.path.join(BASE_DIR, "..", "..", "instance", "index.faiss")
 
+# Whether to keep existing schools in the database and only (re)add new ones
+# or to clear all data and re-populate from scratch
 KEEP_EXISTING_SCHOOLS = True
 
-SCHOOLS_TO_SCRAPE = ["BATTEN"]
+# Whether to rebuild the FAISS index after populating the database
+# (only takes effect if KEEP_EXISTING_SCHOOLS is True)
+REBUILD_INDEX = False
+
+SCHOOLS_TO_SCRAPE = ["DARDEN"]
 
 SCHOOL_DEPARTMENT_DATA = {
     "BATTEN": {
@@ -16,6 +22,15 @@ SCHOOL_DEPARTMENT_DATA = {
         "departments": {
             "Batten (all)": {
                 "people_url": "https://batten.virginia.edu/faculty-research/faculty"
+            }
+        }
+    },
+    "DARDEN": {
+        "base_url": "",
+        "add_nih_data": False,
+        "departments": {
+            "Darden (all)": {
+                "people_url": "https://www.darden.virginia.edu/faculty-research/directory?faculty_type=Faculty&page="
             }
         }
     },
