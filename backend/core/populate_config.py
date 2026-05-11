@@ -7,9 +7,11 @@ INDEX_PATH = os.path.join(BASE_DIR, "..", "..", "instance", "index.faiss")
 
 # Whether to keep existing schools in the database and only (re)add new ones
 # or to clear all data and re-populate from scratch
-# Note: FAISS index will be cleared and re-populated regardless of this setting
-# to avoid mismatches between the index and the database
 KEEP_EXISTING_SCHOOLS = True
+
+# Whether to rebuild the FAISS index after populating the database
+# (only takes effect if KEEP_EXISTING_SCHOOLS is True)
+REBUILD_INDEX = False
 
 SCHOOLS_TO_SCRAPE = ["DARDEN"]
 

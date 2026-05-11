@@ -3,10 +3,12 @@ import os
 from backend.app import app
 from backend.core.populate_config import (
     KEEP_EXISTING_SCHOOLS,
+    REBUILD_INDEX,
     SCHOOLS_TO_SCRAPE,
     SCHOOL_DEPARTMENT_DATA,
     INDEX_PATH,
 )
+from backend.services.scraper.darden_scraper import DardenScraper
 from backend.services.scraper.som_scraper import SOMScraper
 from backend.utils.http_client import HttpClient
 from backend.utils.http_client_cached import HttpClientCached
@@ -26,6 +28,7 @@ scraper_service = ScraperService([
     SOMScraper(http_client),
     SEASScraper(http_client),
     BattenScraper(http_client),
+    DardenScraper(http_client),
 ])
 
 nih_service = NIHReporterService(NIHReporterProxy(http_client))
@@ -67,9 +70,19 @@ def rebuild_faiss_index():
         database_driver.update_faculty_embedding_id(faculty.faculty_id, embedding_id)
 
 
+def should_rebuild_faiss_index():
+    if KEEP_EXISTING_SCHOOLS:
+        return REBUILD_INDEX
+
+    if not REBUILD_INDEX:
+        logger.info("REBUILD_INDEX=False ignored because KEEP_EXISTING_SCHOOLS=False.")
+    return True
+
+
 if __name__ == '__main__':
     logger.info("Starting populate_db.")
     all_faculty = []
+    rebuild_index = should_rebuild_faiss_index()
 
     if KEEP_EXISTING_SCHOOLS:
         logger.info(f"Keeping existing schools outside scrape list: {SCHOOLS_TO_SCRAPE}.")
@@ -78,7 +91,10 @@ if __name__ == '__main__':
         logger.info("Clearing database.")
         database_driver.clear()
 
-    delete_faiss_index()
+    if rebuild_index:
+        delete_faiss_index()
+    else:
+        logger.info("Keeping existing FAISS index and appending embeddings for scraped schools.")
 
     try:
         faculty_dict = dict()
@@ -97,10 +113,15 @@ if __name__ == '__main__':
 
         all_faculty = list(faculty_dict.values())
 
+        if not rebuild_index:
+            for faculty in all_faculty:
+                faculty.embedding_id = embedding_service.generate_and_store_embedding(faculty)
+
         for faculty in all_faculty:
             database_driver.add_faculty(faculty)
 
-        rebuild_faiss_index()
+        if rebuild_index:
+            rebuild_faiss_index()
 
     except Exception as e:
         logger.error(f"Failed to aggregate data: {e}")
@@ -108,4 +129,5 @@ if __name__ == '__main__':
             database_driver.delete_faculty_by_schools(SCHOOLS_TO_SCRAPE)
         else:
             database_driver.clear()
-        delete_faiss_index()
+        if rebuild_index:
+            delete_faiss_index()
