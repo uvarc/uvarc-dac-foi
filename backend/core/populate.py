@@ -9,8 +9,8 @@ from backend.core.populate_config import (
     INDEX_PATH,
 )
 from backend.services.scraper.darden_scraper import DardenScraper
+from backend.services.scraper.nursing_scraper import NursingScraper
 from backend.services.scraper.som_scraper import SOMScraper
-from backend.utils.http_client import HttpClient
 from backend.utils.http_client_cached import HttpClientCached
 from backend.utils.factory import get_embedding_service, get_database_driver
 from backend.services.scraper.seas_scraper import SEASScraper
@@ -29,6 +29,7 @@ scraper_service = ScraperService([
     SEASScraper(http_client),
     BattenScraper(http_client),
     DardenScraper(http_client),
+    NursingScraper(http_client),
 ])
 
 nih_service = NIHReporterService(NIHReporterProxy(http_client))
