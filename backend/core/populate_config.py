@@ -16,6 +16,15 @@ REBUILD_INDEX = False
 SCHOOLS_TO_SCRAPE = ["DARDEN"]
 
 SCHOOL_DEPARTMENT_DATA = {
+    "NURSING": {
+        "base_url": "",
+        "add_nih_data": False,
+        "departments": {
+            "Nursing (all)": {
+                "people_url": "https://nursing.virginia.edu/research/faculty-research/"
+            }
+        }
+    },
     "BATTEN": {
         "base_url": "",
         "add_nih_data": False,
