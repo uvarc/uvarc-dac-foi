@@ -6,7 +6,6 @@ from backend.utils.institution_utils import InstitutionUtils
 from backend.services.scraper.base_scraper import BaseScraper
 from lxml import html
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class SOMScraper(BaseScraper): 
