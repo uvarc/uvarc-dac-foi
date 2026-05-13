@@ -21,39 +21,45 @@ class DataAggregator:
         self.embedding_service = embedding_service
         self.nsf_service = nsf_service
 
-    def aggregate_school_faculty_data(self, school: str) -> typing.List[Faculty]:
+    def aggregate_school_faculty_data(
+            self,
+            school: str,
+            add_nih_data: bool = True,
+            generate_embeddings: bool = True) -> typing.List[Faculty]:
         """
         Aggregate faculty data for school from scrapers, NIH RePORTER API, generate embeddings
         Outputs are DB commit-ready
         :param school: school acronym
+        :param add_nih_data: if False, skip NIH RePORTER API calls for this school
+        :param generate_embeddings: if False, leave embedding IDs unset for a later index rebuild
         :return: dictionary of department faculty data stored as Faculty model objects
         """
         school_faculty_df = self.scraper_service.get_school_faculty_data(school)
-        school_faculty = dict()
+        faculty_list = []
 
         for dept, dept_faculty_df in school_faculty_df.items():
             for faculty_profile in dept_faculty_df.itertuples():
-                faculty_identifier = (faculty_profile.Faculty_Name, faculty_profile.School, faculty_profile.Email_Address)
-
-                if faculty_identifier in school_faculty:
-                    school_faculty[faculty_identifier] = self._update_faculty_department(school_faculty[faculty_identifier], faculty_profile.Department)
-
-                else:
-                    faculty = self._build_faculty_model(faculty_profile)
+                faculty = self._build_faculty_model(faculty_profile, add_nih_data=add_nih_data)
+                if generate_embeddings:
                     faculty.embedding_id = self.embedding_service.generate_and_store_embedding(faculty)
-                    school_faculty[faculty_identifier] = faculty
+                faculty_list.append(faculty)
 
-        return list(school_faculty.values())
+        return faculty_list
 
-    def _build_faculty_model(self, faculty_profile: typing.Tuple) -> Faculty:
+    def _build_faculty_model(self, faculty_profile: typing.Tuple, add_nih_data: bool = True) -> Faculty:
         """
         Build faculty model from faculty profile
         :param faculty_profile: faculty data
+        :param add_nih_data: if False, skip NIH RePORTER API call and leave projects empty
         :return: faculty model
         """
         first_name, last_name = self._extract_names(faculty_profile)
-        logger.info(f"Fetching NIH project information for {first_name} {last_name}.")
-        projects = self._get_projects(first_name, last_name)
+        if add_nih_data:
+            logger.info(f"Fetching NIH project information for {first_name} {last_name}.")
+            projects = self._get_projects(first_name, last_name)
+        else:
+            logger.debug(f"Skipping NIH data for {first_name} {last_name} (add_nih_data=False).")
+            projects = []
         # nsf_grants = self.nsf_service.compile_project_metadata(pi_first_name=first_name, pi_last_name=last_name) if self.nsf_service else pd.DataFrame()
         logger.info(f"Fetching NSF grants for {first_name} {last_name}.")
         # grant_ids = self.get_nsf_grant_ids(first_name, last_name)
@@ -158,16 +164,6 @@ class DataAggregator:
         """
         names = faculty_profile.Faculty_Name.split(" ")
         return names[0], names[-1]
-
-    @staticmethod
-    def _update_faculty_department(faculty: Faculty, new_department: str) -> Faculty:
-        """
-        Update faculty department field, used when faculties are encountered more than once across dept pages
-        :param faculty: Faculty object
-        :param new_department: faculty department field
-        """
-        faculty.department = ",".join(sorted(set(faculty.department.split(",") + [new_department])))
-        return faculty
 
     def _has_funding(self, projects: typing.List[Project]) -> bool:
         """

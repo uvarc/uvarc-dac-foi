@@ -17,9 +17,9 @@ spec:
       {{- end }}
       labels:
         {{- include "uvarc-dac-foi.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+          {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -44,21 +44,32 @@ spec:
                 secretKeyRef:
                   name: {{ include "uvarc-dac-foi.fullname" . }}
                   key: DATABASE_URL
+
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ include "uvarc-dac-foi.fullname" . }}
                   key: OPENAI_API_KEY
+
+            - name: OPENAI_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "uvarc-dac-foi.fullname" . }}
+                  key: OPENAI_BASE_URL
+
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
