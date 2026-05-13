@@ -1,5 +1,6 @@
 import typing
 import logging
+from urllib.parse import quote
 
 from backend.utils.http_client import HttpClient
 from backend.utils.institution_utils import InstitutionUtils
@@ -39,6 +40,9 @@ class SOMScraper(BaseScraper):
                 if url.startswith(self.URL_PREFIX):
                     url = url[len(self.URL_PREFIX):]
 
+                # URL-encode to handle spaces and special characters while preserving URL structure
+                url = quote(url, safe='/:?&=-_.')
+                
                 profile_urls.append(url)
 
         except html.etree.XMLSyntaxError as e:
