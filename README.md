@@ -39,3 +39,5 @@ To add a new school:
 * run the populate script to add the new school's faculty profiles to the database and index.
     * To get more verbose output on the scraping process, change the logging level at the top of `backend/utils/institution_utils.py` to `logging.DEBUG`.
 * add the school to the `<select id="school">` element in `frontend/html/search.html` to make it available as a filter option in the search app. If there are multiple departments for the school, add these at the top of `frontend/html/static/js/search.js` in the `schoolDepartments` object.
+## Pushing a new release to prod
+Create a new GitHub Release, with a tag that has the new version number, and that release will be built by Docker and pushed to prod.
