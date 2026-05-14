@@ -153,6 +153,30 @@ class EmbeddingStorage:
             has_funding=has_funding
         )
 
+    def search_exact_words(self, query: str, top_k: int, school: str = None,
+                           department: str = None, activity_code: str = None,
+                           agency_ic_admin: str = None, has_funding: bool = None) -> typing.List[int]:
+        """
+        Search for exact words in faculty profiles
+        :param query: exact words to search
+        :param top_k: number of results to return
+        :param school: school name
+        :param department: department name
+        :param activity_code: activity code
+        :param agency_ic_admin: agency ic admin name
+        :param has_funding: faculty has funding
+        :return: List of faculty EIDs
+        """
+        return self.database_driver.search_exact_words(
+            query=query,
+            top_k=top_k,
+            school=school,
+            department=department,
+            activity_code=activity_code,
+            agency_ic_admin=agency_ic_admin,
+            has_funding=has_funding
+        )
+
     @staticmethod
     def are_search_parameters_empty(*parameters) -> bool:
         """Check if all search parameters are empty"""

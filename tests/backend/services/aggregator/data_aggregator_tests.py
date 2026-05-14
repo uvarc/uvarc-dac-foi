@@ -5,6 +5,7 @@ from datetime import date, timedelta
 from backend.services.aggregator.data_aggregator import DataAggregator
 from backend.services.embedding.embedding_service import EmbeddingService
 from backend.services.nih.nih_reporter_service import NIHReporterService
+from backend.services.nsf.nsf_service import NSFService
 from backend.services.scraper.scraper_service import ScraperService
 from backend.models.models import Faculty, Project
 
@@ -13,7 +14,14 @@ class TestDataAggregator(unittest.TestCase):
         self.scraper_service = MagicMock(spec=ScraperService)
         self.nih_service = MagicMock(spec=NIHReporterService)
         self.embedding_service = MagicMock(spec=EmbeddingService)
-        self.aggregator = DataAggregator(self.scraper_service, self.nih_service, self.embedding_service)
+        self.nsf_service = MagicMock(spec=NSFService)
+        self.nsf_service.compile_project_metadata.return_value = pd.DataFrame()
+        self.aggregator = DataAggregator(
+            self.scraper_service,
+            self.nih_service,
+            self.embedding_service,
+            self.nsf_service,
+        )
 
     def test_aggregate_school_faculty_data(self):
         mock_faculty_data = {
@@ -47,6 +55,32 @@ class TestDataAggregator(unittest.TestCase):
         self.assertEqual(len(faculty_list), 1)
         self.assertEqual(faculty_list[0].name, "John Doe")
         self.assertEqual(faculty_list[0].embedding_id, 1)
+
+    def test_aggregate_school_faculty_data_skips_nsf_when_disabled(self):
+        mock_faculty_data = {
+            "CS": pd.DataFrame([
+                {
+                    "Faculty_Name": "John Doe",
+                    "School": "SEAS",
+                    "Email_Address": "johndoe@virginia.edu",
+                    "Department": "CS",
+                    "About_Section": "About John",
+                    "Profile_URL": "https://profile.com"
+                 }
+            ])
+        }
+
+        self.scraper_service.get_school_faculty_data.return_value = mock_faculty_data
+        self.nih_service.compile_project_metadata.return_value = pd.DataFrame()
+
+        faculty_list = self.aggregator.aggregate_school_faculty_data(
+            "SEAS",
+            add_nsf_data=False,
+            generate_embeddings=False,
+        )
+
+        self.nsf_service.compile_project_metadata.assert_not_called()
+        self.assertEqual(faculty_list[0].grants, [])
 
     def test_build_faculty_model(self):
         mock_profile = MagicMock(
