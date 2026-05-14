@@ -97,6 +97,48 @@ def should_rebuild_faiss_index():
     return True
 
 
+
+def delete_faiss_index():
+    logger.info("Deleting FAISS index.")
+    if os.path.exists(INDEX_PATH):
+        os.remove(INDEX_PATH)
+    embedding_service.embedding_storage.index = None
+
+
+def merge_faculty_records(faculty_dict, faculty):
+    faculty_identifier = (faculty.name, faculty.email)
+
+    if faculty_identifier in faculty_dict:
+        existing = faculty_dict[faculty_identifier]
+
+        # Merge departments
+        existing.department = ",".join(
+            sorted(set(existing.department.split(",") + faculty.department.split(","))))
+
+        # Merge schools
+        existing.school = ",".join(sorted(set(existing.school.split(",") + faculty.school.split(","))))
+    else:
+        faculty_dict[faculty_identifier] = faculty
+
+
+def rebuild_faiss_index():
+    logger.info("Rebuilding FAISS index.")
+    delete_faiss_index()
+
+    for faculty in database_driver.get_all_faculty():
+        embedding_id = embedding_service.generate_and_store_embedding(faculty)
+        database_driver.update_faculty_embedding_id(faculty.faculty_id, embedding_id)
+
+
+def should_rebuild_faiss_index():
+    if KEEP_EXISTING_SCHOOLS:
+        return REBUILD_INDEX
+
+    if not REBUILD_INDEX:
+        logger.info("REBUILD_INDEX=False ignored because KEEP_EXISTING_SCHOOLS=False.")
+    return True
+
+
 if __name__ == '__main__':
     logger.info("Starting populate_db.")
     all_faculty = []
@@ -116,6 +158,24 @@ if __name__ == '__main__':
 
     try:
         faculty_dict = dict()
+
+        for school in SCHOOLS_TO_SCRAPE:
+            school_config = SCHOOL_DEPARTMENT_DATA.get(school, {})
+            add_nih_data = school_config.get("add_nih_data", True)
+            school_faculty = data_aggregator.aggregate_school_faculty_data(
+                school,
+                add_nih_data=add_nih_data,
+                generate_embeddings=False,
+            )
+
+            for faculty in school_faculty:
+                merge_faculty_records(faculty_dict, faculty)
+
+        all_faculty = list(faculty_dict.values())
+
+        if not rebuild_index:
+            for faculty in all_faculty:
+                faculty.embedding_id = embedding_service.generate_and_store_embedding(faculty)
 
         with logging_redirect_tqdm():
             for school in progress_bar(SCHOOLS_TO_SCRAPE, "Scraping schools"):
@@ -146,6 +206,9 @@ if __name__ == '__main__':
 
             if rebuild_index:
                 rebuild_faiss_index()
+
+        if rebuild_index:
+            rebuild_faiss_index()
 
     except Exception as e:
         logger.error(f"Failed to aggregate data: {e}")
