@@ -19,7 +19,7 @@ SCHOOL_DEPARTMENT_DATA = {
     "NURSING": {
         "base_url": "",
         "add_nih_data": False,
-        "add_nsf_data": False,
+        "add_nsf_data": True,
         "departments": {
             "Nursing (all)": {
                 "people_url": "https://nursing.virginia.edu/research/faculty-research/"
