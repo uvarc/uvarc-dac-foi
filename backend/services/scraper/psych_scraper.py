@@ -1,23 +1,21 @@
 import typing
 import logging
-from urllib.parse import quote
 
 from backend.utils.http_client import HttpClient
 from backend.utils.institution_utils import InstitutionUtils
 from backend.services.scraper.base_scraper import BaseScraper
 from lxml import html
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class SOMScraper(BaseScraper): 
-    SCHOOL_ID = "SOM"
-    URL_PREFIX = "https://med.virginia.edu"
-    CONTACT_BLOCK_NAME_XPATH = '//a[contains(@href, "?facbio")]'
-    SOM_FACULTY_NAME_XPATH= '//h1[@class="post-title"]/text()'
+class PsychScraper(BaseScraper): 
+    SCHOOL_ID = "PSYCH"
+    URL_PREFIX = "https://psychology.as.virginia.edu/"
+    CONTACT_BLOCK_NAME_XPATH = '//a[@class="node-title" and @rel="bookmark"]/@href'
+    EDUCATION_FACULTY_NAME_XPATH= '//h1[@class="post-title"]/text()'
     EMAIL_XPATH = '//a[starts-with(@href, "mailto:")]/@href'
-    ABOUT_XPATH = '//h4[@class="faculty underlined-heading" and contains(text(), "Research Description")]'
-    RESEARCH_INTERESTS_XPATH = '//h4[@class="faculty underlined-heading" and contains(text(), "Research Interests")]'
-    RESEARCH_DISCIPLINES_XPATH = '//h4[@class="faculty underlined-heading" and contains(text(), "Research Disciplines")]'
+    BIOGRAPHY_XPATH = '//h4[@class="faculty underlined-heading" and contains(text(), "Research Interests")]'
 
     def __init__(self, http_client: HttpClient):
         self.http_client = http_client
@@ -40,9 +38,6 @@ class SOMScraper(BaseScraper):
                 if url.startswith(self.URL_PREFIX):
                     url = url[len(self.URL_PREFIX):]
 
-                # URL-encode to handle spaces and special characters while preserving URL structure
-                url = quote(url, safe='/:?&=-_.')
-                
                 profile_urls.append(url)
 
         except html.etree.XMLSyntaxError as e:
@@ -174,37 +169,12 @@ class SOMScraper(BaseScraper):
 
         # Join the extracted text
         return "\n".join(section_text)
+    
 
-# SOMtest = SOMScraper(HttpClient())
+base_url = "https://psychology.as.virginia.edu/faculty"
 
-# from populate_config import *
+EDTest = PsychScraper(HttpClient())
 
-# for department in SCHOOL_DEPARTMENT_DATA["SOM"]["departments"]:
-#     # print(SCHOOL_DEPARTMENT_DATA["SOM"]["departments"][department]["people_url"])
-#     base_url = SCHOOL_DEPARTMENT_DATA["SOM"]["departments"][department]["people_url"]
+profile_urls = EDTest.get_profile_endpoints_from_people(people_url= base_url)
 
-#     # print(base_url)
-
-#     profile_urls = SOMtest.get_profile_endpoints_from_people(people_url= base_url)
-
-#     # print(profile_urls)
-
-#     for index, name in enumerate(profile_urls):
-#         print(SOMtest.get_name_from_profile(base_url+name))
-#     #     print(SOMtest.get_about_from_profile(base_url+name))
-#         print(SOMtest.get_emails_from_profile(base_url+name))
-
-
-########################### THIS WORKS ###########################
-
-# base_url = "https://med.virginia.edu/pharm/primary-faculty/"
-
-# profile_urls = SOMtest.get_profile_endpoints_from_people(people_url= base_url)
-
-# print(profile_urls)
-
-# for index, name in enumerate(profile_urls):
-#     print(base_url+name)
-#     print(f"Name: {SOMtest.get_name_from_profile(base_url+name)}\n")
-#     print(f"About: {SOMtest.get_about_from_profile(base_url+name)}\n")
-#     print(f"Email: {SOMtest.get_emails_from_profile(base_url+name)}\n")
+print(profile_urls)

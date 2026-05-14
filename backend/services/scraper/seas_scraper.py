@@ -106,3 +106,47 @@ class SEASScraper(BaseScraper):
         except Exception as e:
             logger.error(f"Unexpected error processing page {profile_url}: {e}")
             raise
+
+# SEASTest = SEASScraper(HttpClient())
+
+# from populate_config import *
+
+# for department in SCHOOL_DEPARTMENT_DATA["SEAS"]["departments"]:
+#     department_url = SCHOOL_DEPARTMENT_DATA["SEAS"]["departments"][department]["people_url"]
+#     base_url = SCHOOL_DEPARTMENT_DATA["SEAS"]["base_url"]
+
+#     print(base_url)
+
+#     profile_urls = SEASTest.get_profile_endpoints_from_people(people_url= department_url)
+
+#     for index, name in enumerate(profile_urls):
+#         print(f"Name: {SEASTest.get_name_from_profile(base_url+name)}")
+#         print(f"About: {SEASTest.get_about_from_profile(base_url+name)}")
+#         print(f"Email: {SEASTest.get_emails_from_profile(base_url+name)}")
+#         print("-------------------------------------------------------------")
+
+
+# print("-------------------------------------------------------------")
+# print(InstitutionUtils.get_departments_from_school("SEAS"))
+
+# print(InstitutionUtils.get_school_from_department("Chemical Engineering"))
+
+# print(InstitutionUtils.get_school_base_url("SEAS"))
+
+# print(InstitutionUtils.get_people_url_from_department("Chemical Engineering"))
+
+########################### THIS WORKS ###########################
+
+# base_url = "https://engineering.virginia.edu/department/chemical-engineering/people?keyword=&position=2&impact_area=All&research_area=All"
+
+# engineering_url = "https://engineering.virginia.edu/"
+
+# profile_urls = SEASTest.get_profile_endpoints_from_people(people_url= base_url)
+
+# for index, name in enumerate(profile_urls):
+#     print(f"Name: {SEASTest.get_name_from_profile(engineering_url+name)}\n")
+#     print(f"About: {SEASTest.get_about_from_profile(engineering_url+name)}\n")
+#     print(f"Email: {SEASTest.get_emails_from_profile(engineering_url+name)}\n")
+#     print("-------------------------------------------------------------")
+
+
