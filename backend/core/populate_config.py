@@ -19,6 +19,7 @@ SCHOOL_DEPARTMENT_DATA = {
     "NURSING": {
         "base_url": "",
         "add_nih_data": False,
+        "add_nsf_data": False,
         "departments": {
             "Nursing (all)": {
                 "people_url": "https://nursing.virginia.edu/research/faculty-research/"
@@ -28,6 +29,7 @@ SCHOOL_DEPARTMENT_DATA = {
     "BATTEN": {
         "base_url": "",
         "add_nih_data": False,
+        "add_nsf_data": False,
         "departments": {
             "Batten (all)": {
                 "people_url": "https://batten.virginia.edu/faculty-research/faculty"
@@ -37,6 +39,7 @@ SCHOOL_DEPARTMENT_DATA = {
     "DARDEN": {
         "base_url": "",
         "add_nih_data": False,
+        "add_nsf_data": False,
         "departments": {
             "Darden (all)": {
                 "people_url": "https://www.darden.virginia.edu/faculty-research/directory?faculty_type=Faculty&page="
@@ -45,6 +48,8 @@ SCHOOL_DEPARTMENT_DATA = {
     },
     "SEAS": {
         "base_url": "https://engineering.virginia.edu",
+        "add_nih_data": True,
+        "add_nsf_data": True,
         "departments": {
             "Biomedical Engineering": {
                 "people_url": "https://engineering.virginia.edu/department/biomedical-engineering/people?keyword=&position=2&impact_area=All&research_area=All",
@@ -81,6 +86,8 @@ SCHOOL_DEPARTMENT_DATA = {
 
     "SOM": {
         "base_url": "https://med.virginia.edu",
+        "add_nih_data": True,
+        "add_nsf_data": True,
         "departments": {
             "Cell Biology": {
                 "people_url": "https://med.virginia.edu/cell-biology/department-faculty/",

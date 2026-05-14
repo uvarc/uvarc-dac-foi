@@ -25,12 +25,14 @@ class DataAggregator:
             self,
             school: str,
             add_nih_data: bool = True,
+            add_nsf_data: bool = True,
             generate_embeddings: bool = True) -> typing.List[Faculty]:
         """
         Aggregate faculty data for school from scrapers, NIH RePORTER API, generate embeddings
         Outputs are DB commit-ready
         :param school: school acronym
         :param add_nih_data: if False, skip NIH RePORTER API calls for this school
+        :param add_nsf_data: if False, skip NSF API calls for this school
         :param generate_embeddings: if False, leave embedding IDs unset for a later index rebuild
         :return: dictionary of department faculty data stored as Faculty model objects
         """
@@ -39,18 +41,27 @@ class DataAggregator:
 
         for dept, dept_faculty_df in school_faculty_df.items():
             for faculty_profile in dept_faculty_df.itertuples():
-                faculty = self._build_faculty_model(faculty_profile, add_nih_data=add_nih_data)
+                faculty = self._build_faculty_model(
+                    faculty_profile,
+                    add_nih_data=add_nih_data,
+                    add_nsf_data=add_nsf_data,
+                )
                 if generate_embeddings:
                     faculty.embedding_id = self.embedding_service.generate_and_store_embedding(faculty)
                 faculty_list.append(faculty)
 
         return faculty_list
 
-    def _build_faculty_model(self, faculty_profile: typing.Tuple, add_nih_data: bool = True) -> Faculty:
+    def _build_faculty_model(
+            self,
+            faculty_profile: typing.Tuple,
+            add_nih_data: bool = True,
+            add_nsf_data: bool = True) -> Faculty:
         """
         Build faculty model from faculty profile
         :param faculty_profile: faculty data
         :param add_nih_data: if False, skip NIH RePORTER API call and leave projects empty
+        :param add_nsf_data: if False, skip NSF API call and leave grants empty
         :return: faculty model
         """
         first_name, last_name = self._extract_names(faculty_profile)
@@ -61,23 +72,26 @@ class DataAggregator:
             logger.debug(f"Skipping NIH data for {first_name} {last_name} (add_nih_data=False).")
             projects = []
         # nsf_grants = self.nsf_service.compile_project_metadata(pi_first_name=first_name, pi_last_name=last_name) if self.nsf_service else pd.DataFrame()
-        logger.info(f"Fetching NSF grants for {first_name} {last_name}.")
         # grant_ids = self.get_nsf_grant_ids(first_name, last_name)
         # if not grant_ids:
         #     logger.warning(f"No NSF grant IDs found for {first_name} {last_name}.")
         # else:
         #     logger.info(f"IDs for {first_name} {last_name}: {', '.join(grant_ids)}")
-        grants = self.get_nsf_grants(first_name, last_name)
         grants_list = []
-        if grants.empty:
-            logger.warning(f"No NSF grants found for {first_name} {last_name}.")
+        if add_nsf_data:
+            logger.info(f"Fetching NSF grants for {first_name} {last_name}.")
+            grants = self.get_nsf_grants(first_name, last_name)
+            if grants.empty:
+                logger.warning(f"No NSF grants found for {first_name} {last_name}.")
+            else:
+                grants_list = [Grant(
+                        nsf_id=row['id'],
+                        date=self.nsf_service.process_date_string(row['date']),
+                        start_date=self.nsf_service.process_date_string(row['start_date']),
+                        title=row['title']
+                    ) for _, row in grants.iterrows()]
         else:
-            grants_list = [Grant(
-                    nsf_id=row['id'],
-                    date=self.nsf_service.process_date_string(row['date']), 
-                    start_date=self.nsf_service.process_date_string(row['start_date']), 
-                    title=row['title']
-                ) for _, row in grants.iterrows()]
+            logger.debug(f"Skipping NSF data for {first_name} {last_name} (add_nsf_data=False).")
         faculty = Faculty(
             name=faculty_profile.Faculty_Name,
             school=faculty_profile.School,

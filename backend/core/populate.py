@@ -106,9 +106,11 @@ if __name__ == '__main__':
         for school in SCHOOLS_TO_SCRAPE:
             school_config = SCHOOL_DEPARTMENT_DATA.get(school, {})
             add_nih_data = school_config.get("add_nih_data", True)
+            add_nsf_data = school_config.get("add_nsf_data", True)
             school_faculty = data_aggregator.aggregate_school_faculty_data(
                 school,
                 add_nih_data=add_nih_data,
+                add_nsf_data=add_nsf_data,
                 generate_embeddings=False,
             )
 
